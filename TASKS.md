@@ -30,7 +30,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(db): add fifo, purchase, production and return functions
 - [x] feat(db): add report views
 - [x] feat(db): add notifications and daily cron jobs
-- [ ] feat(template): seed telur asin template
+- [x] feat(template): seed telur asin template
 
 ## M1.3 Engine
 
