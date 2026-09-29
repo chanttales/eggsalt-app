@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { BoilSheet } from "@/components/boil-sheet";
+import { ReceiveSheet, ReturnSheet } from "@/components/stock-sheets";
 import { EmptyState, Page, Section, StagePill } from "@/components/ui";
 import { count, daysUntil, rupiah, shortDate } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
@@ -64,6 +65,8 @@ function StockScreen() {
       </Section>
 
       {action === "rebus" && <BoilSheet onClose={close} />}
+      {isOwner && action === "terima" && <ReceiveSheet onClose={close} />}
+      {isOwner && action === "retur" && <ReturnSheet lotId={params.get("lot")} onClose={close} />}
     </Page>
   );
 }
