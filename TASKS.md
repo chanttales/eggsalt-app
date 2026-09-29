@@ -19,7 +19,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(domain): add money, quantity and date helpers (IDR, WIB)
 - [x] feat(domain): add costing math (lot cost with bonus, batch hpp, order profit)
 - [x] test(domain): cover costing with telur asin numbers
-- [ ] feat(domain): add board graph and rule schemas (zod)
+- [x] feat(domain): add board graph and rule schemas (zod)
 - [ ] feat(domain): add rule evaluator
 - [ ] feat(db): add workspace, member and rls helpers
 - [ ] feat(db): add parties, items, states, products and prices
