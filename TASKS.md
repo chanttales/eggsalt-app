@@ -43,6 +43,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(engine): add receive-stock, produce and return-lot
 - [x] feat(db): add other income money kind
 - [x] feat(engine): add record-money with cost allocation
+- [x] feat(db): skip reversed expenses in order profit
 - [ ] feat(engine): add undo via compensating actions
 
 ## M1.4 Screens
