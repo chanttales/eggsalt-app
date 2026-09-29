@@ -63,7 +63,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): add delivery and payment flows
 - [x] feat(web): add money screen and expense entry
 - [x] feat(web): add profit reports
-- [ ] feat(web): add board editor (phone list view)
+- [x] feat(web): add board editor (phone list view)
 - [ ] feat(web): add board editor canvas (web)
 
 ## M1.5 Android

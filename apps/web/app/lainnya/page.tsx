@@ -12,6 +12,9 @@ export default function MorePage() {
         <Link href="/laporan" className={secondaryButton}>
           {t("report.title")}
         </Link>
+        <Link href="/atur/papan" className={secondaryButton}>
+          {t("editor.boards")}
+        </Link>
         <SignOutButton />
       </section>
     </>
