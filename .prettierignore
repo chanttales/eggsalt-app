@@ -2,3 +2,4 @@ pnpm-lock.yaml
 docs/design/
 out/
 .next/
+apps/web/android/
