@@ -1,5 +1,5 @@
 // Engine operations by name. Each op runs inside one database transaction that already knows the
-// caller and has checked they belong to the workspace. A later task adds undo.
+// caller and has checked they belong to the workspace.
 
 import type { TransactionSql } from "postgres";
 import { z } from "zod";
@@ -16,6 +16,7 @@ import { createCard, moveTo } from "./flow.ts";
 import { EngineError } from "./http.ts";
 import { ledgerOps } from "./ledger-ops.ts";
 import { moneyOps } from "./money.ts";
+import { undoOps } from "./undo.ts";
 
 export type Role = "owner" | "staff";
 
@@ -147,4 +148,5 @@ export const ops: Record<string, Op> = {
 
   ...ledgerOps,
   ...moneyOps,
+  ...undoOps,
 };

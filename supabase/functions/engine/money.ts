@@ -155,7 +155,7 @@ export const moneyOps: Record<string, Op> = {
         await exists("stock_lot", a.lotId);
       }
       const { entryId, allocated } = await post(ctx, input);
-      return { entryId, kind: input.kind, amount: input.amount, allocated };
+      return { entryId, kind: input.kind, amount: input.amount, allocated, entryIds: [entryId] };
     });
   },
 };
