@@ -23,6 +23,7 @@ import {
   type Stage,
 } from "./domain.ts";
 import { EngineError } from "./http.ts";
+import { recordMoneyAction } from "./money.ts";
 import type { OpContext } from "./ops.ts";
 import { batchOf, moveStock, release, reserve } from "./stock.ts";
 
@@ -270,8 +271,8 @@ async function runAction(
       for (const i of handled) handledBy.set(i, index);
       return detail;
     }
-    default:
-      throw new EngineError("not_implemented", `Action ${action.action} is not available yet`);
+    case "record_money":
+      return recordMoneyAction(ctx, card, data, action);
   }
 }
 

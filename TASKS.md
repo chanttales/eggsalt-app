@@ -41,7 +41,8 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(engine): add create-card and move-card with idempotency
 - [x] feat(engine): add stock actions (reserve, release, move)
 - [x] feat(engine): add receive-stock, produce and return-lot
-- [ ] feat(engine): add record-money with cost allocation
+- [x] feat(db): add other income money kind
+- [x] feat(engine): add record-money with cost allocation
 - [ ] feat(engine): add undo via compensating actions
 
 ## M1.4 Screens

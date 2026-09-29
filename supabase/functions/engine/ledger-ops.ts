@@ -6,16 +6,16 @@ import { z } from "zod";
 import { EngineError } from "./http.ts";
 import type { Op, OpContext } from "./ops.ts";
 
-const method = z.enum(["cash", "transfer", "qris", "credit_note", "other"]);
+export const method = z.enum(["cash", "transfer", "qris", "credit_note", "other"]);
 
-function parse<T>(schema: z.ZodType<T>, input: unknown): T {
+export function parse<T>(schema: z.ZodType<T>, input: unknown): T {
   const result = schema.safeParse(input);
   if (!result.success) throw new EngineError("bad_request", z.prettifyError(result.error));
   return result.data;
 }
 
 /** Runs `work` once per idempotency key; the result is kept on the op's event. */
-async function once(
+export async function once(
   ctx: OpContext,
   op: string,
   key: string,
