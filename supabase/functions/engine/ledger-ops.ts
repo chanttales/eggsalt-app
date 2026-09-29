@@ -1,6 +1,7 @@
-// Direct stock ops for the Terima stok, Rebus and Retur screens. Each is one ledger function call
-// (receive_purchase, produce_batch, return_lot) after checking ids belong to the workspace and
-// that reserved stock isn't touched. Retries with the same key return the first result.
+// Direct stock ops for onboarding and the Terima stok, Rebus and Retur screens: opening stock and
+// the ledger functions receive_purchase, produce_batch and return_lot, after checking ids belong
+// to the workspace and that reserved stock isn't touched. Retries with the same key return the
+// first result.
 
 import { z } from "zod";
 import { EngineError } from "./http.ts";
@@ -112,7 +113,45 @@ const returnInput = z.strictObject({
   method: method.default("cash"),
 });
 
+const openingInput = z.strictObject({
+  idempotencyKey: z.guid(),
+  stateId: z.guid(),
+  qty: z.int().positive(),
+  /** Cost per egg; defaults to the latest buy price for this state, or 0 if there is none. */
+  unitCost: z.number().nonnegative().optional(),
+});
+
 export const ledgerOps: Record<string, Op> = {
+  /** Stock already on hand when the business starts using Papan. No money moves. */
+  "opening-stock": async (ctx, raw) => {
+    const input = parse(openingInput, raw);
+    if (ctx.role !== "owner")
+      throw new EngineError("forbidden", "Only an owner can set opening stock");
+    return once(ctx, "opening-stock", input.idempotencyKey, null, async () => {
+      const { tx, workspaceId } = ctx;
+      const state = await stateOf(ctx, input.stateId);
+      let unitCost = input.unitCost;
+      if (unitCost === undefined) {
+        const [price] = await tx<{ unit_price: string }[]>`
+          select p.unit_price from price p join product d on d.id = p.product_id
+           where p.workspace_id = ${workspaceId} and p.kind = 'buy' and d.state_id = ${input.stateId}
+           order by p.valid_from desc limit 1`;
+        unitCost = price ? Number(price.unit_price) : 0;
+      }
+      const [lot] = await tx<{ id: string }[]>`
+        insert into stock_lot (workspace_id, item_id, state_id, source, qty_in, qty_remaining,
+                               unit_cost)
+        values (${workspaceId}, ${state.itemId}, ${input.stateId}, 'opening', ${input.qty}, 0,
+                round(${unitCost}::numeric, 4))
+        returning id`;
+      await tx`
+        insert into stock_movement (workspace_id, lot_id, qty, reason, unit_cost, created_by)
+        values (${workspaceId}, ${lot?.id}, ${input.qty}, 'opening', round(${unitCost}::numeric, 4),
+                auth.uid())`;
+      return { lotId: lot?.id, qty: input.qty, unitCost, ...(await ledgerRows(ctx)) };
+    });
+  },
+
   "receive-stock": async (ctx, raw) => {
     const input = parse(receiveInput, raw);
     return once(ctx, "receive-stock", input.idempotencyKey, input.cardId ?? null, async () => {
