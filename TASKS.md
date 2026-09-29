@@ -39,7 +39,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(db): add keys to boards and items for graph references
 - [x] feat(engine): add create-card and move-card with idempotency
 - [x] feat(engine): add stock actions (reserve, release, move)
-- [ ] feat(engine): add receive-stock, produce and return-lot
+- [x] feat(engine): add receive-stock, produce and return-lot
 - [ ] feat(engine): add record-money with cost allocation
 - [ ] feat(engine): add undo via compensating actions
 
