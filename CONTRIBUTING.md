@@ -32,21 +32,22 @@ Steps: PRD → Design System → IA → User Flow → Wireframes → Technical A
 
 **Scopes** (match the monorepo layout from the system design):
 
-| Scope | Area |
-|---|---|
-| `web` | Next.js app screens and routing |
-| `mobile` | Capacitor config and native projects |
-| `ui` | Design-system components and tokens |
-| `domain` | Shared types, schemas, formula/rule evaluator |
-| `engine` | Workflow engine, actions, costing |
-| `db` | Supabase migrations, RLS, SQL functions, seed |
-| `template` | Business templates (e.g. telur-asin) |
-| `ci` / `repo` | GitHub Actions, tooling, root config |
-| `docs` | Documentation |
+| Scope         | Area                                          |
+| ------------- | --------------------------------------------- |
+| `web`         | Next.js app screens and routing               |
+| `mobile`      | Capacitor config and native projects          |
+| `ui`          | Design-system components and tokens           |
+| `domain`      | Shared types, schemas, formula/rule evaluator |
+| `engine`      | Workflow engine, actions, costing             |
+| `db`          | Supabase migrations, RLS, SQL functions, seed |
+| `template`    | Business templates (e.g. telur-asin)          |
+| `ci` / `repo` | GitHub Actions, tooling, root config          |
+| `docs`        | Documentation                                 |
 
-**Format rules:** imperative mood, lowercase, no period, subject ≤ 72 chars. Add a body when the *why* isn't obvious. Breaking changes use `!` (`feat(engine)!: …`) plus a `BREAKING CHANGE:` footer.
+**Format rules:** imperative mood, lowercase, no period, subject ≤ 72 chars. Add a body when the _why_ isn't obvious. Breaking changes use `!` (`feat(engine)!: …`) plus a `BREAKING CHANGE:` footer.
 
 Examples:
+
 ```
 build(repo): initialize pnpm monorepo with next.js app
 ci(repo): add husky, lint-staged and commitlint pre-commit hooks
@@ -61,15 +62,15 @@ Enforced by **commitlint** (`@commitlint/config-conventional` + scope enum) in t
 
 Installed in the first development task, before any feature code.
 
-| Hook | Tool | Runs on | Target time |
-|---|---|---|---|
-| `pre-commit` | **Husky** + **lint-staged** | Staged files only | < 5 s |
-| · formatting | Prettier (+ `prettier-plugin-tailwindcss`) | `*.{ts,tsx,js,json,md,css,yml}` | |
-| · linting | ESLint (`next/core-web-vitals`, `@typescript-eslint`) with `--max-warnings=0` | `*.{ts,tsx}` | |
-| · SQL format | `sql-formatter` (optional) | `supabase/migrations/*.sql` | |
-| · secrets | **gitleaks** `protect --staged` (if installed; skip gracefully otherwise) | Staged diff | |
-| · file guard | Block files > 500 KB and `.env*` except `.env.example` | Staged files | |
-| `commit-msg` | commitlint | Message | < 1 s |
+| Hook         | Tool                                                                          | Runs on                         | Target time |
+| ------------ | ----------------------------------------------------------------------------- | ------------------------------- | ----------- |
+| `pre-commit` | **Husky** + **lint-staged**                                                   | Staged files only               | < 5 s       |
+| · formatting | Prettier (+ `prettier-plugin-tailwindcss`)                                    | `*.{ts,tsx,js,json,md,css,yml}` |             |
+| · linting    | ESLint (`next/core-web-vitals`, `@typescript-eslint`) with `--max-warnings=0` | `*.{ts,tsx}`                    |             |
+| · SQL format | `sql-formatter` (optional)                                                    | `supabase/migrations/*.sql`     |             |
+| · secrets    | **gitleaks** `protect --staged` (if installed; skip gracefully otherwise)     | Staged diff                     |             |
+| · file guard | Block files > 500 KB and `.env*` except `.env.example`                        | Staged files                    |             |
+| `commit-msg` | commitlint                                                                    | Message                         | < 1 s       |
 
 Not in pre-commit (too slow; in CI): full `tsc --noEmit`, tests, `next build`.
 
@@ -96,6 +97,7 @@ Not in pre-commit (too slow; in CI): full `tsc --noEmit`, tests, `next build`.
 ## 7. Definition of Done for a task (added)
 
 A task is done and may be committed when:
+
 - [ ] It does exactly the one thing described in the task, nothing more.
 - [ ] Pre-commit hooks pass (format, lint, secrets).
 - [ ] `pnpm typecheck` passes locally for the touched package.
