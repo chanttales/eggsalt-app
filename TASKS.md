@@ -68,6 +68,6 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 
 ## M1.5 Android
 
-- [ ] build(mobile): add capacitor with android project
-- [ ] feat(mobile): add back button, network status and local notifications
-- [ ] ci(mobile): build and attach signed apk to github releases
+- [x] build(mobile): add capacitor with android project
+- [x] feat(mobile): add back button, network status and local notifications
+- [x] ci(mobile): build and attach signed apk to github releases

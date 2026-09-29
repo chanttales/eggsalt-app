@@ -1,0 +1,96 @@
+name: Release Android
+
+# Tag a version (git tag v0.1.0 && git push origin v0.1.0) to build a signed APK and attach it to
+# a GitHub Release. Needs repository secrets ANDROID_KEYSTORE_BASE64 (base64 of the .jks),
+# ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS and ANDROID_KEY_PASSWORD, and repository variables
+# NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: release-android-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - run: pnpm install --frozen-lockfile
+
+      # Bundled into the APK, so no base path: the app is served from the WebView's root.
+      - name: Build web and copy it into the Android project
+        working-directory: apps/web
+        run: pnpm android:sync
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Version from the tag
+        id: version
+        run: |
+          name="${GITHUB_REF_NAME#v}"
+          [[ "$GITHUB_REF_TYPE" == tag ]] || name="0.0.0-${GITHUB_SHA::7}"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "code=$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Gradle release build (unsigned)
+        working-directory: apps/web/android
+        run: >
+          ./gradlew --no-daemon assembleRelease
+          -Pandroid.injected.version.name=${{ steps.version.outputs.name }}
+          -Pandroid.injected.version.code=${{ steps.version.outputs.code }}
+
+      - name: Sign the APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          tools="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          keystore="$RUNNER_TEMP/release.jks"
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          unsigned=apps/web/android/app/build/outputs/apk/release/app-release-unsigned.apk
+          apk="papan-${{ steps.version.outputs.name }}.apk"
+          "$tools/zipalign" -f -p 4 "$unsigned" "$RUNNER_TEMP/aligned.apk"
+          "$tools/apksigner" sign --ks "$keystore" --ks-pass env:KEYSTORE_PASSWORD \
+            --ks-key-alias "$KEY_ALIAS" --key-pass env:KEY_PASSWORD \
+            --out "$apk" "$RUNNER_TEMP/aligned.apk"
+          "$tools/apksigner" verify "$apk"
+          rm "$keystore"
+          echo "APK=$apk" >> "$GITHUB_ENV"
+
+      - name: Attach to the GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --generate-notes --title "Papan $GITHUB_REF_NAME"
+          gh release upload "$GITHUB_REF_NAME" "$APK" --clobber
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: papan-apk
+          path: ${{ env.APK }}
