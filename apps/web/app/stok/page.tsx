@@ -2,7 +2,9 @@
 
 import { Flame, PackagePlus, Undo2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { BoilSheet } from "@/components/boil-sheet";
 import { EmptyState, Page, Section, StagePill } from "@/components/ui";
 import { count, daysUntil, rupiah, shortDate } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
@@ -12,6 +14,10 @@ import { useSession } from "@/lib/session";
 // S08 Stok: per state how much is on hand, how much is promised to orders and what's free; then
 // the lots still holding stock, with the day-5 return countdown for supplier eggs.
 function StockScreen() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const action = params.get("aksi");
+  const close = () => router.replace("/stok");
   const { state } = useSession();
   const isOwner = state.status === "signed_in" && state.workspace?.role === "owner";
   const levels = useStockLevels();
@@ -56,6 +62,8 @@ function StockScreen() {
           ))
         )}
       </Section>
+
+      {action === "rebus" && <BoilSheet onClose={close} />}
     </Page>
   );
 }
