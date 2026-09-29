@@ -14,6 +14,18 @@ export function parse<T>(schema: z.ZodType<T>, input: unknown): T {
   return result.data;
 }
 
+/** Stock movements and money entries this transaction wrote, so undo can reverse exactly them. */
+export async function ledgerRows({ tx }: OpContext) {
+  const movements = await tx<{ id: string }[]>`
+    select id from stock_movement where xmin = pg_current_xact_id()::xid order by id`;
+  const entries = await tx<{ id: string }[]>`
+    select id from money_entry where xmin = pg_current_xact_id()::xid order by id`;
+  return {
+    movementIds: movements.map((m) => Number(m.id)),
+    entryIds: entries.map((e) => Number(e.id)),
+  };
+}
+
 /** Runs `work` once per idempotency key; the result is kept on the op's event. */
 export async function once(
   ctx: OpContext,
@@ -138,6 +150,7 @@ export const ledgerOps: Record<string, Op> = {
         unitCost: Number(lot?.unitCost),
         total: input.qtyPaid * unitPrice,
         returnBy: lot?.returnBy ?? null,
+        ...(await ledgerRows(ctx)),
       };
     });
   },
@@ -172,6 +185,7 @@ export const ledgerOps: Record<string, Op> = {
         good: input.goodQty,
         loss: input.inputQty - input.goodQty,
         unitCost: lot ? Number(lot.unitCost) : null,
+        ...(await ledgerRows(ctx)),
       };
     });
   },
@@ -201,6 +215,7 @@ export const ledgerOps: Record<string, Op> = {
         lotId: input.lotId,
         qty: input.qty,
         refund: input.refund ?? input.qty * Number(lot.price ?? 0),
+        ...(await ledgerRows(ctx)),
       };
     });
   },
