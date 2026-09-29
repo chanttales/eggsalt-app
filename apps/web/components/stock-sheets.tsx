@@ -16,7 +16,7 @@ import {
 
 const METHODS = ["cash", "transfer", "qris"] as const;
 
-function Choice<T extends string>({
+export function Choice<T extends string>({
   label,
   options,
   value,
@@ -52,7 +52,7 @@ function Choice<T extends string>({
   );
 }
 
-function Money({
+export function Money({
   label,
   value,
   onChange,

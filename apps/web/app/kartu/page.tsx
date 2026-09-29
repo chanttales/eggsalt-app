@@ -3,10 +3,17 @@
 import { transitionOptions, type TransitionOption } from "@domain";
 import { Check, Undo2 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { CardRow } from "@/components/card-row";
 import { FieldInput, fieldText } from "@/components/field-input";
+import {
+  DELIVERY_CHIPS,
+  MoneyChips,
+  PaymentFields,
+  PaymentSheet,
+  type PayMethod,
+} from "@/components/payment";
 import {
   EmptyState,
   Page,
@@ -41,7 +48,9 @@ import { useSession } from "@/lib/session";
 
 // S05 Card detail: where the card is, what can happen next, its money and its history.
 function CardScreen() {
-  const id = useSearchParams().get("id");
+  const params = useSearchParams();
+  const router = useRouter();
+  const id = params.get("id");
   const { state } = useSession();
   const isOwner = state.status === "signed_in" && state.workspace?.role === "owner";
   const card = useCard(id);
@@ -86,6 +95,7 @@ function CardScreen() {
         })
       : [];
   const orderMoney = money.data?.[c.id];
+  const due = Math.max(0, cardTotal(c) - (orderMoney?.paid ?? 0));
   const productName = new Map((products.data ?? []).map((p) => [p.id, p.name]));
 
   return (
@@ -146,7 +156,14 @@ function CardScreen() {
       ))}
 
       {c.status === "open" ? (
-        <NextSteps card={c} options={options} defs={defs} stageNames={g.stages} />
+        <>
+          <NextSteps card={c} options={options} defs={defs} stageNames={g.stages} due={due} />
+          {c.lines.length > 0 && due > 0 && (
+            <Link href={`/kartu?id=${c.id}&aksi=bayar`} className={secondaryButton}>
+              {t("pay.title")}
+            </Link>
+          )}
+        </>
       ) : (
         <p className="rounded-md bg-surface-muted p-3 font-medium">
           {t(c.status === "done" ? "card.done" : "card.cancelled")}
@@ -217,6 +234,9 @@ function CardScreen() {
           stageName={(k) => g.stages.find((s) => s.key === k)?.name ?? k}
         />
       </Section>
+      {params.get("aksi") === "bayar" && (
+        <PaymentSheet card={c} due={due} onClose={() => router.replace(`/kartu?id=${c.id}`)} />
+      )}
     </Page>
   );
 }
@@ -232,6 +252,10 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
   );
 }
 
+const DELIVERY = "ongkir";
+const PAID = "jumlah_bayar";
+const METHOD = "metode_bayar";
+
 // The arrows out of the current stage. A stage that needs fields asks for them first; an arrow
 // whose rule doesn't hold is shown greyed with its label, so the owner sees why.
 function NextSteps({
@@ -239,11 +263,13 @@ function NextSteps({
   options,
   defs,
   stageNames,
+  due,
 }: {
   card: Card;
   options: TransitionOption[];
   defs: Map<string, FieldDef>;
   stageNames: { key: string; name: string }[];
+  due: number;
 }) {
   const enqueue = useEnqueue();
   const [asking, setAsking] = useState<TransitionOption | null>(null);
@@ -259,6 +285,16 @@ function NextSteps({
     });
     setAsking(null);
     setValues({});
+  }
+
+  // Dibayar starts at what's still owed, paid in cash unless changed.
+  function ask(option: TransitionOption) {
+    setAsking(option);
+    setValues(
+      option.missingFields.includes(PAID)
+        ? { [PAID]: due, ...(defs.has(METHOD) ? { [METHOD]: "cash" } : {}) }
+        : {},
+    );
   }
 
   if (options.length === 0) return <p className="text-muted-foreground">{t("card.noNext")}</p>;
@@ -278,6 +314,18 @@ function NextSteps({
           {t("card.moveTo")} {nameOf(asking.transition.to)}
         </p>
         {missing.map((k) => {
+          if (k === PAID) {
+            return (
+              <PaymentFields
+                key={k}
+                due={due}
+                amount={Number(values[PAID]) || 0}
+                method={(values[METHOD] as PayMethod | undefined) ?? "cash"}
+                onAmount={(n) => setValues((s) => ({ ...s, [PAID]: n }))}
+                onMethod={(m) => setValues((s) => ({ ...s, [METHOD]: m }))}
+              />
+            );
+          }
           const def = defs.get(k) ?? {
             key: k,
             label: k,
@@ -286,12 +334,20 @@ function NextSteps({
             options: [],
           };
           return (
-            <FieldInput
-              key={k}
-              def={{ ...def, required: true }}
-              value={values[k]}
-              onChange={(v) => setValues((s) => ({ ...s, [k]: v }))}
-            />
+            <div key={k} className="flex flex-col gap-2">
+              <FieldInput
+                def={{ ...def, required: true }}
+                value={values[k]}
+                onChange={(v) => setValues((s) => ({ ...s, [k]: v }))}
+              />
+              {k === DELIVERY && (
+                <MoneyChips
+                  chips={DELIVERY_CHIPS.map((n) => ({ label: rupiah(n), amount: n }))}
+                  value={values[k]}
+                  onChange={(n) => setValues((s) => ({ ...s, [k]: n }))}
+                />
+              )}
+            </div>
           );
         })}
         <button type="submit" disabled={!complete} className={primaryButton}>
@@ -313,7 +369,7 @@ function NextSteps({
           <button
             key={o.transition.to}
             disabled={ruleBlocked}
-            onClick={() => (o.missingFields.length ? setAsking(o) : move(o))}
+            onClick={() => (o.missingFields.length ? ask(o) : move(o))}
             className={i === 0 && !ruleBlocked ? primaryButton : secondaryButton}
           >
             {label}

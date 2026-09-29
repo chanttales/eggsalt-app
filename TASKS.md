@@ -60,7 +60,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): add stock screen with lots and return countdown
 - [x] feat(web): add boil batch flow
 - [x] feat(web): add receive stock and supplier return flows
-- [ ] feat(web): add delivery and payment flows
+- [x] feat(web): add delivery and payment flows
 - [ ] feat(web): add money screen and expense entry
 - [ ] feat(web): add profit reports
 - [ ] feat(web): add board editor (phone list view)
