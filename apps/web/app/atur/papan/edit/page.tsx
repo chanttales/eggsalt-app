@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { BoardCanvas } from "@/components/board-editor/canvas";
 import { StageList } from "@/components/board-editor/stage-list";
 import { EmptyState, Page, ghostButton, primaryButton } from "@/components/ui";
 import { useBoardDraft, usePublishBoard } from "@/lib/board-editor";
@@ -62,7 +63,13 @@ function Editor({ board, workspaceId }: { board: Board; workspaceId: string }) {
   return (
     <Page title={board.name} subtitle={t("editor.title")}>
       <p className="text-label text-muted-foreground">{t("editor.draftNote")}</p>
-      <StageList draft={draft} defs={fields.data ?? []} cardsIn={cardsIn} />
+      {/* Phones get the stage list; wider screens get the canvas with arrows. */}
+      <div className="lg:hidden">
+        <StageList draft={draft} defs={fields.data ?? []} cardsIn={cardsIn} />
+      </div>
+      <div className="hidden lg:block">
+        <BoardCanvas draft={draft} defs={fields.data ?? []} cardsIn={cardsIn} />
+      </div>
 
       <div className="sticky bottom-20 flex flex-col gap-2 rounded-lg border border-border bg-surface p-3 shadow-sm">
         {draft.problems.map((p) => (
