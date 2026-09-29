@@ -55,6 +55,9 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     return ok(result);
   } catch (err) {
     if (err instanceof EngineError) return fail(err.code, err.message);
+    // Raised by the ledger functions, e.g. "insufficient stock: short by 12".
+    if ((err as { code?: string }).code === "P0001")
+      return fail("conflict", (err as Error).message);
     console.error(err);
     return fail("internal", "Something went wrong");
   }
