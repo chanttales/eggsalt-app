@@ -2,8 +2,8 @@
 // exactly what the engine will post. Unit costs keep 4 decimals (numeric(12,4) in Postgres);
 // money is rounded to whole rupiah only when a cost is booked.
 
-import { assertRupiah, lineTotal, roundRupiah, sumRupiah, type Rupiah } from "./money";
-import { assertPositiveQuantity, assertQuantity } from "./quantity";
+import { assertRupiah, lineTotal, roundRupiah, sumRupiah, type Rupiah } from "./money.ts";
+import { assertPositiveQuantity, assertQuantity } from "./quantity.ts";
 
 const UNIT_COST_SCALE = 10_000;
 

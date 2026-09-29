@@ -2,7 +2,7 @@
 // Pure and synchronous, so the app can preview "what happens next" and the engine can enforce it
 // with exactly the same logic. Stock comes in through a callback so callers decide where it's read.
 
-import type { BoardGraph, Condition, Stage, Transition } from "./board";
+import type { BoardGraph, Condition, Stage, Transition } from "./board.ts";
 
 /** Card data a rule can read, e.g. { lines: { qty: 20 }, fields: { segment: "warung" } }. */
 export type CardData = Record<string, unknown>;
