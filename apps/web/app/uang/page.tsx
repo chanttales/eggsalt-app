@@ -5,24 +5,18 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { ExpenseSheet } from "@/components/expense-sheet";
-import { EmptyState, Page, Section, StatTile, primaryButton } from "@/components/ui";
-import { dayKey, rupiah, shortDate, startOfDay, time } from "@/lib/format";
+import {
+  EmptyState,
+  Page,
+  Section,
+  StatTile,
+  primaryButton,
+  secondaryButton,
+} from "@/components/ui";
+import { PERIODS, periodStart, rupiah, shortDate, time, type Period } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
 import { useMoneyEntries, useOrderMoney, type MoneyEntry } from "@/lib/queries";
 import { useSession } from "@/lib/session";
-
-const PERIODS = ["day", "week", "month"] as const;
-type Period = (typeof PERIODS)[number];
-
-/** Start of the period in Jakarta: today, the last 7 days, or this calendar month. */
-function periodStart(period: Period): string {
-  const today = dayKey();
-  if (period === "day") return startOfDay(today);
-  if (period === "month") return startOfDay(`${today.slice(0, 8)}01`);
-  const d = new Date(`${today}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() - 6);
-  return startOfDay(d.toISOString().slice(0, 10));
-}
 
 // S12 Uang: money in and out for the period, orders still owed, and the ledger itself.
 function MoneyScreen() {
@@ -86,6 +80,9 @@ function MoneyScreen() {
           tone={moneyIn < moneyOut ? "warning" : undefined}
         />
       </div>
+      <Link href="/laporan" className={secondaryButton}>
+        {t("report.open")}
+      </Link>
 
       <Section title={t("money.unpaid")}>
         {unpaid.length === 0 ? (

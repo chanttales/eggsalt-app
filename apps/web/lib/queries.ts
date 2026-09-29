@@ -668,3 +668,99 @@ export function useMoneyEntries(since: string) {
     }));
   });
 }
+
+export interface OrderProfit extends OrderMoney {
+  partyName: string | null;
+  segment: string | null;
+}
+
+export interface ProfitReport {
+  /** Orders whose eggs left stock (sold) in the period. */
+  orders: OrderProfit[];
+  /** Expenses in the period that aren't already in HPP, by category. */
+  expenses: { name: string; amount: number }[];
+}
+
+/**
+ * P&L for a period. Revenue and HPP follow the sale movements; expenses follow the money ledger,
+ * except costs booked on production batches and purchases, which already sit in HPP.
+ */
+export function useProfitReport(since: string) {
+  return useWorkspaceQuery(`profit:${since}`, async (workspaceId): Promise<ProfitReport> => {
+    const [sales, spend] = await Promise.all([
+      supabase()
+        .from("stock_movement")
+        .select("id, card_id, reverses_id")
+        .eq("workspace_id", workspaceId)
+        .in("reason", ["sale", "reversal"])
+        .gte("created_at", since)
+        .not("card_id", "is", null),
+      supabase()
+        .from("money_entry")
+        .select("id, kind, amount, card_id, reverses_id, expense_category (name)")
+        .eq("workspace_id", workspaceId)
+        .in("kind", ["expense", "reversal"])
+        .gte("occurred_at", since),
+    ]);
+    const moves = must(sales);
+    const undone = new Set(moves.map((m) => m.reverses_id).filter(Boolean));
+    const sold = [
+      ...new Set(
+        moves.filter((m) => !m.reverses_id && !undone.has(m.id)).map((m) => m.card_id as string),
+      ),
+    ];
+    const [profit, parties] = sold.length
+      ? await Promise.all([
+          supabase()
+            .from("v_order_profit")
+            .select("card_id, number, title, revenue, cogs, direct_costs, profit")
+            .in("card_id", sold),
+          supabase().from("card").select("id, party (name, segment)").in("id", sold),
+        ])
+      : [
+          { data: [], error: null },
+          { data: [], error: null },
+        ];
+    const partyOf = new Map(
+      must(parties).map((c) => [
+        c.id,
+        c.party as unknown as { name: string; segment: string | null } | null,
+      ]),
+    );
+    const orders = must(profit).map((p): OrderProfit => ({
+      cardId: p.card_id,
+      title: p.title,
+      number: p.number,
+      revenue: Number(p.revenue),
+      cogs: Number(p.cogs),
+      directCosts: Number(p.direct_costs),
+      profit: Number(p.profit),
+      paid: 0,
+      partyName: partyOf.get(p.card_id)?.name ?? null,
+      segment: partyOf.get(p.card_id)?.segment ?? null,
+    }));
+
+    // Expenses on an order card are delivery-type costs; those on other cards are in HPP.
+    const entries = must(spend);
+    const cancelled = new Set(entries.map((e) => e.reverses_id).filter(Boolean));
+    const onCards = [...new Set(entries.map((e) => e.card_id).filter(Boolean))] as string[];
+    const orderCards = new Set(
+      onCards.length
+        ? must(
+            await supabase().from("v_order_profit").select("card_id").in("card_id", onCards),
+          ).map((r) => r.card_id)
+        : [],
+    );
+    const byCategory = new Map<string, number>();
+    for (const e of entries) {
+      if (e.kind !== "expense" || cancelled.has(e.id)) continue;
+      if (e.card_id && !orderCards.has(e.card_id)) continue;
+      const name = (e.expense_category as unknown as Named | null)?.name ?? "";
+      byCategory.set(name, (byCategory.get(name) ?? 0) + Number(e.amount));
+    }
+    return {
+      orders,
+      expenses: [...byCategory].map(([name, amount]) => ({ name, amount })),
+    };
+  });
+}
