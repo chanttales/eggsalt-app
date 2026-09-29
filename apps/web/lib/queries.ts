@@ -1,0 +1,315 @@
+"use client";
+
+import { parseBoardGraph, type BoardGraph } from "@domain";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "@/lib/session";
+import { supabase } from "@/lib/supabase";
+
+// Reads for the screens. Row-level security limits every table to the user's workspaces, and each
+// query is keyed by workspace so switching businesses never shows the other one's cached data.
+
+function useWorkspaceId(): string | undefined {
+  const { state } = useSession();
+  return state.status === "signed_in" ? state.workspace?.id : undefined;
+}
+
+function useWorkspaceQuery<T>(name: string, load: (workspaceId: string) => Promise<T>) {
+  const workspaceId = useWorkspaceId();
+  return useQuery({
+    queryKey: [workspaceId, name],
+    queryFn: () => load(workspaceId as string),
+    enabled: Boolean(workspaceId),
+  });
+}
+
+function must<T>({ data, error }: { data: T; error: unknown }): NonNullable<T> {
+  if (error) throw error;
+  return data as NonNullable<T>;
+}
+
+export type CardKind = "order" | "production" | "purchase" | "custom";
+
+export interface Board {
+  id: string;
+  key: string;
+  name: string;
+  sort: number;
+  kind: CardKind;
+  cardTypeId: string;
+  versionId: string;
+  graph: BoardGraph;
+}
+
+export function useBoards() {
+  return useWorkspaceQuery("boards", async (workspaceId) => {
+    const rows = must(
+      await supabase()
+        .from("board")
+        .select(
+          "id, key, name, sort, card_type_id, active_version_id, card_type (kind), board_version!board_active_version_fk (graph)",
+        )
+        .eq("workspace_id", workspaceId)
+        .is("archived_at", null)
+        .order("sort"),
+    );
+    return rows.flatMap((row): Board[] => {
+      const version = row.board_version as unknown as { graph: unknown } | null;
+      const type = row.card_type as unknown as { kind: CardKind } | null;
+      if (!version || !type || !row.active_version_id) return [];
+      return [
+        {
+          id: row.id,
+          key: row.key,
+          name: row.name,
+          sort: row.sort,
+          kind: type.kind,
+          cardTypeId: row.card_type_id,
+          versionId: row.active_version_id,
+          graph: parseBoardGraph(version.graph),
+        },
+      ];
+    });
+  });
+}
+
+export interface CardLine {
+  productId: string;
+  qty: number;
+  unitPrice: number;
+}
+
+export interface Card {
+  id: string;
+  number: number;
+  boardId: string;
+  versionId: string;
+  stageKey: string;
+  status: "open" | "done" | "cancelled";
+  title: string;
+  partyId: string | null;
+  partyName: string | null;
+  dueAt: string | null;
+  flags: string[];
+  fields: Record<string, unknown>;
+  parentCardId: string | null;
+  rowVersion: number;
+  createdAt: string;
+  updatedAt: string;
+  lines: CardLine[];
+}
+
+const CARD_COLUMNS =
+  "id, number, board_id, board_version_id, stage_key, status, title, party_id, due_at, flags, fields, parent_card_id, row_version, created_at, updated_at, party (name), card_line (product_id, qty, unit_price)";
+
+type CardRow = {
+  id: string;
+  number: number;
+  board_id: string;
+  board_version_id: string;
+  stage_key: string;
+  status: Card["status"];
+  title: string;
+  party_id: string | null;
+  due_at: string | null;
+  flags: string[];
+  fields: Record<string, unknown>;
+  parent_card_id: string | null;
+  row_version: number;
+  created_at: string;
+  updated_at: string;
+  party: { name: string } | null;
+  card_line: { product_id: string; qty: number; unit_price: number }[];
+};
+
+function toCard(row: CardRow): Card {
+  return {
+    id: row.id,
+    number: row.number,
+    boardId: row.board_id,
+    versionId: row.board_version_id,
+    stageKey: row.stage_key,
+    status: row.status,
+    title: row.title,
+    partyId: row.party_id,
+    partyName: row.party?.name ?? null,
+    dueAt: row.due_at,
+    flags: row.flags,
+    fields: row.fields,
+    parentCardId: row.parent_card_id,
+    rowVersion: row.row_version,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    lines: row.card_line.map((l) => ({
+      productId: l.product_id,
+      qty: l.qty,
+      unitPrice: Number(l.unit_price),
+    })),
+  };
+}
+
+export function cardQty(card: Card): number {
+  return card.lines.reduce((sum, l) => sum + l.qty, 0);
+}
+
+export function cardTotal(card: Card): number {
+  return card.lines.reduce((sum, l) => sum + l.qty * l.unitPrice, 0);
+}
+
+/** Open cards on every board, newest first. */
+export function useOpenCards() {
+  return useWorkspaceQuery("cards-open", async (workspaceId) => {
+    const rows = must(
+      await supabase()
+        .from("card")
+        .select(CARD_COLUMNS)
+        .eq("workspace_id", workspaceId)
+        .eq("status", "open")
+        .order("created_at", { ascending: false }),
+    );
+    return (rows as unknown as CardRow[]).map(toCard);
+  });
+}
+
+export interface StockLevel {
+  itemId: string;
+  stateId: string;
+  stateKey: string;
+  stateName: string;
+  onHand: number;
+  reserved: number;
+  available: number;
+}
+
+export function useStockLevels() {
+  return useWorkspaceQuery("stock-levels", async (workspaceId) => {
+    const [levels, states] = await Promise.all([
+      supabase()
+        .from("v_stock_on_hand")
+        .select("item_id, state_id, on_hand, reserved, available")
+        .eq("workspace_id", workspaceId),
+      supabase()
+        .from("item_state")
+        .select("id, item_id, key, name, sort")
+        .eq("workspace_id", workspaceId)
+        .order("sort"),
+    ]);
+    const byState = new Map(must(levels).map((l) => [l.state_id, l]));
+    return must(states).map((s): StockLevel => ({
+      itemId: s.item_id,
+      stateId: s.id,
+      stateKey: s.key,
+      stateName: s.name,
+      onHand: byState.get(s.id)?.on_hand ?? 0,
+      reserved: byState.get(s.id)?.reserved ?? 0,
+      available: byState.get(s.id)?.available ?? 0,
+    }));
+  });
+}
+
+export interface ReturnLot {
+  id: string;
+  receivedAt: string;
+  returnBy: string;
+  qtyRemaining: number;
+  daysLeft: number;
+  supplierId: string | null;
+}
+
+/** Supplier lots with raw eggs still to use or send back, soonest first. */
+export function useReturnLots() {
+  return useWorkspaceQuery("lots-return", async (workspaceId) => {
+    const rows = must(
+      await supabase()
+        .from("v_lots_return_due")
+        .select("id, received_at, return_by, qty_remaining, days_left, supplier_id")
+        .eq("workspace_id", workspaceId)
+        .order("return_by"),
+    );
+    return rows.map((r): ReturnLot => ({
+      id: r.id,
+      receivedAt: r.received_at,
+      returnBy: r.return_by,
+      qtyRemaining: r.qty_remaining,
+      daysLeft: r.days_left,
+      supplierId: r.supplier_id,
+    }));
+  });
+}
+
+export interface OrderMoney {
+  cardId: string;
+  revenue: number;
+  cogs: number;
+  directCosts: number;
+  profit: number;
+  paid: number;
+}
+
+/** Revenue, HPP, costs and payments per order card, from the profit view and the money ledger. */
+export function useOrderMoney() {
+  return useWorkspaceQuery("order-money", async (workspaceId) => {
+    const [profit, payments] = await Promise.all([
+      supabase()
+        .from("v_order_profit")
+        .select("card_id, revenue, cogs, direct_costs, profit")
+        .eq("workspace_id", workspaceId),
+      supabase()
+        .from("money_entry")
+        .select("id, card_id, kind, amount, reverses_id")
+        .eq("workspace_id", workspaceId)
+        .not("card_id", "is", null)
+        .in("kind", ["customer_payment", "reversal"]),
+    ]);
+    const entries = must(payments);
+    const reversed = new Set(entries.map((e) => e.reverses_id).filter(Boolean));
+    const paid = new Map<string, number>();
+    for (const e of entries) {
+      if (e.kind !== "customer_payment" || reversed.has(e.id) || !e.card_id) continue;
+      paid.set(e.card_id, (paid.get(e.card_id) ?? 0) + Number(e.amount));
+    }
+    // A plain object, not a Map, because the cache is saved to IndexedDB as JSON.
+    const byCard: Record<string, OrderMoney> = Object.fromEntries(
+      must(profit).map((p) => [
+        p.card_id,
+        {
+          cardId: p.card_id,
+          revenue: Number(p.revenue),
+          cogs: Number(p.cogs),
+          directCosts: Number(p.direct_costs),
+          profit: Number(p.profit),
+          paid: paid.get(p.card_id) ?? 0,
+        } satisfies OrderMoney,
+      ]),
+    );
+    return byCard;
+  });
+}
+
+export interface Settings {
+  timezone: string;
+  lpgPerBatch: number;
+  expectedLossPerBatch: number;
+  unpaidAfterDays: number;
+  raw: Record<string, unknown>;
+}
+
+export function useSettings() {
+  return useWorkspaceQuery("settings", async (workspaceId) => {
+    const row = must(
+      await supabase()
+        .from("workspace")
+        .select("timezone, settings")
+        .eq("id", workspaceId)
+        .single(),
+    );
+    const s = (row.settings ?? {}) as Record<string, unknown>;
+    const num = (v: unknown, fallback: number) => (typeof v === "number" ? v : fallback);
+    return {
+      timezone: row.timezone,
+      lpgPerBatch: num(s.lpg_per_batch, 0),
+      expectedLossPerBatch: num(s.expected_loss_per_batch, 0),
+      unpaidAfterDays: num(s.unpaid_after_days, 7),
+      raw: s,
+    } satisfies Settings;
+  });
+}
