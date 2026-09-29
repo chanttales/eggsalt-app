@@ -9,7 +9,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] ci(repo): add prettier, eslint, husky, lint-staged and commitlint
 - [x] ci(repo): add github actions ci workflow
 - [x] feat(ui): add design tokens, fonts and tailwind theme
-- [ ] feat(web): add app shell with bottom tab bar and routes
+- [x] feat(web): add app shell with bottom tab bar and routes
 - [ ] ci(repo): deploy static export to github pages
 - [ ] build(db): initialize supabase project and local config
 
