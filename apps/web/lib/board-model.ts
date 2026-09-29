@@ -1,6 +1,6 @@
-import type { Stage } from "@domain";
+import type { CardData, RuleContext, Stage } from "@domain";
 import { dayKey } from "@/lib/format";
-import { cardQty, type Board, type Card } from "@/lib/queries";
+import { cardQty, cardTotal, type Board, type Card, type StockLevel } from "@/lib/queries";
 
 // Screen-level readings of the board graphs the owner draws. Nothing here hard-codes the Telur Asin
 // stage names: "ready", "sold" and "paid" are found from what each stage does when a card enters it.
@@ -39,4 +39,21 @@ export function batchQty(card: Card, cardsById: Map<string, Card>): number {
 /** Due date of a card as a Jakarta calendar day, if it has one. */
 export function dueDay(card: Card): string | null {
   return card.dueAt ? dayKey(card.dueAt) : null;
+}
+
+/** The card as rules see it; the same shape the engine builds, so previews match what happens. */
+export function ruleData(card: Card): CardData {
+  return {
+    number: card.number,
+    title: card.title,
+    flags: card.flags,
+    fields: card.fields,
+    lines: { qty: cardQty(card), total: cardTotal(card) },
+    party: card.partyName ? { name: card.partyName, segment: card.partySegment } : null,
+  };
+}
+
+export function stockReader(levels: StockLevel[] | undefined): RuleContext["stockAvailable"] {
+  return ({ state }) =>
+    (levels ?? []).filter((l) => l.stateKey === state).reduce((sum, l) => sum + l.available, 0);
 }

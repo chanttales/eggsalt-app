@@ -2,6 +2,7 @@
 
 import { parseBoardGraph, type BoardGraph } from "@domain";
 import { useQuery } from "@tanstack/react-query";
+import { dayKey } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import { supabase } from "@/lib/supabase";
 
@@ -13,12 +14,16 @@ function useWorkspaceId(): string | undefined {
   return state.status === "signed_in" ? state.workspace?.id : undefined;
 }
 
-function useWorkspaceQuery<T>(name: string, load: (workspaceId: string) => Promise<T>) {
+function useWorkspaceQuery<T>(
+  name: string,
+  load: (workspaceId: string) => Promise<T>,
+  ready = true,
+) {
   const workspaceId = useWorkspaceId();
   return useQuery({
     queryKey: [workspaceId, name],
     queryFn: () => load(workspaceId as string),
-    enabled: Boolean(workspaceId),
+    enabled: Boolean(workspaceId) && ready,
   });
 }
 
@@ -88,6 +93,7 @@ export interface Card {
   title: string;
   partyId: string | null;
   partyName: string | null;
+  partySegment: string | null;
   dueAt: string | null;
   flags: string[];
   fields: Record<string, unknown>;
@@ -99,7 +105,7 @@ export interface Card {
 }
 
 const CARD_COLUMNS =
-  "id, number, board_id, board_version_id, stage_key, status, title, party_id, due_at, flags, fields, parent_card_id, row_version, created_at, updated_at, party (name), card_line (product_id, qty, unit_price)";
+  "id, number, board_id, board_version_id, stage_key, status, title, party_id, due_at, flags, fields, parent_card_id, row_version, created_at, updated_at, party (name, segment), card_line (product_id, qty, unit_price)";
 
 type CardRow = {
   id: string;
@@ -117,7 +123,7 @@ type CardRow = {
   row_version: number;
   created_at: string;
   updated_at: string;
-  party: { name: string } | null;
+  party: { name: string; segment: string | null } | null;
   card_line: { product_id: string; qty: number; unit_price: number }[];
 };
 
@@ -132,6 +138,7 @@ function toCard(row: CardRow): Card {
     title: row.title,
     partyId: row.party_id,
     partyName: row.party?.name ?? null,
+    partySegment: row.party?.segment ?? null,
     dueAt: row.due_at,
     flags: row.flags,
     fields: row.fields,
@@ -311,5 +318,187 @@ export function useSettings() {
       unpaidAfterDays: num(s.unpaid_after_days, 7),
       raw: s,
     } satisfies Settings;
+  });
+}
+
+/** One card, open or closed. */
+export function useCard(id: string | null) {
+  return useWorkspaceQuery(
+    `card:${id}`,
+    async (workspaceId) => {
+      const { data: row, error } = await supabase()
+        .from("card")
+        .select(CARD_COLUMNS)
+        .eq("workspace_id", workspaceId)
+        .eq("id", id as string)
+        .maybeSingle();
+      if (error) throw error;
+      return row ? toCard(row as unknown as CardRow) : null;
+    },
+    Boolean(id),
+  );
+}
+
+/** Cards linked to this one: the batch an order started, or the order a batch serves. */
+export function useLinkedCards(card: Card | undefined) {
+  return useWorkspaceQuery(
+    `card-links:${card?.id}`,
+    async (workspaceId) => {
+      if (!card) return [];
+      const filter = card.parentCardId
+        ? `parent_card_id.eq.${card.id},id.eq.${card.parentCardId}`
+        : `parent_card_id.eq.${card.id}`;
+      const rows = must(
+        await supabase()
+          .from("card")
+          .select(CARD_COLUMNS)
+          .eq("workspace_id", workspaceId)
+          .or(filter),
+      );
+      return (rows as unknown as CardRow[]).map(toCard);
+    },
+    Boolean(card),
+  );
+}
+
+export interface CardEvent {
+  id: number;
+  type: string;
+  fromStage: string | null;
+  toStage: string | null;
+  payload: Record<string, unknown>;
+  reversesEventId: number | null;
+  createdAt: string;
+}
+
+export function useCardEvents(cardId: string | null) {
+  return useWorkspaceQuery(
+    `card-events:${cardId}`,
+    async (workspaceId) => {
+      const rows = must(
+        await supabase()
+          .from("card_event")
+          .select("id, type, from_stage, to_stage, payload, reverses_event_id, created_at")
+          .eq("workspace_id", workspaceId)
+          .eq("card_id", cardId as string)
+          .order("id", { ascending: false }),
+      );
+      return rows.map((e): CardEvent => ({
+        id: Number(e.id),
+        type: e.type,
+        fromStage: e.from_stage,
+        toStage: e.to_stage,
+        payload: e.payload ?? {},
+        reversesEventId: e.reverses_event_id === null ? null : Number(e.reverses_event_id),
+        createdAt: e.created_at,
+      }));
+    },
+    Boolean(cardId),
+  );
+}
+
+/** The graph a card follows: the board version it was created on, not necessarily the latest. */
+export function useVersionGraph(versionId: string | undefined) {
+  return useWorkspaceQuery(
+    `version:${versionId}`,
+    async (workspaceId) => {
+      const row = must(
+        await supabase()
+          .from("board_version")
+          .select("graph")
+          .eq("workspace_id", workspaceId)
+          .eq("id", versionId as string)
+          .single(),
+      );
+      return parseBoardGraph(row.graph);
+    },
+    Boolean(versionId),
+  );
+}
+
+export type FieldType =
+  "text" | "number" | "money" | "date" | "datetime" | "select" | "party" | "boolean" | "formula";
+
+export interface FieldDef {
+  key: string;
+  label: string;
+  type: FieldType;
+  required: boolean;
+  options: string[];
+  min?: number;
+  max?: number;
+}
+
+export function useFieldDefs(cardTypeId: string | undefined) {
+  return useWorkspaceQuery(
+    `fields:${cardTypeId}`,
+    async (workspaceId) => {
+      const rows = must(
+        await supabase()
+          .from("field_def")
+          .select("key, label, type, config, required, sort")
+          .eq("workspace_id", workspaceId)
+          .eq("card_type_id", cardTypeId as string)
+          .order("sort"),
+      );
+      return rows.map((f): FieldDef => {
+        const label = (f.label ?? {}) as Record<string, string>;
+        const config = (f.config ?? {}) as { options?: string[]; min?: number; max?: number };
+        return {
+          key: f.key,
+          label: label.id ?? label.en ?? f.key,
+          type: f.type,
+          required: f.required,
+          options: config.options ?? [],
+          min: config.min,
+          max: config.max,
+        };
+      });
+    },
+    Boolean(cardTypeId),
+  );
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  itemId: string;
+  stateId: string;
+  /** Latest general sell and buy prices valid today (segment prices are applied by the engine). */
+  sellPrice: number | null;
+  buyPrice: number | null;
+}
+
+export function useProducts() {
+  return useWorkspaceQuery("products", async (workspaceId) => {
+    const [products, prices] = await Promise.all([
+      supabase()
+        .from("product")
+        .select("id, name, item_id, state_id")
+        .eq("workspace_id", workspaceId)
+        .eq("active", true)
+        .order("name"),
+      supabase()
+        .from("price")
+        .select("product_id, kind, unit_price, valid_from")
+        .eq("workspace_id", workspaceId)
+        .is("segment", null)
+        .order("valid_from", { ascending: false }),
+    ]);
+    const today = dayKey();
+    const latest = (productId: string, kind: "sell" | "buy") => {
+      const p = must(prices).find(
+        (x) => x.product_id === productId && x.kind === kind && x.valid_from <= today,
+      );
+      return p ? Number(p.unit_price) : null;
+    };
+    return must(products).map((p): Product => ({
+      id: p.id,
+      name: p.name,
+      itemId: p.item_id,
+      stateId: p.state_id,
+      sellPrice: latest(p.id, "sell"),
+      buyPrice: latest(p.id, "buy"),
+    }));
   });
 }
