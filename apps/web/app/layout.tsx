@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
-import { AppNav } from "@/components/app-nav";
+import { AuthGate } from "@/components/auth-gate";
+import { SessionProvider } from "@/lib/session";
 import "./globals.css";
 
 // Bundled from npm rather than fetched from Google Fonts, so builds don't depend on that download.
@@ -31,8 +32,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="id" className={jakarta.variable}>
       <body className="font-sans">
-        <div className="pb-20 lg:pb-0 lg:pl-56">{children}</div>
-        <AppNav />
+        <SessionProvider>
+          <AuthGate>{children}</AuthGate>
+        </SessionProvider>
       </body>
     </html>
   );
