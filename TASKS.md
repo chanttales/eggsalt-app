@@ -5,7 +5,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 ## M1.1 Foundation
 
 - [x] docs(repo): add design documents, workflow and task backlog
-- [ ] build(repo): initialize pnpm monorepo with next.js static app
+- [x] build(repo): initialize pnpm monorepo with next.js static app
 - [ ] ci(repo): add prettier, eslint, husky, lint-staged and commitlint
 - [ ] ci(repo): add github actions ci workflow
 - [ ] feat(ui): add design tokens, fonts and tailwind theme
