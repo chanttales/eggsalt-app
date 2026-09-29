@@ -10,17 +10,17 @@ Next.js (static export) · Tailwind CSS + shadcn/ui · CapacitorJS (Android) · 
 
 ## Docs
 
-| Doc | What it covers |
-|---|---|
-| [PRD](docs/design/01-prd.md) | Problem, requirements, the Telur Asin example and its numbers |
-| [Design system](docs/design/02-design-system.md) | Tokens, components, patterns, microcopy |
-| [Information architecture](docs/design/03-information-architecture.md) | Sitemap, navigation, screens and routes |
-| [User flows](docs/design/04-user-flow.md) | The 11 key flows |
-| [Wireframes](docs/design/05-wireframes.html) | Clickable phone prototype (open in a browser) |
-| [Technical architecture](docs/design/06-technical-architecture.md) | Hosting, frontend, backend, CI/CD |
-| [Data model](docs/design/07-data-model.md) · [schema](docs/design/07-schema.sql) | Tables, ledgers, costing functions |
-| [Contributing](CONTRIBUTING.md) | Development workflow and commit rules |
-| [Tasks](TASKS.md) | Backlog, one line per commit |
+| Doc                                                                              | What it covers                                                |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [PRD](docs/design/01-prd.md)                                                     | Problem, requirements, the Telur Asin example and its numbers |
+| [Design system](docs/design/02-design-system.md)                                 | Tokens, components, patterns, microcopy                       |
+| [Information architecture](docs/design/03-information-architecture.md)           | Sitemap, navigation, screens and routes                       |
+| [User flows](docs/design/04-user-flow.md)                                        | The 11 key flows                                              |
+| [Wireframes](docs/design/05-wireframes.html)                                     | Clickable phone prototype (open in a browser)                 |
+| [Technical architecture](docs/design/06-technical-architecture.md)               | Hosting, frontend, backend, CI/CD                             |
+| [Data model](docs/design/07-data-model.md) · [schema](docs/design/07-schema.sql) | Tables, ledgers, costing functions                            |
+| [Contributing](CONTRIBUTING.md)                                                  | Development workflow and commit rules                         |
+| [Tasks](TASKS.md)                                                                | Backlog, one line per commit                                  |
 
 ## Status
 
