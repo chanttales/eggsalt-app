@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/* Design tokens from docs/design/02-design-system.md. Names follow shadcn/ui. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #fafaf7;
+  --surface: #ffffff;
+  --surface-muted: #f2f1ec;
+  --border: #e4e2da;
+  --foreground: #1c2421;
+  --muted-foreground: #5e6b66;
+  --primary: #0f766e;
+  --primary-foreground: #ffffff;
+  --primary-soft: #e0f2ef;
+  --accent: #f59e0b;
+  --accent-foreground: #3a2500;
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #b91c1c;
+  --info: #1d4ed8;
+
+  /* Stage colors: soft background + strong text, owner picks one per stage. */
+  --stage-gray-bg: #eeede8;
+  --stage-gray-fg: #44504b;
+  --stage-teal-bg: #ddf3ef;
+  --stage-teal-fg: #0f5f58;
+  --stage-blue-bg: #e0eafd;
+  --stage-blue-fg: #1e40af;
+  --stage-violet-bg: #ede7fd;
+  --stage-violet-fg: #5b21b6;
+  --stage-pink-bg: #fbe4ef;
+  --stage-pink-fg: #9d174d;
+  --stage-orange-bg: #fdebdd;
+  --stage-orange-fg: #9a3412;
+  --stage-amber-bg: #fdf3d6;
+  --stage-amber-fg: #854d0e;
+  --stage-green-bg: #e1f5e6;
+  --stage-green-fg: #166534;
+}
+
+.dark {
+  --background: #0f1412;
+  --surface: #161c1a;
+  --surface-muted: #1e2523;
+  --border: #2a3330;
+  --foreground: #eef2f0;
+  --muted-foreground: #9aa8a2;
+  --primary: #2db3a5;
+  --primary-foreground: #06201d;
+  --primary-soft: #123330;
+  --accent: #fbbf24;
+  --accent-foreground: #2a1b00;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --info: #60a5fa;
+
+  --stage-gray-bg: #262d2b;
+  --stage-gray-fg: #c4ccc9;
+  --stage-teal-bg: #123330;
+  --stage-teal-fg: #7eddd2;
+  --stage-blue-bg: #16233f;
+  --stage-blue-fg: #a5c0fb;
+  --stage-violet-bg: #241a3d;
+  --stage-violet-fg: #c4b5fd;
+  --stage-pink-bg: #3a1526;
+  --stage-pink-fg: #f9a8d4;
+  --stage-orange-bg: #35200f;
+  --stage-orange-fg: #fdba8c;
+  --stage-amber-bg: #2e2610;
+  --stage-amber-fg: #fcd34d;
+  --stage-green-bg: #12291a;
+  --stage-green-fg: #86efac;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  --color-stage-gray-bg: var(--stage-gray-bg);
+  --color-stage-gray-fg: var(--stage-gray-fg);
+  --color-stage-teal-bg: var(--stage-teal-bg);
+  --color-stage-teal-fg: var(--stage-teal-fg);
+  --color-stage-blue-bg: var(--stage-blue-bg);
+  --color-stage-blue-fg: var(--stage-blue-fg);
+  --color-stage-violet-bg: var(--stage-violet-bg);
+  --color-stage-violet-fg: var(--stage-violet-fg);
+  --color-stage-pink-bg: var(--stage-pink-bg);
+  --color-stage-pink-fg: var(--stage-pink-fg);
+  --color-stage-orange-bg: var(--stage-orange-bg);
+  --color-stage-orange-fg: var(--stage-orange-fg);
+  --color-stage-amber-bg: var(--stage-amber-bg);
+  --color-stage-amber-fg: var(--stage-amber-fg);
+  --color-stage-green-bg: var(--stage-green-bg);
+  --color-stage-green-fg: var(--stage-green-fg);
+
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+
+  --text-display: 2rem;
+  --text-display--line-height: 2.5rem;
+  --text-title-lg: 1.375rem;
+  --text-title-lg--line-height: 1.75rem;
+  --text-title: 1.125rem;
+  --text-title--line-height: 1.5rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.25rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.06);
+  --shadow-sheet: 0 8px 24px rgb(0 0 0 / 0.12);
+
+  --spacing-touch: 3rem;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-body text-foreground antialiased;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
