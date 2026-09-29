@@ -16,3 +16,4 @@ supabase/.temp
 android/app/build/
 *.keystore
 *.jks
+next-env.d.ts
