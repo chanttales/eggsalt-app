@@ -15,7 +15,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 
 ## M1.2 Domain and data
 
-- [ ] build(domain): add packages/domain with typescript and vitest
+- [x] build(domain): add packages/domain with typescript and vitest
 - [ ] feat(domain): add money, quantity and date helpers (IDR, WIB)
 - [ ] feat(domain): add costing math (lot cost with bonus, batch hpp, order profit)
 - [ ] test(domain): cover costing with telur asin numbers
