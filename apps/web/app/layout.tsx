@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
+import { AppNav } from "@/components/app-nav";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -28,7 +29,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="id" className={jakarta.variable}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <div className="pb-20 lg:pb-0 lg:pl-56">{children}</div>
+        <AppNav />
+      </body>
     </html>
   );
 }
