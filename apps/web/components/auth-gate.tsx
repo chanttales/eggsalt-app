@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { AppNav } from "@/components/app-nav";
 import { t } from "@/lib/i18n";
+import { NativeBridge } from "@/lib/native";
 import { useSession } from "@/lib/session";
 
 /** Pages anyone can open. */
@@ -52,7 +53,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (!hasWorkspace) return <>{children}</>;
   return (
     <>
-      <div className="pb-20 lg:pb-0 lg:pl-56">{children}</div>
+      <div className="pb-20 lg:pb-0 lg:pl-56">
+        <NativeBridge />
+        {children}
+      </div>
       <AppNav />
     </>
   );
