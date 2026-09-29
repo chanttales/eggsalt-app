@@ -50,19 +50,21 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 
 - [x] feat(web): add supabase client, auth and workspace guard
 - [x] feat(web): add query client with persistence and outbox
-- [ ] feat(web): add onboarding with telur asin template
-- [ ] feat(web): add hari ini screen
-- [ ] feat(web): add board kanban view
-- [ ] feat(web): add card detail with stage stepper and profit
-- [ ] feat(web): add new order sheet
-- [ ] feat(web): add stock screen with lots and return countdown
-- [ ] feat(web): add boil batch flow
-- [ ] feat(web): add receive stock and supplier return flows
-- [ ] feat(web): add delivery and payment flows
-- [ ] feat(web): add money screen and expense entry
-- [ ] feat(web): add profit reports
-- [ ] feat(web): add board editor (phone list view)
-- [ ] feat(web): add board editor canvas (web)
+- [x] feat(db): add create workspace from template function
+- [x] feat(engine): add opening-stock op
+- [x] feat(web): add onboarding with telur asin template
+- [x] feat(web): add hari ini screen
+- [x] feat(web): add board kanban view
+- [x] feat(web): add card detail with stage stepper and profit
+- [x] feat(web): add new order sheet
+- [x] feat(web): add stock screen with lots and return countdown
+- [x] feat(web): add boil batch flow
+- [x] feat(web): add receive stock and supplier return flows
+- [x] feat(web): add delivery and payment flows
+- [x] feat(web): add money screen and expense entry
+- [x] feat(web): add profit reports
+- [x] feat(web): add board editor (phone list view)
+- [x] feat(web): add board editor canvas (web)
 
 ## M1.5 Android
 
