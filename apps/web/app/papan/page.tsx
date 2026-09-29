@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { CardRow } from "@/components/card-row";
+import { NewCardSheet } from "@/components/new-card-sheet";
 import { EmptyState, Page, StagePill } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useBoards, useOpenCards, type Board, type Card } from "@/lib/queries";
@@ -92,6 +93,10 @@ function BoardScreen() {
         </div>
       ) : (
         <EmptyState>{t("board.empty")}</EmptyState>
+      )}
+
+      {board && params.get("aksi") === "baru" && (
+        <NewCardSheet board={board} onClose={() => router.replace(`/papan?b=${board.id}`)} />
       )}
     </Page>
   );

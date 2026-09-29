@@ -502,3 +502,38 @@ export function useProducts() {
     }));
   });
 }
+
+export interface Party {
+  id: string;
+  kind: "customer" | "supplier";
+  name: string;
+  segment: string | null;
+  phone: string | null;
+  returnDays: number | null;
+  bonusPerPurchase: number | null;
+  minPurchaseQty: number | null;
+}
+
+export function useParties(kind: Party["kind"]) {
+  return useWorkspaceQuery(`parties:${kind}`, async (workspaceId) => {
+    const rows = must(
+      await supabase()
+        .from("party")
+        .select("id, kind, name, segment, phone, return_days, bonus_per_purchase, min_purchase_qty")
+        .eq("workspace_id", workspaceId)
+        .eq("kind", kind)
+        .is("archived_at", null)
+        .order("name"),
+    );
+    return rows.map((p): Party => ({
+      id: p.id,
+      kind: p.kind,
+      name: p.name,
+      segment: p.segment,
+      phone: p.phone,
+      returnDays: p.return_days,
+      bonusPerPurchase: p.bonus_per_purchase,
+      minPurchaseQty: p.min_purchase_qty,
+    }));
+  });
+}

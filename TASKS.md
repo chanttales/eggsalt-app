@@ -56,7 +56,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): add hari ini screen
 - [x] feat(web): add board kanban view
 - [x] feat(web): add card detail with stage stepper and profit
-- [ ] feat(web): add new order sheet
+- [x] feat(web): add new order sheet
 - [ ] feat(web): add stock screen with lots and return countdown
 - [ ] feat(web): add boil batch flow
 - [ ] feat(web): add receive stock and supplier return flows
