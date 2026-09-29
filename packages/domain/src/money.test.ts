@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatRupiah, formatUnitCost, lineTotal, roundRupiah, sumRupiah } from "./money";
+import { formatRupiah, formatUnitCost, lineTotal, roundRupiah, sumRupiah } from "./money.ts";
 
 describe("money", () => {
   it("rounds half away from zero", () => {

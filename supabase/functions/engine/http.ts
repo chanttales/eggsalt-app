@@ -9,14 +9,25 @@ export const CORS_HEADERS = {
 };
 
 export type ErrorCode =
-  "bad_request" | "unauthorized" | "forbidden" | "method_not_allowed" | "unknown_op" | "internal";
+  | "bad_request"
+  | "unauthorized"
+  | "forbidden"
+  | "not_found"
+  | "method_not_allowed"
+  | "conflict"
+  | "unknown_op"
+  | "not_implemented"
+  | "internal";
 
 const STATUS: Record<ErrorCode, number> = {
   bad_request: 400,
   unauthorized: 401,
   forbidden: 403,
+  not_found: 404,
   method_not_allowed: 405,
+  conflict: 409,
   unknown_op: 400,
+  not_implemented: 501,
   internal: 500,
 };
 

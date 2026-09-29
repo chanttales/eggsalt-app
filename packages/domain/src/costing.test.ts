@@ -8,7 +8,7 @@ import {
   purchaseLot,
   roundUnitCost,
   type LotBalance,
-} from "./costing";
+} from "./costing.ts";
 
 // Owner-confirmed numbers for Bisnis Telur Asin (docs/design/01-prd.md, "Worked HPP example").
 const PRICE_MENTAH_BUY = 2300;
