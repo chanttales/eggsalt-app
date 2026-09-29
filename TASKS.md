@@ -23,7 +23,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(domain): add rule evaluator
 - [x] feat(db): add workspace, member and rls helpers
 - [x] feat(db): add parties, items, states, products and prices
-- [ ] feat(db): add card types, fields, boards and versions
+- [x] feat(db): add card types, fields, boards and versions
 - [ ] feat(db): add cards, lines and events
 - [ ] feat(db): add stock lots, movements and reservations
 - [ ] feat(db): add money entries and cost allocations
