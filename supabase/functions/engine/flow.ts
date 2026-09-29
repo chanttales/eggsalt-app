@@ -24,6 +24,7 @@ import {
 } from "./domain.ts";
 import { EngineError } from "./http.ts";
 import type { OpContext } from "./ops.ts";
+import { batchOf, moveStock, release, reserve } from "./stock.ts";
 
 /** Guards against arrows that route in a loop and links that create cards forever. */
 const MAX_DEPTH = 10;
@@ -154,10 +155,16 @@ async function enterStage(
   depth: number,
 ): Promise<void> {
   if (depth > MAX_DEPTH) throw new EngineError("conflict", "Too many automatic steps in a row");
+  // Actions another action already covered (a batch's damaged-egg move), by index.
+  const handledBy = new Map<number, number>();
   for (const [index, action] of stage.onEnter.entries()) {
     card = await lockCard(ctx, card.id);
     const data = await cardData(ctx, card);
-    const detail = await runAction(ctx, card, data, stage, index, action, depth);
+    const covering = handledBy.get(index);
+    const detail =
+      covering === undefined
+        ? await runAction(ctx, card, data, stage, index, action, depth, handledBy)
+        : { handledBy: covering };
     await ctx.tx`
       insert into card_event (workspace_id, card_id, type, to_stage, payload, actor)
       values (${ctx.workspaceId}, ${card.id}, 'action_run', ${stage.key},
@@ -189,6 +196,7 @@ async function runAction(
   index: number,
   action: Action,
   depth: number,
+  handledBy: Map<number, number>,
 ): Promise<Record<string, unknown>> {
   const { tx, workspaceId } = ctx;
   switch (action.action) {
@@ -250,6 +258,17 @@ async function runAction(
         on conflict (workspace_id, dedupe_key) where dedupe_key is not null do nothing
         returning id`;
       return { date, notificationId: row?.id ?? null };
+    }
+    case "reserve_stock":
+      return reserve(ctx, card, data, action);
+    case "release_reservation":
+      return release(ctx, card, action);
+    case "move_stock": {
+      const batch = batchOf(stage, action);
+      if (batch !== undefined) return { handledBy: batch };
+      const { detail, handled } = await moveStock(ctx, card, data, stage, index, action);
+      for (const i of handled) handledBy.set(i, index);
+      return detail;
     }
     default:
       throw new EngineError("not_implemented", `Action ${action.action} is not available yet`);

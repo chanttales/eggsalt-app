@@ -38,7 +38,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] refactor(domain): use explicit .ts import paths so deno can load it
 - [x] feat(db): add keys to boards and items for graph references
 - [x] feat(engine): add create-card and move-card with idempotency
-- [ ] feat(engine): add stock actions (reserve, release, move)
+- [x] feat(engine): add stock actions (reserve, release, move)
 - [ ] feat(engine): add receive-stock, produce and return-lot
 - [ ] feat(engine): add record-money with cost allocation
 - [ ] feat(engine): add undo via compensating actions
