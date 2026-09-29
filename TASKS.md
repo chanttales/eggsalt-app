@@ -28,7 +28,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(db): add stock lots, movements and reservations
 - [x] feat(db): add money entries and cost allocations
 - [x] feat(db): add fifo, purchase, production and return functions
-- [ ] feat(db): add report views
+- [x] feat(db): add report views
 - [ ] feat(db): add notifications and daily cron jobs
 - [ ] feat(template): seed telur asin template
 
