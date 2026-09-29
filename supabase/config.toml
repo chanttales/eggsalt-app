@@ -242,6 +242,16 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# The app signs in with a 6-digit code (works the same on web and in the Android app), so both
+# emails a sign-in can send show {{ .Token }}: confirmation for a new user, magic_link otherwise.
+[auth.email.template.confirmation]
+subject = "Kode masuk Papan"
+content_path = "./supabase/templates/login-code.html"
+
+[auth.email.template.magic_link]
+subject = "Kode masuk Papan"
+content_path = "./supabase/templates/login-code.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"

@@ -48,7 +48,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 
 ## M1.4 Screens
 
-- [ ] feat(web): add supabase client, auth and workspace guard
+- [x] feat(web): add supabase client, auth and workspace guard
 - [ ] feat(web): add query client with persistence and outbox
 - [ ] feat(web): add onboarding with telur asin template
 - [ ] feat(web): add hari ini screen
