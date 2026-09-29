@@ -1,0 +1,617 @@
+<title>Papan Telur Asin Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: phone frame centered, annotation panel beside it on wide screens; frame fills the screen on phones */
+:root{
+  --bg:#EDEBE4; --background:#FAFAF7; --surface:#FFFFFF; --surface-muted:#F2F1EC; --border:#E4E2DA;
+  --fg:#1C2421; --muted:#5E6B66; --primary:#0F766E; --primary-fg:#FFFFFF; --primary-soft:#E0F2EF;
+  --accent:#F59E0B; --accent-fg:#3A2500; --success:#15803D; --warning:#B45309; --danger:#B91C1C; --info:#1D4ED8;
+  --warning-soft:#FDF3D6; --danger-soft:#FBE4E4; --success-soft:#E1F5E6;
+  --s-gray-bg:#EEEDE8; --s-gray:#44504B; --s-orange-bg:#FDEBDD; --s-orange:#9A3412; --s-teal-bg:#DDF3EF; --s-teal:#0F5F58;
+  --s-blue-bg:#E0EAFD; --s-blue:#1E40AF; --s-green-bg:#E1F5E6; --s-green:#166534; --s-amber-bg:#FDF3D6; --s-amber:#854D0E; --s-violet-bg:#EDE7FD; --s-violet:#5B21B6;
+  --shadow1:0 1px 2px rgb(0 0 0 / .06); --shadow2:0 8px 24px rgb(0 0 0 / .14);
+  --font:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0A0E0D; --background:#0F1412; --surface:#161C1A; --surface-muted:#1E2523; --border:#2A3330;
+  --fg:#EEF2F0; --muted:#9AA8A2; --primary:#2DB3A5; --primary-fg:#06201D; --primary-soft:#123330;
+  --accent:#FBBF24; --accent-fg:#2A1B00; --success:#4ADE80; --warning:#FBBF24; --danger:#F87171; --info:#60A5FA;
+  --warning-soft:#2E2610; --danger-soft:#321616; --success-soft:#12291A;
+  --s-gray-bg:#262D2B; --s-gray:#C4CCC9; --s-orange-bg:#35200F; --s-orange:#FDBA8C; --s-teal-bg:#123330; --s-teal:#7EDDD2;
+  --s-blue-bg:#16233F; --s-blue:#A5C0FB; --s-green-bg:#12291A; --s-green:#86EFAC; --s-amber-bg:#2E2610; --s-amber:#FCD34D; --s-violet-bg:#241A3D; --s-violet:#C4B5FD;
+  --shadow2:0 8px 24px rgb(0 0 0 / .5); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0A0E0D; --background:#0F1412; --surface:#161C1A; --surface-muted:#1E2523; --border:#2A3330;
+  --fg:#EEF2F0; --muted:#9AA8A2; --primary:#2DB3A5; --primary-fg:#06201D; --primary-soft:#123330;
+  --accent:#FBBF24; --accent-fg:#2A1B00; --success:#4ADE80; --warning:#FBBF24; --danger:#F87171; --info:#60A5FA;
+  --warning-soft:#2E2610; --danger-soft:#321616; --success-soft:#12291A;
+  --s-gray-bg:#262D2B; --s-gray:#C4CCC9; --s-orange-bg:#35200F; --s-orange:#FDBA8C; --s-teal-bg:#123330; --s-teal:#7EDDD2;
+  --s-blue-bg:#16233F; --s-blue:#A5C0FB; --s-green-bg:#12291A; --s-green:#86EFAC; --s-amber-bg:#2E2610; --s-amber:#FCD34D; --s-violet-bg:#241A3D; --s-violet:#C4B5FD;
+  --shadow2:0 8px 24px rgb(0 0 0 / .5); color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.5}
+.num{font-variant-numeric:tabular-nums}
+.wrap{display:flex;gap:32px;justify-content:center;align-items:flex-start;padding-inline:16px;padding-block:24px;min-height:100%}
+.notes{width:320px;flex:none;position:sticky;top:24px;display:flex;flex-direction:column;gap:16px}
+.notes h1{font-size:22px;line-height:28px;margin:0;text-wrap:balance}
+.notes p{margin:0;color:var(--muted);font-size:14px}
+.note-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.note-box .eyebrow{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.note-box h2{margin:0;font-size:18px}
+.note-box ul{margin:0;padding-left:18px;font-size:14px;color:var(--fg)}
+.note-box li{margin-block:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px}
+.legend span{font-size:12px;border:1px solid var(--border);border-radius:999px;padding:2px 8px;color:var(--muted)}
+
+.phone{width:390px;max-width:100%;height:min(820px, calc(100dvh - 48px));min-height:560px;background:var(--background);border:10px solid #1B1F1E;border-radius:44px;position:relative;overflow:hidden;box-shadow:var(--shadow2);flex:none;display:flex;flex-direction:column}
+@media (max-width:760px){
+  .notes{display:none}
+  .wrap{padding:0;display:block}
+  .phone{width:100%;height:100dvh;min-height:0;border:0;border-radius:0;box-shadow:none}
+}
+.statusbar{height:28px;flex:none;display:flex;justify-content:space-between;align-items:center;padding-inline:22px;font-size:12px;font-weight:600;color:var(--fg)}
+@media (max-width:760px){.statusbar{display:none}}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding-inline:16px;padding-block:8px 110px}
+.screen::-webkit-scrollbar{width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-block:8px 12px}
+.topbar h2{margin:0;font-size:22px;line-height:28px;font-weight:700}
+.sub{color:var(--muted);font-size:14px}
+.cap{font-size:12px;line-height:16px;color:var(--muted);font-weight:500}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--fg);display:grid;place-items:center;cursor:pointer}
+.iconbtn svg{width:20px;height:20px}
+.section-title{font-size:14px;font-weight:600;color:var(--muted);margin:20px 0 8px;display:flex;justify-content:space-between;align-items:center}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0;cursor:pointer;text-align:left;color:var(--fg);font:inherit}
+.tile .big{font-size:26px;line-height:32px;font-weight:700}
+.tile .lbl{font-size:13px;color:var(--muted);font-weight:500}
+
+.banner{border-radius:16px;padding:12px;display:flex;gap:12px;align-items:flex-start;margin-top:12px}
+.banner.suggest{background:var(--primary-soft)}
+.banner.warn{background:var(--warning-soft)}
+.banner .ico{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--surface)}
+.banner .ico svg{width:18px;height:18px}
+.banner .txt{flex:1;min-width:0;font-size:14px}
+.banner .txt b{display:block;font-size:15px}
+.banner .act{margin-top:8px}
+
+.btn{min-height:44px;border-radius:12px;border:0;padding:0 16px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--primary);color:var(--primary-fg)}
+.btn.secondary{background:var(--primary-soft);color:var(--primary)}
+.btn.ghost{background:transparent;color:var(--primary)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.sm{min-height:36px;font-size:14px;padding:0 12px;border-radius:10px}
+.btn.block{width:100%;min-height:52px}
+.btn:focus-visible,.chip:focus-visible,.tab:focus-visible,.iconbtn:focus-visible,.card:focus-visible,.tile:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+
+.list{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:12px;border-top:1px solid var(--border);cursor:pointer;min-height:56px}
+.row:first-child{border-top:0}
+.row .main{flex:1;min-width:0}
+.row .main b{display:block;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .right{text-align:right;font-weight:600;font-size:15px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:2px 8px;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.p-gray{background:var(--s-gray-bg);color:var(--s-gray)} .p-orange{background:var(--s-orange-bg);color:var(--s-orange)}
+.p-teal{background:var(--s-teal-bg);color:var(--s-teal)} .p-blue{background:var(--s-blue-bg);color:var(--s-blue)}
+.p-green{background:var(--s-green-bg);color:var(--s-green)} .p-amber{background:var(--s-amber-bg);color:var(--s-amber)}
+.p-violet{background:var(--s-violet-bg);color:var(--s-violet)} .p-danger{background:var(--danger-soft);color:var(--danger)}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips.wrapc{flex-wrap:wrap;overflow:visible}
+.chip{flex:none;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--fg);font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+.chip.on{background:var(--primary-soft);border-color:var(--primary);color:var(--primary);font-weight:600}
+
+.kanban{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-16px;padding-inline:16px;padding-bottom:8px;scrollbar-width:none}
+.col{flex:none;width:280px;scroll-snap-align:start;background:var(--surface-muted);border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:8px;align-self:flex-start}
+.col-h{display:flex;align-items:center;gap:8px;padding:4px 4px 2px;font-weight:600;font-size:14px}
+.col-h .count{color:var(--muted);font-weight:500}
+.card{background:var(--surface);border-radius:12px;padding:12px;box-shadow:var(--shadow1);border-left:4px solid var(--border);cursor:pointer;display:flex;flex-direction:column;gap:4px;text-align:left;color:var(--fg);font:inherit;border-top:0;border-right:0;border-bottom:0;width:100%}
+.card b{font-size:15px}
+.card .meta{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted)}
+.card .amt{font-weight:600;color:var(--fg)}
+.empty{font-size:13px;color:var(--muted);padding:8px;text-align:center}
+
+.stepper{display:flex;gap:4px;margin:12px 0}
+.stepper .st{flex:1;display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--muted);font-weight:500;min-width:0}
+.stepper .bar{height:6px;border-radius:3px;background:var(--border)}
+.stepper .st.done .bar{background:var(--primary)} .stepper .st.cur .bar{background:var(--accent)}
+.stepper .st.cur{color:var(--fg);font-weight:600}
+
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;text-align:right;font-weight:600}
+.pb{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.pb div{display:flex;justify-content:space-between}
+.pb .tot{border-top:1px dashed var(--border);padding-top:8px;font-size:17px;font-weight:700}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
+.hist{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.hist div::before{content:"⚡ ";}
+.hist div.m::before{content:"→ ";}
+
+.meter{display:flex;flex-direction:column;gap:6px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:16px}
+.meter .top{display:flex;justify-content:space-between;align-items:baseline}
+.meter .top b{font-size:24px}
+.track{height:8px;background:var(--surface-muted);border-radius:4px;overflow:hidden;display:flex}
+.track i{display:block;height:100%}
+.stock-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.seg{display:flex;background:var(--surface-muted);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;min-height:40px;border:0;border-radius:9px;background:transparent;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--fg);box-shadow:var(--shadow1)}
+
+.qty{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface-muted);border-radius:16px;padding:8px}
+.qty button{width:52px;height:52px;border-radius:12px;border:0;background:var(--surface);font-size:24px;font-weight:600;color:var(--fg);cursor:pointer}
+.qty .v{text-align:center}
+.qty .v b{font-size:32px;line-height:40px;display:block}
+.effect{background:var(--surface-muted);border-radius:12px;padding:10px 12px;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.effect b{font-weight:600}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;font-weight:500}
+.input{min-height:48px;border-radius:12px;border:1px solid var(--border);background:var(--surface);padding:0 14px;font:inherit;font-size:16px;color:var(--fg);width:100%}
+
+.tabbar{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+.tab{flex:1;min-height:60px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;position:relative}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--primary)}
+.tab .badge{position:absolute;top:6px;left:calc(50% + 6px);background:var(--danger);color:#fff;font-size:10px;border-radius:999px;padding:0 5px;line-height:16px}
+.fab{position:absolute;right:16px;bottom:76px;width:60px;height:60px;border-radius:50%;background:var(--primary);color:var(--primary-fg);border:0;box-shadow:0 0 0 4px var(--accent),var(--shadow2);cursor:pointer;display:grid;place-items:center;z-index:6}
+.fab svg{width:28px;height:28px}
+
+.scrim{position:absolute;inset:0;background:rgb(0 0 0 / .4);z-index:10;display:flex;align-items:flex-end}
+.sheet{background:var(--surface);width:100%;max-height:92%;overflow-y:auto;border-radius:20px 20px 0 0;padding:8px 16px 20px;display:flex;flex-direction:column;gap:14px;animation:up .25s cubic-bezier(.2,.8,.2,1)}
+.sheet .handle{width:40px;height:4px;border-radius:2px;background:var(--border);align-self:center;margin-bottom:4px}
+.sheet h3{margin:0;font-size:18px;line-height:24px}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+.toast{position:absolute;left:16px;right:16px;bottom:76px;background:var(--fg);color:var(--background);border-radius:12px;padding:10px 12px 10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;z-index:20;box-shadow:var(--shadow2)}
+.toast button{background:transparent;border:0;color:var(--accent);font:inherit;font-weight:700;cursor:pointer;min-height:36px}
+.back{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;color:var(--primary);font:inherit;font-weight:600;cursor:pointer;min-height:40px;padding:0}
+.editor-stage{display:flex;gap:12px;align-items:flex-start;padding:12px;border-top:1px solid var(--border)}
+.editor-stage:first-child{border-top:0}
+.editor-stage .grip{color:var(--muted);font-size:18px;line-height:20px;cursor:grab}
+.editor-stage .acts{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.editor-stage .acts span{font-size:12px;background:var(--surface-muted);border-radius:6px;padding:2px 6px;color:var(--muted)}
+.rule{border:1px dashed var(--primary);border-radius:12px;padding:10px 12px;font-size:14px;background:var(--primary-soft);color:var(--fg)}
+</style>
+
+<div class="wrap">
+  <aside class="notes" aria-label="Screen notes">
+    <div>
+      <h1>Papan · Telur Asin</h1>
+      <p>Clickable phone wireframe, roadmap step 5. The data is sample data built from the owners' real prices; tap anything.</p>
+    </div>
+    <div class="note-box" id="note"></div>
+    <div class="note-box">
+      <div class="eyebrow">Try this</div>
+      <ul>
+        <li>Tap <b>+</b> → Pesanan, pick 40 matang (stock runs short)</li>
+        <li>Hari ini → <b>Rebus</b> suggestion, then sort the batch</li>
+        <li>Papan → a card in Disiapkan → <b>Tandai dikirim</b> → pay</li>
+        <li>Stok → the lot due today → <b>Retur</b></li>
+        <li>Lainnya → Atur papan → add a stage</li>
+      </ul>
+    </div>
+    <div class="legend"><span>⚡ automatic action</span><span>Undo on every toast</span><span>Effect line before saving</span></div>
+  </aside>
+
+  <div class="phone" id="phone">
+    <div class="statusbar"><span>09.41</span><span>●●● 4G ▮</span></div>
+    <main class="screen" id="screen" tabindex="-1"></main>
+    <button class="fab" id="fab" aria-label="Tambah"></button>
+    <nav class="tabbar" id="tabbar" aria-label="Navigasi utama"></nav>
+    <div id="layer"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+const I = {
+  sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  board:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 7v7M12 7v4M16 7v9"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/></svg>',
+  wallet:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2M6 6l10-3 1 3"/></svg>',
+  menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  flame:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 22c4 0 7-3 7-7 0-5-5-7-5-12-3 2-5 5-5 8-1-1-2-2-2-4-2 2-2 5-2 8 0 4 3 7 7 7z"/></svg>',
+  undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 8a6 6 0 1112 0c0 7 3 8 3 8H3s3-1 3-8M10 21h4"/></svg>'
+};
+
+const HPP = {matang:2339, mentah:2244};
+const PRICE = {Matang:3500, Mentah:3300};
+const rp = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+const STAGES = [
+  {id:'baru', name:'Baru', c:'gray'},
+  {id:'rebus', name:'Menunggu rebus', c:'orange'},
+  {id:'siap', name:'Disiapkan', c:'teal'},
+  {id:'kirim', name:'Dikirim', c:'blue'},
+  {id:'selesai', name:'Selesai', c:'green'}
+];
+const stageOf = id => STAGES.find(s=>s.id===id);
+
+const S = {
+  tab:'today', view:null, board:'Pesanan', period:'Minggu',
+  stock:{mentah:167, matang:35, rusak:2},
+  lots:[
+    {id:'L1', date:'24 Sep', qty:38, cost:2244, returnIn:0},
+    {id:'L2', date:'27 Sep', qty:129, cost:2244, returnIn:3}
+  ],
+  customers:[
+    {n:'Warung Bu Siti', t:'Warung'},{n:'Warung Pak Darmo', t:'Warung'},{n:'Warung Mbak Yuni', t:'Warung'},
+    {n:'Catering Bu Rina', t:'Catering'},{n:'Warung Barokah', t:'Warung'}
+  ],
+  orders:[
+    {id:12, cust:'Warung Bu Siti', variant:'Matang', qty:20, stage:'siap', due:'Hari ini', ship:0, paid:0, hist:['Dibuat 07.12','Stok cukup: 20 matang dipesan']},
+    {id:13, cust:'Warung Pak Darmo', variant:'Matang', qty:15, stage:'rebus', due:'Hari ini', ship:0, paid:0, hist:['Dibuat 07.40','Stok matang kurang: menunggu rebus']},
+    {id:14, cust:'Warung Mbak Yuni', variant:'Matang', qty:25, stage:'rebus', due:'Besok', ship:0, paid:0, hist:['Dibuat 08.05','Stok matang kurang: menunggu rebus']},
+    {id:11, cust:'Warung Barokah', variant:'Mentah', qty:10, stage:'kirim', due:'Hari ini', ship:5000, paid:0, hist:['Dibuat kemarin','Stok mentah −10','Ongkir Rp 5.000 dicatat']},
+    {id:10, cust:'Warung Bu Siti', variant:'Matang', qty:25, stage:'selesai', due:'Kemarin', ship:5000, paid:87500, hist:['Selesai kemarin','Pembayaran Rp 87.500 tunai']},
+    {id:9, cust:'Catering Bu Rina', variant:'Matang', qty:100, stage:'baru', due:'Sab, 4 Okt', ship:10000, paid:100000, pre:true, hist:['Pre-order dibuat','DP Rp 100.000 transfer','Pengingat rebus H-1 dijadwalkan']}
+  ],
+  tx:[
+    {d:'Kemarin', t:'Pembayaran · Warung Bu Siti', a:87500, dir:'in'},
+    {d:'27 Sep', t:'DP · Catering Bu Rina', a:100000, dir:'in'},
+    {d:'27 Sep', t:'Pembelian 200 (+5) mentah', a:460000, dir:'out'},
+    {d:'26 Sep', t:'LPG 3 kg', a:22000, dir:'out'},
+    {d:'26 Sep', t:'Ongkir · 2 pesanan', a:10000, dir:'out'}
+  ],
+  editorStages:[
+    {n:'Baru', c:'gray', a:['Cek stok matang']},
+    {n:'Menunggu rebus', c:'orange', a:['Buat batch rebus']},
+    {n:'Disiapkan', c:'teal', a:['Pesan stok']},
+    {n:'Dikirim', c:'blue', a:['Stok −jumlah','Wajib: ongkir']},
+    {n:'Selesai', c:'green', a:['Catat pembayaran','Hitung laba']}
+  ],
+  draft:false
+};
+const reserved = () => S.orders.filter(o=>o.stage==='siap'&&o.variant==='Matang').reduce((a,o)=>a+o.qty,0);
+const availMatang = () => S.stock.matang - reserved();
+const total = o => o.qty*PRICE[o.variant];
+const profit = o => total(o) - o.qty*(o.variant==='Matang'?HPP.matang:HPP.mentah) - o.ship;
+
+const NOTES = {
+  today:['S03','Hari ini','What to do now. Tiles count live from the board; suggestions and the day-5 return task sit on top.',['StatTile','SuggestionBanner','Return task (IN-5)','List rows deep-link to the step']],
+  board:['S04','Papan · Kanban','Default view of a board. Columns snap one per swipe on phones. Tap a card to open it.',['Board switcher chips','StageColumn','BoardCard with stage-color edge']],
+  card:['S05','Detail pesanan','Where the order is, what happens next, and whether it makes money.',['StageStepper','ProfitBreakdown','Riwayat shows every ⚡ action','Next-step button opens a sheet']],
+  stock:['S08','Stok','Stock by state, plus lots in FIFO order with the 5-day return countdown.',['StockMeter','LotRow with return badge','Retur is one tap on the due lot']],
+  money:['S12','Uang','Money in, money out, profit. HPP comes from lots and batches, not typed in.',['SegmentedControl period','P&L breakdown','Transactions']],
+  more:['S16','Lainnya','Weekly things: lists, reports, board setup, settings.',['List rows','Entry to Atur papan']],
+  editor:['S21','Atur papan (phone)','Phone version of the board editor. The full canvas with arrows is on the web.',['Stage rows with actions','RuleBuilder summary','Draft → Terbitkan versi']],
+};
+
+const $ = s => document.querySelector(s);
+const screen = $('#screen'), layer = $('#layer');
+let toastTimer;
+
+function toast(msg, undo){
+  clearTimeout(toastTimer);
+  const el = document.createElement('div');
+  el.className='toast'; el.setAttribute('role','status');
+  el.innerHTML = '<span>'+msg+'</span>'+(undo?'<button type="button">Batalkan</button>':'');
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  $('#phone').appendChild(el);
+  if(undo){ el.querySelector('button').onclick=()=>{undo(); el.remove(); render(); toast('Dibatalkan');}; }
+  toastTimer=setTimeout(()=>el.remove(), 5000);
+}
+const snapshot = () => JSON.parse(JSON.stringify({stock:S.stock,lots:S.lots,orders:S.orders,tx:S.tx}));
+const restore = snap => Object.assign(S, snap);
+
+function renderTabs(){
+  const unpaid = S.orders.filter(o=>o.stage==='kirim').length;
+  const tabs=[['today','Hari ini',I.sun,S.lots.some(l=>l.returnIn===0)?1:0],['board','Papan',I.board,0],['stock','Stok',I.box,0],['money','Uang',I.wallet,unpaid],['more','Lainnya',I.menu,0]];
+  $('#tabbar').innerHTML = tabs.map(([id,l,ic,b])=>'<button class="tab'+(S.tab===id&&!S.view?' on':'')+'" data-tab="'+id+'" aria-current="'+(S.tab===id?'page':'false')+'">'+ic+l+(b?'<span class="badge">'+b+'</span>':'')+'</button>').join('');
+  $('#tabbar').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;S.view=null;render();screen.scrollTop=0;});
+  $('#fab').innerHTML=I.plus; $('#fab').onclick=openQuickAdd;
+}
+
+function renderNote(){
+  const key = S.view ? S.view.type : S.tab;
+  const n = NOTES[key]; if(!n) return;
+  $('#note').innerHTML='<div class="eyebrow">'+n[0]+' · screen</div><h2>'+n[1]+'</h2><p>'+n[2]+'</p><ul>'+n[3].map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+}
+
+function orderRow(o){
+  const s=stageOf(o.stage);
+  return '<div class="row" data-card="'+o.id+'"><span class="dot" style="background:var(--s-'+s.c+')"></span><div class="main"><b>'+o.cust+'</b><span class="cap">'+o.qty+' '+o.variant.toLowerCase()+' · '+o.due+'</span></div><span class="pill p-'+s.c+'">'+s.name+'</span></div>';
+}
+
+function viewToday(){
+  const rebusOrders=S.orders.filter(o=>o.stage==='rebus');
+  const need=rebusOrders.reduce((a,o)=>a+o.qty,0);
+  const due=S.orders.filter(o=>o.due==='Hari ini'&&o.stage!=='selesai');
+  const lot=S.lots.find(l=>l.returnIn===0);
+  const unpaid=S.orders.filter(o=>o.stage==='kirim').reduce((a,o)=>a+total(o),0);
+  return '<div class="topbar"><div><div class="sub">Senin, 29 Sep</div><h2>Hari ini</h2></div><div style="display:flex;gap:8px"><button class="iconbtn" aria-label="Cari">'+I.search+'</button><button class="iconbtn" aria-label="Notifikasi">'+I.bell+'</button></div></div>'+
+  '<div class="tiles">'+
+   '<button class="tile" data-go="board"><span class="big num">'+due.length+'</span><span class="lbl">Pesanan hari ini</span></button>'+
+   '<button class="tile" data-act="rebus"><span class="big num">'+(need?need+2:0)+'</span><span class="lbl">Telur perlu direbus</span></button>'+
+   '<button class="tile" data-go="board"><span class="big num">'+S.orders.filter(o=>o.stage==='siap').length+'</span><span class="lbl">Siap diantar</span></button>'+
+   '<button class="tile" data-go="money"><span class="big num" style="font-size:20px">'+rp(unpaid)+'</span><span class="lbl">Belum dibayar</span></button>'+
+  '</div>'+
+  (lot?'<div class="banner warn"><span class="ico" style="color:var(--warning)">'+I.undo+'</span><div class="txt"><b>Retur hari ini: '+lot.qty+' telur mentah</b>Batch '+lot.date+' sudah hari ke-5. Sisa telur mentah dikembalikan ke supplier.<div class="act"><button class="btn sm primary" data-act="retur" data-lot="'+lot.id+'">Retur sekarang</button></div></div></div>':'')+
+  (need?'<div class="banner suggest"><span class="ico" style="color:var(--primary)">'+I.flame+'</span><div class="txt"><b>Rebus '+(need+2)+' telur sekali jalan</b>'+rebusOrders.length+' pesanan menunggu. Satu batch lebih hemat daripada rebus terpisah (susut 2 telur per batch).<div class="act"><button class="btn sm primary" data-act="rebus">Mulai rebus</button></div></div></div>':'')+
+  '<div class="section-title">Jatuh tempo hari ini</div>'+
+  '<div class="list">'+(due.length?due.map(orderRow).join(''):'<div class="empty">Tidak ada pesanan hari ini.</div>')+'</div>'+
+  '<div class="section-title">Pre-order mendatang</div>'+
+  '<div class="list">'+S.orders.filter(o=>o.pre).map(orderRow).join('')+'</div>';
+}
+
+function viewBoard(){
+  const boards=['Pesanan','Pre-order','Rebus','Pembelian'];
+  return '<div class="topbar"><h2>Papan</h2><button class="iconbtn" aria-label="Cari">'+I.search+'</button></div>'+
+  '<div class="chips" role="tablist">'+boards.map(b=>'<button class="chip'+(S.board===b?' on':'')+'" data-board="'+b+'">'+b+'</button>').join('')+'</div>'+
+  (S.board!=='Pesanan'?'<div class="panel" style="margin-top:12px"><b>'+S.board+'</b><p class="sub" style="margin:4px 0 0">This board works the same way; the prototype fills in only Pesanan. See the user flows doc for its stages.</p></div>':
+  '<div class="sub" style="margin:8px 0">Geser untuk tahap berikutnya →</div><div class="kanban">'+STAGES.map(s=>{
+    const cards=S.orders.filter(o=>o.stage===s.id&&!o.pre);
+    return '<section class="col" aria-label="'+s.name+'"><div class="col-h"><span class="dot" style="background:var(--s-'+s.c+')"></span>'+s.name+' <span class="count">'+cards.length+'</span></div>'+
+      (cards.length?cards.map(o=>'<button class="card" data-card="'+o.id+'" style="border-left-color:var(--s-'+s.c+')"><b>'+o.cust+'</b><div class="meta"><span>'+o.qty+' '+o.variant.toLowerCase()+' · '+o.due+'</span><span class="amt num">'+rp(total(o))+'</span></div>'+(o.stage==='rebus'?'<span class="pill p-orange" style="align-self:flex-start">Stok matang kurang</span>':'')+'</button>').join(''):'<div class="empty">Kosong</div>')+'</section>';
+  }).join('')+'</div>');
+}
+
+function viewCard(id){
+  const o=S.orders.find(x=>x.id===id); if(!o) return viewBoard();
+  const idx=STAGES.findIndex(s=>s.id===o.stage);
+  const nextLabel={baru:'Cek stok',rebus:'Buka batch rebus',siap:'Tandai dikirim',kirim:'Catat pembayaran'}[o.stage];
+  const cogs=o.qty*(o.variant==='Matang'?HPP.matang:HPP.mentah);
+  return '<button class="back" data-back>‹ Kembali</button>'+
+  '<div class="topbar" style="padding-top:0"><div><div class="sub">Pesanan #'+String(o.id).padStart(3,'0')+(o.pre?' · Pre-order':'')+'</div><h2>'+o.cust+'</h2></div><span class="pill p-'+stageOf(o.stage).c+'">'+stageOf(o.stage).name+'</span></div>'+
+  '<div class="stepper">'+STAGES.map((s,i)=>'<div class="st '+(i<idx?'done':i===idx?'cur':'')+'"><span class="bar"></span>'+s.name+'</div>').join('')+'</div>'+
+  '<div class="panel"><dl class="kv"><dt>Produk</dt><dd>Telur asin '+o.variant.toLowerCase()+'</dd><dt>Jumlah</dt><dd class="num">'+o.qty+' butir</dd><dt>Harga</dt><dd class="num">'+rp(PRICE[o.variant])+'</dd><dt>Jatuh tempo</dt><dd>'+o.due+'</dd><dt>Dibayar</dt><dd class="num">'+rp(o.paid)+'</dd></dl></div>'+
+  '<div class="section-title">Laba pesanan ini</div>'+
+  '<div class="panel pb num"><div><span>Pendapatan</span><span>'+rp(total(o))+'</span></div><div><span>HPP ('+o.qty+' × '+rp(o.variant==='Matang'?HPP.matang:HPP.mentah)+')</span><span>−'+rp(cogs)+'</span></div><div><span>Ongkir</span><span>−'+rp(o.ship)+'</span></div><div class="tot"><span>Laba</span><span style="color:var(--success)">'+rp(profit(o))+' ('+Math.round(profit(o)/total(o)*100)+'%)</span></div></div>'+
+  '<div class="section-title">Riwayat</div><div class="panel hist">'+o.hist.map(h=>'<div>'+h+'</div>').join('')+'</div>'+
+  (nextLabel?'<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px"><button class="btn primary block" data-next="'+o.id+'">'+nextLabel+' →</button><button class="btn ghost" data-skip="'+o.id+'">Lewati tahap (dengan alasan)</button></div>':'');
+}
+
+function viewStock(){
+  const res=reserved(), t=S.stock.matang||1;
+  return '<div class="topbar"><h2>Stok</h2><span class="sub">Telur asin bebek</span></div>'+
+  '<div class="stock-grid">'+
+   meter('Mentah', S.stock.mentah, 'amber', 0)+
+   meter('Matang', S.stock.matang, 'orange', res)+
+   meter('Rusak / susut', S.stock.rusak, 'gray', 0)+
+   meter('Dipesan', res, 'violet', 0)+
+  '</div>'+
+  '<div class="section-title">Batch dari supplier (FIFO, terlama dipakai dulu)</div>'+
+  '<div class="list">'+(S.lots.length?S.lots.map(l=>'<div class="row" data-lot="'+l.id+'"><div class="main"><b>Batch '+l.date+'</b><span class="cap num">'+l.qty+' butir · HPP '+rp(l.cost)+'/butir</span></div>'+(l.returnIn===0?'<span class="pill p-danger">Retur hari ini</span>':'<span class="pill p-amber">Retur '+l.returnIn+' hari lagi</span>')+'</div>').join(''):'<div class="empty">Semua batch sudah terpakai atau diretur.</div>')+'</div>'+
+  '<div class="section-title">Aksi</div><div class="chips wrapc"><button class="chip" data-act="terima">Terima stok</button><button class="chip" data-act="rebus">Rebus</button><button class="chip">Catat rusak</button><button class="chip">Stok opname</button></div>';
+}
+function meter(label,n,c,res){
+  const trays=Math.floor(n/30), rest=n%30;
+  const pct = res&&n? Math.min(100,res/n*100):0;
+  return '<div class="meter"><div class="top"><span class="cap">'+label+'</span><span class="pill p-'+c+'">'+(res?res+' dipesan':'')+'</span></div><b class="num">'+n+'</b><span class="cap num">'+trays+' tray + '+rest+'</span><div class="track"><i style="width:'+pct+'%;background:var(--s-violet)"></i><i style="flex:1;background:var(--s-'+c+'-bg)"></i></div></div>';
+}
+
+function viewMoney(){
+  const done=S.orders.filter(o=>o.stage==='selesai'||o.stage==='kirim');
+  const rev=done.reduce((a,o)=>a+total(o),0);
+  const cogs=done.reduce((a,o)=>a+o.qty*(o.variant==='Matang'?HPP.matang:HPP.mentah),0);
+  const ship=done.reduce((a,o)=>a+o.ship,0);
+  const other=22000*0.1;
+  const inn=S.tx.filter(t=>t.dir==='in').reduce((a,t)=>a+t.a,0), out=S.tx.filter(t=>t.dir==='out').reduce((a,t)=>a+t.a,0);
+  return '<div class="topbar"><h2>Uang</h2></div>'+
+  '<div class="seg">'+['Hari','Minggu','Bulan'].map(p=>'<button class="'+(S.period===p?'on':'')+'" data-period="'+p+'">'+p+'</button>').join('')+'</div>'+
+  '<div class="tiles" style="margin-top:12px"><div class="tile"><span class="lbl">Uang masuk</span><span class="big num" style="font-size:20px;color:var(--success)">'+rp(inn)+'</span></div><div class="tile"><span class="lbl">Uang keluar</span><span class="big num" style="font-size:20px">'+rp(out)+'</span></div></div>'+
+  '<div class="section-title">Laba rugi · '+S.period.toLowerCase()+' ini</div>'+
+  '<div class="panel pb num"><div><span>Penjualan ('+done.length+' pesanan)</span><span>'+rp(rev)+'</span></div><div><span>HPP</span><span>−'+rp(cogs)+'</span></div><div><span>Ongkir</span><span>−'+rp(ship)+'</span></div><div><span>Biaya lain (LPG umum)</span><span>−'+rp(other)+'</span></div><div class="tot"><span>Laba bersih</span><span style="color:var(--success)">'+rp(rev-cogs-ship-other)+'</span></div></div>'+
+  '<p class="cap" style="margin:6px 2px 0">Pembelian stok tidak dihitung sebagai biaya sampai telurnya terjual (masuk HPP).</p>'+
+  '<div class="section-title">Transaksi</div><div class="list">'+S.tx.map(t=>'<div class="row"><div class="main"><b>'+t.t+'</b><span class="cap">'+t.d+'</span></div><span class="right num" style="color:'+(t.dir==='in'?'var(--success)':'var(--fg)')+'">'+(t.dir==='in'?'+':'−')+rp(t.a)+'</span></div>').join('')+'</div>';
+}
+
+function viewMore(){
+  const rows=[['Pelanggan','5 pelanggan'],['Produk & harga','Mentah Rp 3.300 · Matang Rp 3.500'],['Supplier','1 supplier · bonus +5, retur 5 hari'],['Laporan','Laba rugi, laba per pesanan, HPP & susut'],['Atur papan','4 papan · ubah tahap dan aturan','editor'],['Pengaturan','Usaha, biaya produksi, anggota']];
+  return '<div class="topbar"><h2>Lainnya</h2></div><div class="list">'+rows.map(r=>'<div class="row" '+(r[2]?'data-open="'+r[2]+'"':'')+'><div class="main"><b>'+r[0]+'</b><span class="cap">'+r[1]+'</span></div><span class="sub">›</span></div>').join('')+'</div>';
+}
+
+function viewEditor(){
+  return '<button class="back" data-back>‹ Lainnya</button><div class="topbar" style="padding-top:0"><div><div class="sub">Atur papan'+(S.draft?' · draf':' · versi 1')+'</div><h2>Pesanan</h2></div></div>'+
+  '<div class="rule"><b>Aturan masuk:</b> Jika <u>Jumlah ≥ 100</u> atau <u>Pelanggan = Catering</u> → pindah ke papan <b>Pre-order</b></div>'+
+  '<div class="section-title">Tahap (geser untuk urutkan)</div>'+
+  '<div class="list">'+S.editorStages.map((s,i)=>'<div class="editor-stage"><span class="grip" aria-hidden="true">⋮⋮</span><span class="dot" style="background:var(--s-'+s.c+');margin-top:6px"></span><div style="flex:1;min-width:0"><b>'+s.n+'</b><div class="acts">'+s.a.map(a=>'<span>⚡ '+a+'</span>').join('')+'</div></div></div>').join('')+'</div>'+
+  '<div class="field" style="margin-top:12px"><label for="newstage">Tahap baru</label><div style="display:flex;gap:8px"><input id="newstage" class="input" placeholder="mis. Cek kualitas"><button class="btn secondary" data-act="addstage">Tambah</button></div><span class="cap">Ditambahkan sebelum "Dikirim".</span></div>'+
+  '<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px"><button class="btn primary block" data-act="publish"'+(S.draft?'':' disabled style="opacity:.5"')+'>Terbitkan versi 2</button><span class="cap" style="text-align:center">Pesanan yang sedang berjalan tetap di versi 1 sampai selesai. Kanvas dengan panah dan cabang tersedia di versi web.</span></div>';
+}
+
+function render(){
+  let html;
+  if(S.view){
+    html = S.view.type==='card'?viewCard(S.view.id):viewEditor();
+  } else html = {today:viewToday,board:viewBoard,stock:viewStock,money:viewMoney,more:viewMore}[S.tab]();
+  screen.innerHTML=html;
+  renderTabs(); renderNote(); bind();
+}
+
+function bind(){
+  screen.querySelectorAll('[data-card]').forEach(el=>el.onclick=()=>{S.view={type:'card',id:+el.dataset.card};render();screen.scrollTop=0;});
+  screen.querySelectorAll('[data-go]').forEach(el=>el.onclick=()=>{S.tab=el.dataset.go;S.view=null;render();});
+  screen.querySelectorAll('[data-board]').forEach(el=>el.onclick=()=>{S.board=el.dataset.board;render();});
+  screen.querySelectorAll('[data-period]').forEach(el=>el.onclick=()=>{S.period=el.dataset.period;render();});
+  screen.querySelectorAll('[data-back]').forEach(el=>el.onclick=()=>{S.view=null;render();});
+  screen.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>{S.view={type:'editor'};render();});
+  screen.querySelectorAll('[data-lot]').forEach(el=>el.onclick=(e)=>{e.stopPropagation();openRetur(el.dataset.lot);});
+  screen.querySelectorAll('[data-next]').forEach(el=>el.onclick=()=>nextStep(+el.dataset.next));
+  screen.querySelectorAll('[data-skip]').forEach(el=>el.onclick=()=>toast('Pilih tahap tujuan dan tulis alasannya (tercatat di riwayat)'));
+  screen.querySelectorAll('[data-act]').forEach(el=>el.onclick=(e)=>{
+    e.stopPropagation();
+    const a=el.dataset.act;
+    if(a==='rebus') openRebus();
+    else if(a==='retur') openRetur(el.dataset.lot);
+    else if(a==='terima') openTerima();
+    else if(a==='addstage'){ const v=$('#newstage').value.trim()||'Cek kualitas'; S.editorStages.splice(3,0,{n:v,c:'violet',a:['Wajib: foto (opsional)']}); S.draft=true; render(); toast('Tahap "'+v+'" ditambahkan ke draf'); }
+    else if(a==='publish'){ S.draft=false; render(); toast('Versi 2 terbit. Pesanan baru memakai versi ini.'); }
+  });
+}
+
+function sheet(html, onbind){
+  layer.innerHTML='<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true"><span class="handle"></span>'+html+'</div></div>';
+  $('#scrim').onclick=e=>{ if(e.target.id==='scrim') close(); };
+  onbind && onbind(layer.querySelector('.sheet'));
+}
+function close(){ layer.innerHTML=''; }
+
+function openQuickAdd(){
+  sheet('<h3>Tambah</h3><div class="list">'+
+    [['order','Pesanan','Warung, catering, pre-order'],['exp','Pengeluaran','LPG, ongkir, lainnya'],['terima','Terima stok','Dari supplier'],['rebus','Rebus','Batch produksi']].map(r=>'<div class="row" data-q="'+r[0]+'"><div class="main"><b>'+r[1]+'</b><span class="cap">'+r[2]+'</span></div><span class="sub">›</span></div>').join('')+'</div>',
+  s=>s.querySelectorAll('[data-q]').forEach(el=>el.onclick=()=>{
+    const q=el.dataset.q;
+    if(q==='order') openOrder(); else if(q==='rebus') openRebus(); else if(q==='terima') openTerima(); else openExpense();
+  }));
+}
+
+function openOrder(){
+  const st={cust:S.customers[0].n, variant:'Matang', qty:20};
+  const draw=()=>{
+    const cust=S.customers.find(c=>c.n===st.cust);
+    const isPre = st.qty>=100 || cust.t==='Catering';
+    const avail = st.variant==='Matang'?availMatang():S.stock.mentah;
+    const enough = avail>=st.qty;
+    sheet('<h3>Pesanan baru</h3>'+
+    '<div class="field"><label>Pelanggan</label><div class="chips">'+S.customers.map(c=>'<button class="chip'+(c.n===st.cust?' on':'')+'" data-c="'+c.n+'">'+c.n.replace('Warung ','')+'</button>').join('')+'</div></div>'+
+    '<div class="seg">'+['Matang','Mentah'].map(v=>'<button class="'+(st.variant===v?'on':'')+'" data-v="'+v+'">'+v+' · '+rp(PRICE[v])+'</button>').join('')+'</div>'+
+    '<div class="qty"><button aria-label="Kurangi" data-d="-5">−</button><div class="v"><b class="num">'+st.qty+'</b><span class="cap">butir · '+Math.floor(st.qty/30)+' tray + '+st.qty%30+'</span></div><button aria-label="Tambah" data-d="5">+</button></div>'+
+    '<div class="chips">'+[10,15,20,25,40,100].map(n=>'<button class="chip'+(st.qty===n?' on':'')+'" data-n="'+n+'">'+n+'</button>').join('')+'</div>'+
+    (isPre?'<div class="banner warn" style="margin:0"><div class="txt"><b>Jadikan pre-order?</b>Pesanan '+(st.qty>=100?'≥ 100 butir':'catering')+' sebaiknya dipesan H-1 supaya stok dan waktu rebus cukup.</div></div>':'')+
+    '<div class="effect num"><span>Total <b>'+rp(st.qty*PRICE[st.variant])+'</b></span><span>'+(enough?'Stok '+st.variant.toLowerCase()+' tersedia '+avail+' → '+(avail-st.qty)+' <b style="color:var(--success)">cukup</b>':'Stok '+st.variant.toLowerCase()+' tersedia '+avail+' · <b style="color:var(--warning)">kurang '+(st.qty-avail)+'</b> → masuk "Menunggu rebus"')+'</span></div>'+
+    '<button class="btn primary block" data-save>'+(isPre?'Simpan sebagai pre-order':'Simpan pesanan')+'</button>',
+    s=>{
+      s.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{st.cust=b.dataset.c;draw();});
+      s.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{st.variant=b.dataset.v;draw();});
+      s.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{st.qty=Math.max(5,st.qty+ +b.dataset.d);draw();});
+      s.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{st.qty=+b.dataset.n;draw();});
+      s.querySelector('[data-save]').onclick=()=>{
+        const snap=snapshot();
+        const id=Math.max(...S.orders.map(o=>o.id))+1;
+        const stage = isPre?'baru':(enough?'siap':(st.variant==='Matang'?'rebus':'baru'));
+        S.orders.unshift({id,cust:st.cust,variant:st.variant,qty:st.qty,stage,due:isPre?'Besok':'Hari ini',ship:0,paid:0,pre:isPre,hist:['Dibuat baru saja', enough?'Stok cukup: '+st.qty+' '+st.variant.toLowerCase()+' dipesan':'Stok kurang: menunggu rebus']});
+        close(); S.tab='board'; S.view=null; S.board='Pesanan'; render();
+        toast(isPre?'Pre-order tersimpan · pengingat H-1 dibuat':(enough?'Pesanan tersimpan · langsung Disiapkan':'Pesanan tersimpan · menunggu rebus'), ()=>restore(snap));
+      };
+    });
+  };
+  draw();
+}
+
+function openRebus(){
+  const waiting=S.orders.filter(o=>o.stage==='rebus');
+  const need=waiting.reduce((a,o)=>a+o.qty,0);
+  const st={qty: need? need+2 : 30, sorting:false, good:0};
+  const draw=()=>{
+    const oldLot=S.lots[0];
+    const hppBatch=Math.round((st.qty*HPP.mentah + (st.qty>40?1000:500))/Math.max(1,st.qty-2));
+    if(!st.sorting){
+      sheet('<h3>Rebus batch</h3>'+
+      (waiting.length?'<div class="field"><label>Untuk pesanan</label><div class="list">'+waiting.map(o=>'<div class="row"><div class="main"><b>'+o.cust+'</b><span class="cap">'+o.qty+' matang · '+o.due+'</span></div></div>').join('')+'</div></div>':'')+
+      '<div class="qty"><button aria-label="Kurangi" data-d="-5">−</button><div class="v"><b class="num">'+st.qty+'</b><span class="cap">telur mentah (termasuk susut 2)</span></div><button aria-label="Tambah" data-d="5">+</button></div>'+
+      (oldLot?'<div class="effect"><span>⚡ Diambil dulu dari <b>batch '+oldLot.date+'</b>'+(oldLot.returnIn===0?' (jatuh tempo retur hari ini)':'')+'</span></div>':'')+
+      (st.qty<24?'<div class="banner warn" style="margin:0"><div class="txt"><b>Batch kecil</b>Di bawah ±24 telur, beli matang dari supplier (Rp 2.500) lebih murah dari rebus sendiri ('+rp(hppBatch)+').</div></div>':'')+
+      '<div class="effect num"><span>Perkiraan HPP matang <b>'+rp(hppBatch)+'/butir</b></span><span>Waktu ±'+Math.max(10,Math.round(st.qty/2))+' menit</span></div>'+
+      '<button class="btn primary block" data-start>Mulai rebus</button>',
+      s=>{
+        s.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{st.qty=Math.max(5,st.qty+ +b.dataset.d);draw();});
+        s.querySelector('[data-start]').onclick=()=>{st.sorting=true;st.good=st.qty-2;draw();};
+      });
+    } else {
+      sheet('<h3>Sortir hasil rebus</h3><p class="sub" style="margin:0">'+st.qty+' telur direbus. Berapa yang bagus?</p>'+
+      '<div class="qty"><button aria-label="Kurangi" data-d="-1">−</button><div class="v"><b class="num">'+st.good+'</b><span class="cap">bagus · '+(st.qty-st.good)+' rusak/susut</span></div><button aria-label="Tambah" data-d="1">+</button></div>'+
+      '<div class="effect num"><span>Mentah '+S.stock.mentah+' → '+(S.stock.mentah-st.qty)+'</span><span>Matang '+S.stock.matang+' → '+(S.stock.matang+st.good)+'</span><span>Rusak +'+(st.qty-st.good)+' · LPG dicatat ke batch ini</span></div>'+
+      '<button class="btn primary block" data-done>Simpan hasil</button>',
+      s=>{
+        s.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{st.good=Math.min(st.qty,Math.max(0,st.good+ +b.dataset.d));draw();});
+        s.querySelector('[data-done]').onclick=()=>{
+          const snap=snapshot();
+          let left=st.qty;
+          S.lots.forEach(l=>{const take=Math.min(l.qty,left);l.qty-=take;left-=take;});
+          S.lots=S.lots.filter(l=>l.qty>0);
+          S.stock.mentah-=st.qty; S.stock.matang+=st.good; S.stock.rusak+=st.qty-st.good;
+          waiting.forEach(o=>{o.stage='siap';o.hist.push('Batch rebus selesai: '+o.qty+' matang dipesan');});
+          close(); render();
+          toast(st.good+' matang siap · '+waiting.length+' pesanan pindah ke Disiapkan', ()=>restore(snap));
+        };
+      });
+    }
+  };
+  draw();
+}
+
+function nextStep(id){
+  const o=S.orders.find(x=>x.id===id);
+  if(o.stage==='rebus'){ openRebus(); return; }
+  if(o.stage==='baru'){
+    const snap=snapshot();
+    const ok=availMatang()>=o.qty;
+    o.stage= ok?'siap':'rebus'; o.hist.push(ok?'Stok cukup: '+o.qty+' matang dipesan':'Stok matang kurang: menunggu rebus');
+    render(); toast(ok?'Stok cukup · Disiapkan':'Stok kurang · Menunggu rebus',()=>restore(snap)); return;
+  }
+  if(o.stage==='siap'){
+    let ship=5000;
+    const draw=()=>sheet('<h3>Tandai dikirim</h3><div class="field"><label>Ongkir</label><div class="chips">'+[0,5000,10000].map(n=>'<button class="chip'+(ship===n?' on':'')+'" data-s="'+n+'">'+rp(n)+'</button>').join('')+'</div></div>'+
+      '<div class="effect num"><span>⚡ Stok '+o.variant.toLowerCase()+' '+S.stock[o.variant.toLowerCase()]+' → '+(S.stock[o.variant.toLowerCase()]-o.qty)+'</span><span>⚡ Ongkir '+rp(ship)+' dicatat ke pesanan ini</span></div>'+
+      '<button class="btn primary block" data-ok>Dikirim</button>',
+      s=>{s.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{ship=+b.dataset.s;draw();});
+        s.querySelector('[data-ok]').onclick=()=>{const snap=snapshot();o.stage='kirim';o.ship=ship;S.stock[o.variant.toLowerCase()]-=o.qty;o.hist.push('Stok '+o.variant.toLowerCase()+' −'+o.qty,'Ongkir '+rp(ship)+' dicatat');close();render();toast('Dikirim · stok dikurangi',()=>restore(snap));};});
+    draw(); return;
+  }
+  if(o.stage==='kirim'){
+    let method='Tunai';
+    const due=total(o)-o.paid;
+    const draw=()=>sheet('<h3>Catat pembayaran</h3><div class="field"><label for="amt">Jumlah</label><input id="amt" class="input num" value="'+rp(due)+'" inputmode="numeric"></div>'+
+      '<div class="chips"><button class="chip on">Lunas</button><button class="chip">Sebagian</button></div>'+
+      '<div class="seg">'+['Tunai','Transfer','QRIS'].map(m=>'<button class="'+(method===m?'on':'')+'" data-m="'+m+'">'+m+'</button>').join('')+'</div>'+
+      '<div class="effect num"><span>⚡ Uang masuk '+rp(due)+'</span><span>⚡ Laba pesanan: <b style="color:var(--success)">'+rp(profit(o))+'</b></span></div>'+
+      '<button class="btn primary block" data-ok>Simpan pembayaran</button>',
+      s=>{s.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{method=b.dataset.m;draw();});
+        s.querySelector('[data-ok]').onclick=()=>{const snap=snapshot();o.paid=total(o);o.stage='selesai';o.hist.push('Pembayaran '+rp(due)+' '+method.toLowerCase(),'Laba dihitung: '+rp(profit(o)));S.tx.unshift({d:'Baru saja',t:'Pembayaran · '+o.cust,a:due,dir:'in'});close();render();toast('Lunas · laba '+rp(profit(o)),()=>restore(snap));};});
+    draw();
+  }
+}
+
+function openRetur(lotId){
+  const l=S.lots.find(x=>x.id===lotId); if(!l) return;
+  sheet('<h3>Retur ke supplier</h3><p class="sub" style="margin:0">Batch '+l.date+(l.returnIn===0?' · hari ke-5, sisa mentah dikembalikan':' · retur '+l.returnIn+' hari lagi')+'</p>'+
+  '<div class="qty"><button disabled style="opacity:.4">−</button><div class="v"><b class="num">'+l.qty+'</b><span class="cap">telur mentah</span></div><button disabled style="opacity:.4">+</button></div>'+
+  '<div class="seg"><button class="on">Uang kembali</button><button>Potong pembelian berikutnya</button></div>'+
+  '<div class="effect num"><span>⚡ Stok mentah '+S.stock.mentah+' → '+(S.stock.mentah-l.qty)+'</span><span>⚡ Pengembalian '+rp(l.qty*2300)+' dari supplier</span></div>'+
+  '<button class="btn primary block" data-ok>Retur '+l.qty+' telur</button>',
+  s=>s.querySelector('[data-ok]').onclick=()=>{
+    const snap=snapshot();
+    S.stock.mentah-=l.qty; S.tx.unshift({d:'Baru saja',t:'Retur ke supplier · '+l.qty+' mentah',a:l.qty*2300,dir:'in'});
+    S.lots=S.lots.filter(x=>x.id!==lotId); close(); render(); toast('Retur tercatat · batch '+l.date+' ditutup',()=>restore(snap));
+  });
+}
+
+function openTerima(){
+  let qty=200;
+  const draw=()=>{
+    const got=qty+5, cost=qty*2300;
+    sheet('<h3>Terima stok</h3><div class="chips">'+[100,200].map(n=>'<button class="chip'+(qty===n?' on':'')+'" data-n="'+n+'">'+n+' butir</button>').join('')+'</div>'+
+    '<div class="panel pb num"><div><span>Dibayar</span><span>'+qty+' × Rp 2.300</span></div><div><span>Bonus supplier</span><span>+5 butir</span></div><div><span>Diterima</span><span>'+got+' butir</span></div><div class="tot"><span>HPP per butir</span><span>'+rp(cost/got)+'</span></div></div>'+
+    '<div class="effect num"><span>⚡ Stok mentah '+S.stock.mentah+' → '+(S.stock.mentah+got)+'</span><span>⚡ Pengeluaran '+rp(cost)+'</span><span>⚡ Retur paling lambat: <b>Sab, 4 Okt</b> (hari ke-5)</span></div>'+
+    '<button class="btn primary block" data-ok>Simpan</button>',
+    s=>{s.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{qty=+b.dataset.n;draw();});
+      s.querySelector('[data-ok]').onclick=()=>{const snap=snapshot();S.stock.mentah+=got;S.lots.push({id:'L'+Date.now(),date:'29 Sep',qty:got,cost:Math.round(cost/got),returnIn:5});S.tx.unshift({d:'Baru saja',t:'Pembelian '+qty+' (+5) mentah',a:cost,dir:'out'});close();S.tab='stock';S.view=null;render();toast('Stok diterima · batch baru dibuat',()=>restore(snap));};});
+  };
+  draw();
+}
+
+function openExpense(){
+  let cat='LPG';
+  const draw=()=>sheet('<h3>Pengeluaran</h3><div class="chips wrapc">'+['LPG','Pengiriman','Akomodasi','Pembelian','Lainnya'].map(c=>'<button class="chip'+(cat===c?' on':'')+'" data-c="'+c+'">'+c+'</button>').join('')+'</div>'+
+    '<div class="field"><label for="exp">Jumlah</label><input id="exp" class="input num" value="Rp 22.000" inputmode="numeric"></div>'+
+    (cat==='LPG'?'<div class="field"><label>Untuk</label><div class="seg"><button class="on">Batch hari ini</button><button>Umum</button></div></div>':'')+
+    '<button class="btn primary block" data-ok>Simpan</button>',
+    s=>{s.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{cat=b.dataset.c;draw();});
+      s.querySelector('[data-ok]').onclick=()=>{const snap=snapshot();S.tx.unshift({d:'Baru saja',t:cat,a:22000,dir:'out'});close();render();toast('Pengeluaran tersimpan',()=>restore(snap));};});
+  draw();
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
+render();
+})();
+</script>
