@@ -26,7 +26,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(db): add card types, fields, boards and versions
 - [x] feat(db): add cards, lines and events
 - [x] feat(db): add stock lots, movements and reservations
-- [ ] feat(db): add money entries and cost allocations
+- [x] feat(db): add money entries and cost allocations
 - [ ] feat(db): add fifo, purchase, production and return functions
 - [ ] feat(db): add report views
 - [ ] feat(db): add notifications and daily cron jobs
