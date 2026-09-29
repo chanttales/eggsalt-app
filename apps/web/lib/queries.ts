@@ -263,6 +263,8 @@ export function useReturnLots() {
 
 export interface OrderMoney {
   cardId: string;
+  title: string;
+  number: number;
   revenue: number;
   cogs: number;
   directCosts: number;
@@ -276,7 +278,7 @@ export function useOrderMoney() {
     const [profit, payments] = await Promise.all([
       supabase()
         .from("v_order_profit")
-        .select("card_id, revenue, cogs, direct_costs, profit")
+        .select("card_id, number, title, revenue, cogs, direct_costs, profit")
         .eq("workspace_id", workspaceId),
       supabase()
         .from("money_entry")
@@ -298,6 +300,8 @@ export function useOrderMoney() {
         p.card_id,
         {
           cardId: p.card_id,
+          title: p.title,
+          number: p.number,
           revenue: Number(p.revenue),
           cogs: Number(p.cogs),
           directCosts: Number(p.direct_costs),
@@ -595,6 +599,72 @@ export function useOpenLots() {
       qtyRemaining: l.qty_remaining,
       unitCost: Number(l.unit_cost),
       purchasePrice: l.purchase_price === null ? null : Number(l.purchase_price),
+    }));
+  });
+}
+
+export interface ExpenseCategory {
+  id: string;
+  key: string;
+  name: string;
+}
+
+export function useExpenseCategories() {
+  return useWorkspaceQuery("expense-categories", async (workspaceId) => {
+    const rows = must(
+      await supabase()
+        .from("expense_category")
+        .select("id, key, name")
+        .eq("workspace_id", workspaceId)
+        .order("sort"),
+    );
+    return rows.map((c): ExpenseCategory => ({ id: c.id, key: c.key, name: c.name }));
+  });
+}
+
+export interface MoneyEntry {
+  id: number;
+  direction: "in" | "out";
+  kind: string;
+  amount: number;
+  method: string | null;
+  categoryName: string | null;
+  cardId: string | null;
+  partyName: string | null;
+  note: string | null;
+  occurredAt: string;
+  /** Cancelled by a later reversal entry, or itself a reversal. */
+  reversed: boolean;
+}
+
+type Named = { name: string };
+
+/** Ledger entries since an instant, newest first. Reversal pairs are flagged, not dropped. */
+export function useMoneyEntries(since: string) {
+  return useWorkspaceQuery(`money-entries:${since}`, async (workspaceId) => {
+    const rows = must(
+      await supabase()
+        .from("money_entry")
+        .select(
+          "id, direction, kind, amount, method, card_id, note, occurred_at, reverses_id, expense_category (name), party (name)",
+        )
+        .eq("workspace_id", workspaceId)
+        .gte("occurred_at", since)
+        .order("occurred_at", { ascending: false }),
+    );
+    const reversed = new Set(rows.map((r) => r.reverses_id).filter(Boolean));
+    return rows.map((r): MoneyEntry => ({
+      id: r.id,
+      direction: r.direction,
+      kind: r.kind,
+      amount: Number(r.amount),
+      method: r.method,
+      categoryName: (r.expense_category as unknown as Named | null)?.name ?? null,
+      cardId: r.card_id,
+      partyName: (r.party as unknown as Named | null)?.name ?? null,
+      note: r.note,
+      occurredAt: r.occurred_at,
+      reversed: r.kind === "reversal" || reversed.has(r.id),
     }));
   });
 }
