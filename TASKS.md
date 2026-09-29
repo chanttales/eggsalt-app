@@ -12,6 +12,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): add app shell with bottom tab bar and routes
 - [x] ci(repo): deploy static export to github pages
 - [x] build(db): initialize supabase project and local config
+- [x] fix(ui): self-host plus jakarta sans instead of fetching google fonts
 
 ## M1.2 Domain and data
 
