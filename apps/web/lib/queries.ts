@@ -185,6 +185,11 @@ export interface StockLevel {
   onHand: number;
   reserved: number;
   available: number;
+  sellable: boolean;
+  returnable: boolean;
+  color: string | null;
+  packName: string | null;
+  packSize: number | null;
 }
 
 export function useStockLevels() {
@@ -196,20 +201,33 @@ export function useStockLevels() {
         .eq("workspace_id", workspaceId),
       supabase()
         .from("item_state")
-        .select("id, item_id, key, name, sort")
+        .select(
+          "id, item_id, key, name, sort, sellable, returnable, color, item (pack_name, pack_size)",
+        )
         .eq("workspace_id", workspaceId)
         .order("sort"),
     ]);
     const byState = new Map(must(levels).map((l) => [l.state_id, l]));
-    return must(states).map((s): StockLevel => ({
-      itemId: s.item_id,
-      stateId: s.id,
-      stateKey: s.key,
-      stateName: s.name,
-      onHand: byState.get(s.id)?.on_hand ?? 0,
-      reserved: byState.get(s.id)?.reserved ?? 0,
-      available: byState.get(s.id)?.available ?? 0,
-    }));
+    return must(states).map((s): StockLevel => {
+      const item = s.item as unknown as {
+        pack_name: string | null;
+        pack_size: number | null;
+      } | null;
+      return {
+        itemId: s.item_id,
+        stateId: s.id,
+        stateKey: s.key,
+        stateName: s.name,
+        onHand: byState.get(s.id)?.on_hand ?? 0,
+        reserved: byState.get(s.id)?.reserved ?? 0,
+        available: byState.get(s.id)?.available ?? 0,
+        sellable: s.sellable,
+        returnable: s.returnable,
+        color: s.color,
+        packName: item?.pack_name ?? null,
+        packSize: item?.pack_size ?? null,
+      };
+    });
   });
 }
 
@@ -534,6 +552,49 @@ export function useParties(kind: Party["kind"]) {
       returnDays: p.return_days,
       bonusPerPurchase: p.bonus_per_purchase,
       minPurchaseQty: p.min_purchase_qty,
+    }));
+  });
+}
+
+export interface Lot {
+  id: string;
+  stateId: string;
+  source: string;
+  supplierId: string | null;
+  supplierName: string | null;
+  receivedAt: string;
+  returnBy: string | null;
+  qtyIn: number;
+  qtyRemaining: number;
+  unitCost: number;
+  purchasePrice: number | null;
+}
+
+/** Lots with stock left, oldest first (the order FIFO takes them in). */
+export function useOpenLots() {
+  return useWorkspaceQuery("lots-open", async (workspaceId) => {
+    const rows = must(
+      await supabase()
+        .from("stock_lot")
+        .select(
+          "id, state_id, source, supplier_id, received_at, return_by, qty_in, qty_remaining, unit_cost, purchase_price, party (name)",
+        )
+        .eq("workspace_id", workspaceId)
+        .gt("qty_remaining", 0)
+        .order("received_at"),
+    );
+    return rows.map((l): Lot => ({
+      id: l.id,
+      stateId: l.state_id,
+      source: l.source,
+      supplierId: l.supplier_id,
+      supplierName: (l.party as unknown as { name: string } | null)?.name ?? null,
+      receivedAt: l.received_at,
+      returnBy: l.return_by,
+      qtyIn: l.qty_in,
+      qtyRemaining: l.qty_remaining,
+      unitCost: Number(l.unit_cost),
+      purchasePrice: l.purchase_price === null ? null : Number(l.purchase_price),
     }));
   });
 }

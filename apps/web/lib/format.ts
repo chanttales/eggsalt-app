@@ -44,3 +44,9 @@ export function time(date: Date | string | number): string {
 export function startOfDay(day: string): string {
   return `${day}T00:00:00+07:00`;
 }
+
+/** Whole days from today (Jakarta) to a YYYY-MM-DD date; negative when it has passed. */
+export function daysUntil(day: string): number {
+  const ms = Date.parse(`${day}T00:00:00Z`) - Date.parse(`${dayKey()}T00:00:00Z`);
+  return Math.round(ms / 86_400_000);
+}
