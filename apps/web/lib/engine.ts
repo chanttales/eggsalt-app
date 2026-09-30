@@ -22,7 +22,7 @@ export type EngineErrorCode =
 export function refusedText(error: EngineRequestError): string {
   switch (error.code) {
     case "conflict":
-      return t("refused.conflict");
+      return conflictText(error.message);
     case "forbidden":
       return t("refused.forbidden");
     case "not_found":
@@ -32,6 +32,22 @@ export function refusedText(error: EngineRequestError): string {
     default:
       return t("refused.other");
   }
+}
+
+/** The engine words a conflict in English for logs; pick the matching plain reason. */
+function conflictText(message: string): string {
+  const stock =
+    /^Only (-?\d+) /.exec(message) ?? /insufficient stock: short by (\d+)/.exec(message);
+  if (stock) {
+    const key = message.startsWith("Only") ? "refused.stockLeft" : "refused.stockShort";
+    return t(key).replace("{n}", stock[1] ?? "0");
+  }
+  const fields = /^Fill in: (.+)$/.exec(message);
+  if (fields) return t("refused.fillIn").replace("{fields}", fields[1] ?? "");
+  if (message.startsWith("The card changed")) return t("refused.stale");
+  if (message.includes("already closed")) return t("refused.closed");
+  if (message.startsWith("This arrow's rule")) return t("refused.rule");
+  return t("refused.conflict");
 }
 
 export class EngineRequestError extends Error {
