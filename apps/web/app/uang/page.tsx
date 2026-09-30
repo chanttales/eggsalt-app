@@ -10,7 +10,9 @@ import {
   Page,
   Section,
   StatTile,
-  primaryButton,
+  headerButton,
+  segment,
+  segmented,
   secondaryButton,
 } from "@/components/ui";
 import { PERIODS, periodStart, rupiah, shortDate, time, type Period } from "@/lib/format";
@@ -51,21 +53,19 @@ function MoneyScreen() {
       guide="uang"
       title={t("nav.money")}
       actions={
-        <Link href="/uang?aksi=keluar" className={primaryButton}>
+        <Link href="/uang?aksi=keluar" className={headerButton}>
           <Plus aria-hidden size={18} /> {t("expense.title")}
         </Link>
       }
     >
-      <div role="tablist" className="flex gap-1 rounded-full bg-surface-muted p-1">
+      <div role="tablist" className={segmented}>
         {PERIODS.map((p) => (
           <button
             key={p}
             role="tab"
             aria-selected={p === period}
             onClick={() => setPeriod(p)}
-            className={`min-h-touch flex-1 rounded-full font-medium ${
-              p === period ? "bg-surface shadow-sm" : "text-muted-foreground"
-            }`}
+            className={segment(p === period)}
           >
             {t(`money.period.${p}`)}
           </button>

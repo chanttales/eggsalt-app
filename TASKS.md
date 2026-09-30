@@ -122,4 +122,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 
 - [x] fix(web): remove the guide button from Home
 - [x] fix(web): add vertical padding to the bottom nav
-- [ ] fix(web): tidy the Pesanan and Uang layouts
+- [x] fix(web): tidy the Pesanan and Uang layouts

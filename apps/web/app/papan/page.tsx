@@ -6,14 +6,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { CardRow } from "@/components/card-row";
 import { NewCardSheet } from "@/components/new-card-sheet";
-import { EmptyState, Page, StagePill, stageStyle } from "@/components/ui";
+import {
+  EmptyState,
+  headerButton,
+  Page,
+  segment,
+  segmented,
+  StagePill,
+  stageStyle,
+} from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useBoards, useOpenCards, type Board, type Card } from "@/lib/queries";
 
 type View = "kanban" | "list";
 
-// Pesanan (was the board screen). Phones get no sideways scrolling: boards in a 2-column grid, stage filter chips that
-// wrap, and the cards stacked by stage. Wide screens keep the kanban columns and a list view.
+// Pesanan (was the board screen). Phones get pill tabs for the order lists, one scrolling row of
+// stage chips, and the cards stacked by stage. Wide screens keep the kanban columns and a list view.
 function BoardScreen() {
   const params = useSearchParams();
   const router = useRouter();
@@ -49,28 +57,21 @@ function BoardScreen() {
       title={t("nav.orders")}
       actions={
         board && (
-          <Link
-            href={`/papan?b=${board.id}&aksi=baru`}
-            className="flex min-h-touch items-center gap-1 rounded-md bg-primary px-3 font-semibold text-primary-foreground"
-          >
-            <Plus aria-hidden size={20} />
+          <Link href={`/papan?b=${board.id}&aksi=baru`} className={headerButton}>
+            <Plus aria-hidden size={18} />
             {t("board.newCard")}
           </Link>
         )
       }
     >
-      <div role="tablist" className="grid grid-cols-2 gap-2 lg:flex lg:flex-wrap">
+      <div role="tablist" className={segmented}>
         {list.map((b) => (
           <button
             key={b.id}
             role="tab"
             aria-selected={b.id === board?.id}
             onClick={() => go({ b: b.id })}
-            className={`min-h-touch rounded-lg border px-3 py-2 text-left text-label leading-tight font-medium lg:rounded-full lg:px-4 ${
-              b.id === board?.id
-                ? "border-primary bg-primary-soft text-primary"
-                : "border-border bg-surface"
-            }`}
+            className={segment(b.id === board?.id)}
           >
             {b.name}
           </button>
@@ -129,7 +130,7 @@ function BoardScreen() {
   );
 }
 
-// Phone view: filter chips wrap onto new lines instead of scrolling, and cards stack under a
+// Phone view: filter chips sit on one row that scrolls sideways, and cards stack under a
 // header per stage. Picking a stage shows only that stage; "Semua" shows every stage that has cards.
 function Stacked({
   board,
@@ -147,12 +148,16 @@ function Stacked({
     stage ? s.key === stage : cards.some((c) => c.stageKey === s.key),
   );
   const chip = (active: boolean) =>
-    `flex min-h-touch items-center gap-1.5 rounded-full border px-3 text-label font-medium ${
+    `flex min-h-touch shrink-0 items-center gap-1.5 rounded-full border px-3 text-label font-medium whitespace-nowrap ${
       active ? "border-primary bg-primary-soft text-primary" : "border-border bg-surface"
     }`;
   return (
     <div className="flex flex-col gap-4">
-      <div role="tablist" aria-label={t("card.stages")} className="flex flex-wrap gap-2">
+      <div
+        role="tablist"
+        aria-label={t("card.stages")}
+        className="-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4"
+      >
         <button
           role="tab"
           aria-selected={!stage}
