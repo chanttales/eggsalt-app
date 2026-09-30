@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Sheet, useConfirm } from "@/components/sheet";
+import { useToast } from "@/components/toast";
 import { EmptyState, ghostButton, inputClass, Page, primaryButton } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useParties, type Party } from "@/lib/queries";
@@ -80,24 +81,24 @@ function PartySheet({
       : empty,
   );
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { ask, dialog } = useConfirm();
+  const toast = useToast();
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
 
   async function write(change: Record<string, unknown>) {
     setBusy(true);
-    setError(null);
     const db = supabase().from("party");
     const { error } = party
       ? await db.update(change).eq("id", party.id)
       : await db.insert({ ...change, workspace_id: workspaceId, kind } as never);
     setBusy(false);
     if (error) {
-      setError(t("contact.failed"));
+      toast({ title: t("toast.failed"), text: t("contact.failed"), tone: "danger" });
       return;
     }
     await queryClient.invalidateQueries();
     onClose();
+    toast({ title: t("toast.saved"), text: t("contact.saved") });
   }
 
   const save = () =>
@@ -163,11 +164,6 @@ function PartySheet({
             onChange={(n) => set({ minPurchaseQty: n })}
           />
         </>
-      )}
-      {error && (
-        <p role="alert" className="text-label text-danger">
-          {error}
-        </p>
       )}
       <button
         disabled={busy || !draft.name.trim()}

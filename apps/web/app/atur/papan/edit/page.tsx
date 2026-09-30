@@ -6,6 +6,7 @@ import { BoardCanvas } from "@/components/board-editor/canvas";
 import { StageList } from "@/components/board-editor/stage-list";
 import { EmptyState, Page, ghostButton, primaryButton } from "@/components/ui";
 import { useBoardDraft, usePublishBoard } from "@/lib/board-editor";
+import { useToast } from "@/components/toast";
 import { t } from "@/lib/i18n";
 import { useBoards, useFieldDefs, useOpenCards, type Board } from "@/lib/queries";
 import { useSession } from "@/lib/session";
@@ -41,6 +42,7 @@ function Editor({ board, workspaceId }: { board: Board; workspaceId: string }) {
   const publish = usePublishBoard();
   const fields = useFieldDefs(board.cardTypeId);
   const cards = useOpenCards();
+  const toast = useToast();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const cardsIn = (key: string) =>
@@ -52,6 +54,7 @@ function Editor({ board, workspaceId }: { board: Board; workspaceId: string }) {
     try {
       await publish(board, workspaceId, draft.graph);
       draft.markSaved();
+      toast({ title: t("toast.saved"), text: t("editor.published") });
       router.push("/atur/papan");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
