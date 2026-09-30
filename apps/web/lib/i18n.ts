@@ -98,6 +98,14 @@ const messages = {
     "refused.forbidden": "Akun ini tidak punya izin untuk perubahan ini.",
     "refused.notFound": "Datanya tidak ditemukan, mungkin sudah dihapus.",
     "refused.badRequest": "Ada isian yang belum benar. Periksa lalu coba lagi.",
+    "refused.stockLeft":
+      "Stok telur tidak cukup, hanya {n} yang tersedia. Rebus atau tambah stok dulu, lalu coba lagi.",
+    "refused.stockShort": "Stok telur kurang {n}. Rebus atau tambah stok dulu, lalu coba lagi.",
+    "refused.fillIn": "Lengkapi dulu: {fields}.",
+    "refused.stale":
+      "Pesanan ini baru saja diubah dari HP lain. Tampilan sudah diperbarui; tekan Coba lagi untuk tetap menyimpan.",
+    "refused.closed": "Pesanan ini sudah selesai atau dibatalkan.",
+    "refused.rule": "Syarat untuk pindah ke tahap ini belum terpenuhi.",
     "refused.other": "Ada gangguan di server. Coba lagi sebentar lagi.",
     "toast.undone": "Dibatalkan",
     "card.done": "Selesai.",
@@ -543,6 +551,14 @@ const messages = {
     "refused.forbidden": "This account isn't allowed to make this change.",
     "refused.notFound": "The data wasn't found; it may have been deleted.",
     "refused.badRequest": "Something entered isn't right. Check and try again.",
+    "refused.stockLeft":
+      "Not enough eggs in stock, only {n} available. Boil or add stock first, then try again.",
+    "refused.stockShort": "Egg stock is {n} short. Boil or add stock first, then try again.",
+    "refused.fillIn": "Fill in first: {fields}.",
+    "refused.stale":
+      "Someone changed this order on another phone. The view is up to date; tap Try again to save anyway.",
+    "refused.closed": "This order is already finished or cancelled.",
+    "refused.rule": "This stage's condition isn't met yet.",
     "refused.other": "There was a server problem. Try again shortly.",
     "toast.undone": "Undone",
     "card.done": "Done.",

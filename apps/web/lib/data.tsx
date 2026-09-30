@@ -78,7 +78,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
           box.dismiss(item.id);
           const key = crypto.randomUUID();
           retriedKeys.add(key);
-          void box.enqueue(item.op, item.workspaceId, { ...item.input, idempotencyKey: key });
+          // Sent after the view refreshed, so it no longer checks the card's old version.
+          const input: Record<string, unknown> = { ...item.input, idempotencyKey: key };
+          delete input.rowVersion;
+          void box.enqueue(item.op, item.workspaceId, input);
         },
       });
     });
