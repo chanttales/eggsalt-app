@@ -3,7 +3,7 @@
 import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { CardRow } from "@/components/card-row";
 import { NewCardSheet } from "@/components/new-card-sheet";
 import { Sheet } from "@/components/sheet";
@@ -150,6 +150,7 @@ function BoardScreen() {
 
 // Phone view: filter chips sit on one row that scrolls sideways, and cards stack under a
 // header per stage. Picking a stage shows only that stage; "Semua" shows every stage that has cards.
+// Chips for empty stages stay hidden until "Tampilkan semua tahap" is ticked.
 function Stacked({
   board,
   cards,
@@ -162,6 +163,10 @@ function Stacked({
   onStage: (key: string | null) => void;
 }) {
   const stages = board.graph.stages;
+  const [allStages, setAllStages] = useState(false);
+  const chips = stages.filter(
+    (s) => allStages || s.key === stage || cards.some((c) => c.stageKey === s.key),
+  );
   const shown = stages.filter((s) =>
     stage ? s.key === stage : cards.some((c) => c.stageKey === s.key),
   );
@@ -171,6 +176,15 @@ function Stacked({
     }`;
   return (
     <div className="flex flex-col gap-4">
+      <label className="flex items-center gap-2 self-end text-label text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={allStages}
+          onChange={(e) => setAllStages(e.target.checked)}
+          className="size-4 accent-primary"
+        />
+        {t("board.allStages")}
+      </label>
       <div
         role="tablist"
         aria-label={t("card.stages")}
@@ -184,7 +198,7 @@ function Stacked({
         >
           {t("board.all")} <span className="tabular-nums opacity-70">{cards.length}</span>
         </button>
-        {stages.map((s) => {
+        {chips.map((s) => {
           const n = cards.filter((c) => c.stageKey === s.key).length;
           return (
             <button

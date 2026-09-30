@@ -132,3 +132,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] fix(web): ask one date per order type in the new order form
 - [x] feat(web): restyle sign in with a blue header and a card
 - [x] fix(web): center sign in on a full blue background
+- [x] feat(web): hide empty stage chips unless all stages are shown
