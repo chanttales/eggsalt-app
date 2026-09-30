@@ -54,6 +54,8 @@ const createCardInput = z.strictObject({
   title: z.string().trim().min(1).max(120),
   partyId: z.guid().optional(),
   dueAt: z.iso.datetime({ offset: true }).optional(),
+  /** Day the sale really happened (business time), for past sales entered late. */
+  orderedOn: z.iso.date().optional(),
   flags: z
     .array(z.string().regex(/^[a-z][a-z0-9_]{0,23}$/))
     .max(10)
