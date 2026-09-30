@@ -117,3 +117,9 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): add Pesanan list for warung and catering orders
 - [x] feat(web): add bottom nav with Home, Pesanan, add, Uang and Profil
 - [x] feat(web): hide the board editor and use salted egg wording
+
+## M2.1 Layout fixes
+
+- [x] fix(web): remove the guide button from Home
+- [ ] fix(web): add vertical padding to the bottom nav
+- [ ] fix(web): tidy the Pesanan and Uang layouts
