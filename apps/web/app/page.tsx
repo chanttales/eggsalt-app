@@ -11,6 +11,7 @@ import { t } from "@/lib/i18n";
 import {
   cardQty,
   useBoards,
+  useDoneCards,
   useOpenCards,
   useReturnLots,
   useSettings,
@@ -21,6 +22,8 @@ import {
 import { useSession } from "@/lib/session";
 
 const DAYS_SHOWN = 5;
+/** Days before today in the strip, to look back at recent orders. */
+const PAST_DAYS = 2;
 
 function greeting(): string {
   const hour = Number(
@@ -36,9 +39,9 @@ function greeting(): string {
   return t("home.evening");
 }
 
-/** Today and the next few days, as YYYY-MM-DD in Jakarta. */
-function nextDays(): string[] {
-  const start = Date.parse(`${dayKey()}T00:00:00Z`);
+/** A couple of days back, today and the next few days, as YYYY-MM-DD in Jakarta. */
+function stripDays(): string[] {
+  const start = Date.parse(`${dayKey()}T00:00:00Z`) - PAST_DAYS * 86_400_000;
   return Array.from({ length: DAYS_SHOWN }, (_, i) =>
     new Date(start + i * 86_400_000).toISOString().slice(0, 10),
   );
@@ -155,11 +158,12 @@ export default function HomePage() {
   const isOwner = state.status === "signed_in" && state.workspace?.role === "owner";
   const boards = useBoards();
   const cards = useOpenCards();
+  const done = useDoneCards();
   const lots = useReturnLots();
   const stock = useStockLevels();
   const settings = useSettings();
-  const days = nextDays();
-  const today = days[0]!;
+  const days = stripDays();
+  const today = days[PAST_DAYS]!;
   const [day, setDay] = useState(today);
 
   const byBoard = boardMap(boards.data);
@@ -175,8 +179,10 @@ export default function HomePage() {
     (c) =>
       byBoard.get(c.boardId)?.kind === "order" && !isTerminal(byBoard.get(c.boardId), c.stageKey),
   );
-  // Today also shows anything overdue, so nothing late drops off the screen.
-  const onDay = orders
+  // Today also shows anything overdue, so nothing late drops off the screen. A past day also
+  // shows the orders already finished.
+  const finished = (done.data ?? []).filter((c) => byBoard.get(c.boardId)?.kind === "order");
+  const onDay = (day < today ? [...orders, ...finished] : orders)
     .filter((c) => {
       const due = dueDay(c);
       return due !== null && (day === today ? due <= today : due === day);
