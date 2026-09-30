@@ -95,6 +95,8 @@ export function ReceiveSheet({ onClose }: { onClose: () => void }) {
   const [bonus, setBonus] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
   const [method, setMethod] = useState<(typeof METHODS)[number]>("cash");
+  const today = dayKey();
+  const [boughtOn, setBoughtOn] = useState(today);
 
   const supplier = (suppliers.data ?? []).find((s) => s.id === supplierId) ?? suppliers.data?.[0];
   const states = (levels.data ?? []).filter((l) => l.sellable);
@@ -106,7 +108,7 @@ export function ReceiveSheet({ onClose }: { onClose: () => void }) {
   const total = qty + free;
   const returnBy =
     state?.returnable && supplier?.returnDays != null
-      ? addDays(dayKey(), supplier.returnDays)
+      ? addDays(boughtOn, supplier.returnDays)
       : null;
 
   if (suppliers.isSuccess && !supplier) {
@@ -144,6 +146,18 @@ export function ReceiveSheet({ onClose }: { onClose: () => void }) {
           name={(id) => states.find((s) => s.stateId === id)?.stateName ?? id}
         />
       )}
+      <label className="flex flex-col gap-1 text-label font-medium">
+        {t("receive.date")}
+        <input
+          type="date"
+          value={boughtOn}
+          max={today}
+          onChange={(e) =>
+            setBoughtOn(e.target.value && e.target.value <= today ? e.target.value : today)
+          }
+          className={inputClass}
+        />
+      </label>
       <div className="flex flex-col gap-1">
         <span className="text-label font-medium">{t("receive.qtyPaid")}</span>
         <QtyStepper value={qty} onChange={setQty} chips={[100, 150, 200, 300]} />
@@ -192,6 +206,7 @@ export function ReceiveSheet({ onClose }: { onClose: () => void }) {
             bonus: free,
             unitPrice: unit,
             method,
+            ...(boughtOn !== today && { receivedOn: boughtOn }),
           });
           onClose();
         }}

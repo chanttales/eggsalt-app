@@ -326,6 +326,7 @@ const messages = {
     "price.saved": "Harga tersimpan.",
     "price.failed": "Harga gagal disimpan. Periksa koneksi lalu coba lagi.",
     "price.ownerOnly": "Hanya pemilik yang bisa mengubah harga.",
+    "receive.date": "Tanggal beli",
   },
   en: {
     "nav.label": "Main navigation",
@@ -644,6 +645,7 @@ const messages = {
     "price.saved": "Prices saved.",
     "price.failed": "Couldn't save prices. Check the connection and try again.",
     "price.ownerOnly": "Only the owner can change prices.",
+    "receive.date": "Purchase date",
   },
 } as const;
 
