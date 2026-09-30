@@ -327,6 +327,9 @@ const messages = {
     "price.failed": "Harga gagal disimpan. Periksa koneksi lalu coba lagi.",
     "price.ownerOnly": "Hanya pemilik yang bisa mengubah harga.",
     "receive.date": "Tanggal beli",
+    "order.date": "Tanggal pesanan",
+    "order.pastHint":
+      "Penjualan lampau: harga, stok, dan uang yang dicatat hari ini untuk pesanan ini ikut tanggal tersebut.",
   },
   en: {
     "nav.label": "Main navigation",
@@ -646,6 +649,9 @@ const messages = {
     "price.failed": "Couldn't save prices. Check the connection and try again.",
     "price.ownerOnly": "Only the owner can change prices.",
     "receive.date": "Purchase date",
+    "order.date": "Order date",
+    "order.pastHint":
+      "Past sale: the price, stock and money recorded today for this order use that date.",
   },
 } as const;
 
