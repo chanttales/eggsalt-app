@@ -210,9 +210,10 @@ export default function HomePage() {
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-title font-medium">{t("home.pickDate")}</h2>
-            {/* Any other day, past or future: the native date picker behind a calendar button. */}
+            {/* Any other day, past or future: the native date picker behind a calendar button. Clipped,
+                because a phone's date input keeps a wide minimum width and would widen the page. */}
             <label
-              className={`relative flex size-10 items-center justify-center rounded-full ${
+              className={`relative flex size-10 items-center justify-center overflow-hidden rounded-full ${
                 days.includes(day)
                   ? "bg-surface-muted text-primary"
                   : "bg-primary text-primary-foreground"
@@ -225,7 +226,7 @@ export default function HomePage() {
                 value={day}
                 onChange={(e) => e.target.value && setDay(e.target.value)}
                 onClick={(e) => e.currentTarget.showPicker?.()}
-                className="absolute inset-0 cursor-pointer opacity-0"
+                className="absolute inset-0 size-full min-w-0 cursor-pointer opacity-0"
               />
             </label>
           </div>
