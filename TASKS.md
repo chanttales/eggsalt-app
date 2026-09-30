@@ -75,7 +75,8 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 ## M1.6 Settings and dashboard
 
 - [x] feat(web): add price editor with an effective date
-- [ ] feat(db): let receive_purchase take a purchase date
+- [x] feat(db): let receive_purchase take a purchase date
+- [ ] feat(engine): accept a purchase date on receive-stock
 - [ ] feat(web): add purchase date to receive stock
 - [ ] feat(engine): add order date for past sales
 - [ ] feat(web): add order date to the new order sheet
