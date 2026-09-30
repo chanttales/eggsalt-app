@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
-/* Design tokens from docs/design/02-design-system.md. Names follow shadcn/ui. */
-@custom-variant dark (&:where(.dark, .dark *));
+/* Design tokens from docs/design/02-design-system.md. Names follow shadcn/ui. Light mode only. */
 
 :root {
-  --background: #fafaf7;
+  /* EggSalt: blue from the owner's Figma reference (Color-Primary/060), orange accent. */
+  --background: #fcfcfc;
   --surface: #ffffff;
-  --surface-muted: #f2f1ec;
-  --border: #e4e2da;
-  --foreground: #1c2421;
-  --muted-foreground: #5e6b66;
-  --primary: #0f766e;
+  --surface-muted: #f0f2f6;
+  --border: #e3e7ef;
+  --foreground: #0d1829;
+  --muted-foreground: #445668;
+  --primary: #2051e5;
   --primary-foreground: #ffffff;
-  --primary-soft: #e0f2ef;
-  --accent: #f59e0b;
-  --accent-foreground: #3a2500;
+  --primary-soft: #eef2ff;
+  --accent: #f97316;
+  --accent-foreground: #ffffff;
   --success: #15803d;
   --warning: #b45309;
-  --danger: #b91c1c;
-  --info: #1d4ed8;
+  --danger: #c62d1f;
+  --info: #2051e5;
 
   /* Stage colors: soft background + strong text, owner picks one per stage. */
   --stage-gray-bg: #eeede8;
@@ -37,42 +37,6 @@
   --stage-amber-fg: #854d0e;
   --stage-green-bg: #e1f5e6;
   --stage-green-fg: #166534;
-}
-
-.dark {
-  --background: #0f1412;
-  --surface: #161c1a;
-  --surface-muted: #1e2523;
-  --border: #2a3330;
-  --foreground: #eef2f0;
-  --muted-foreground: #9aa8a2;
-  --primary: #2db3a5;
-  --primary-foreground: #06201d;
-  --primary-soft: #123330;
-  --accent: #fbbf24;
-  --accent-foreground: #2a1b00;
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --info: #60a5fa;
-
-  --stage-gray-bg: #262d2b;
-  --stage-gray-fg: #c4ccc9;
-  --stage-teal-bg: #123330;
-  --stage-teal-fg: #7eddd2;
-  --stage-blue-bg: #16233f;
-  --stage-blue-fg: #a5c0fb;
-  --stage-violet-bg: #241a3d;
-  --stage-violet-fg: #c4b5fd;
-  --stage-pink-bg: #3a1526;
-  --stage-pink-fg: #f9a8d4;
-  --stage-orange-bg: #35200f;
-  --stage-orange-fg: #fdba8c;
-  --stage-amber-bg: #2e2610;
-  --stage-amber-fg: #fcd34d;
-  --stage-green-bg: #12291a;
-  --stage-green-fg: #86efac;
-  color-scheme: dark;
 }
 
 @theme inline {
