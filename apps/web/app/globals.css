@@ -14,7 +14,9 @@
   /* #3DB2FF is 2.3:1 on white, too light for text; blue text uses this deeper shade (4.9:1). */
   --primary-ink: #0a74c2;
   --primary-foreground: #ffffff;
-  --primary-soft: #eaf6ff;
+  --primary-soft: #d8efff;
+  /* Card edges and the progress ring track: a light blue that still reads on white. */
+  --primary-line: #b5e0ff;
   --accent: #f97316;
   --accent-foreground: #ffffff;
   --success: #15803d;
@@ -56,6 +58,7 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-soft: var(--primary-soft);
+  --color-primary-line: var(--primary-line);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-success: var(--success);

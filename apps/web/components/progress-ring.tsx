@@ -1,4 +1,4 @@
-/** Round progress like the Figma "ongoing task" ring: blue done, orange still to go. */
+/** Round progress like the Figma "ongoing task" ring: blue done, light blue still to go. */
 export function ProgressRing({ value, size = 54 }: { value: number; size?: number }) {
   const pct = Math.max(0, Math.min(100, Math.round(value)));
   const r = (size - 6) / 2;
@@ -17,7 +17,7 @@ export function ProgressRing({ value, size = 54 }: { value: number; size?: numbe
           r={r}
           fill="none"
           strokeWidth={5}
-          className="stroke-accent"
+          className="stroke-primary-line"
         />
         <circle
           cx={size / 2}

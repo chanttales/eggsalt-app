@@ -89,7 +89,7 @@ function Shortcut({ href, title, status }: { href: string; title: string; status
   return (
     <Link
       href={href}
-      className="flex min-h-[100px] flex-col justify-between rounded-[14px] bg-primary-soft p-3.5 shadow-[0_1px_1px_1px_rgb(0_0_0/0.05)]"
+      className="flex min-h-[100px] flex-col justify-between rounded-[14px] border border-primary-line bg-primary-soft p-3.5 shadow-[0_1px_1px_1px_rgb(0_0_0/0.05)]"
     >
       <span className="text-label font-semibold">{title}</span>
       <span className="flex items-center justify-between text-label font-medium text-primary">
@@ -109,7 +109,7 @@ function OrderCard({ card, board }: { card: Card; board: Board | undefined }) {
   return (
     <Link
       href={`/kartu?id=${card.id}`}
-      className="relative flex items-center gap-3 overflow-hidden rounded-[14px] bg-linear-[111deg] from-[#e3f3ff] to-[#f7fbff] py-4 pr-4 pl-6"
+      className="relative flex items-center gap-3 overflow-hidden rounded-[14px] border border-primary-line bg-linear-[111deg] from-[#cdebff] to-[#eef8ff] py-4 pr-4 pl-6"
     >
       <span aria-hidden className="absolute top-5 left-0 h-7 w-1 rounded-r-[10px] bg-primary" />
       <div className="flex min-w-0 flex-1 flex-col gap-3">
