@@ -52,7 +52,7 @@ export function AppNav() {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] lg:inset-y-0 lg:right-auto lg:w-56 lg:border-t-0 lg:border-r lg:pb-0"
     >
       <p className="hidden px-6 pt-6 pb-4 text-title font-bold text-primary lg:block">EggSalt</p>
-      <ul className="flex items-center lg:flex-col lg:items-stretch lg:gap-1 lg:px-3">
+      <ul className="flex items-center py-2 lg:flex-col lg:items-stretch lg:gap-1 lg:px-3 lg:py-0">
         {left.map((tab) => (
           <TabLink key={tab.href} tab={tab} pathname={pathname} />
         ))}

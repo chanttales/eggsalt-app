@@ -121,5 +121,5 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 ## M2.1 Layout fixes
 
 - [x] fix(web): remove the guide button from Home
-- [ ] fix(web): add vertical padding to the bottom nav
+- [x] fix(web): add vertical padding to the bottom nav
 - [ ] fix(web): tidy the Pesanan and Uang layouts
