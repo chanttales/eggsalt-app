@@ -1,11 +1,12 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { CardRow } from "@/components/card-row";
 import { NewCardSheet } from "@/components/new-card-sheet";
+import { Sheet } from "@/components/sheet";
 import {
   EmptyState,
   headerButton,
@@ -123,8 +124,25 @@ function BoardScreen() {
         </>
       )}
 
-      {board && params.get("aksi") === "baru" && (
-        <NewCardSheet board={board} onClose={() => router.replace(`/papan?b=${board.id}`)} />
+      {params.get("aksi") === "baru" && !params.get("b") && orderBoards.length > 1 ? (
+        // The + button: pick warung order or catering pre-order first.
+        <Sheet title={t("order.new")} onClose={() => router.replace("/papan")}>
+          {orderBoards.map((b) => (
+            <button
+              key={b.id}
+              onClick={() => router.replace(`/papan?b=${b.id}&aksi=baru`)}
+              className="flex min-h-touch items-center justify-between rounded-[14px] bg-primary-soft px-4 py-3 text-left font-semibold"
+            >
+              {b.name}
+              <ArrowRight aria-hidden size={20} className="text-primary" />
+            </button>
+          ))}
+        </Sheet>
+      ) : (
+        board &&
+        params.get("aksi") === "baru" && (
+          <NewCardSheet board={board} onClose={() => router.replace(`/papan?b=${board.id}`)} />
+        )
       )}
     </Page>
   );
