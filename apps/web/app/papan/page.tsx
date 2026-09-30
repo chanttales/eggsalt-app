@@ -9,7 +9,7 @@ import { NewCardSheet } from "@/components/new-card-sheet";
 import { Sheet } from "@/components/sheet";
 import { EmptyState, Page, segment, segmented, StagePill, stageStyle } from "@/components/ui";
 import { t } from "@/lib/i18n";
-import { useBoards, useOpenCards, type Board, type Card } from "@/lib/queries";
+import { useBoards, useDoneCards, useOpenCards, type Board, type Card } from "@/lib/queries";
 
 type View = "kanban" | "list";
 
@@ -20,6 +20,7 @@ function BoardScreen() {
   const router = useRouter();
   const boards = useBoards();
   const cards = useOpenCards();
+  const done = useDoneCards();
 
   // Pesanan: the order boards (warung, catering). An old link to another board still opens it.
   const all = boards.data ?? [];
@@ -28,7 +29,10 @@ function BoardScreen() {
   const list = board && !orderBoards.includes(board) ? [...orderBoards, board] : orderBoards;
   const view: View = params.get("v") === "list" ? "list" : "kanban";
   const stageFilter = params.get("s");
-  const onBoard = (cards.data ?? []).filter((c) => c.boardId === board?.id);
+  // Finished orders stay listed under their last stage (Selesai) for 30 days.
+  const onBoard = [...(cards.data ?? []), ...(done.data ?? [])].filter(
+    (c) => c.boardId === board?.id,
+  );
 
   function go(next: { b?: string; v?: View; s?: string | null }) {
     const q = new URLSearchParams(params.toString());

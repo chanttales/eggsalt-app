@@ -177,6 +177,23 @@ export function useOpenCards() {
   });
 }
 
+/** Cards finished in the last 30 days, newest first, so the last stage (Selesai) is not empty. */
+export function useDoneCards() {
+  return useWorkspaceQuery("cards-done", async (workspaceId) => {
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const rows = must(
+      await supabase()
+        .from("card")
+        .select(CARD_COLUMNS)
+        .eq("workspace_id", workspaceId)
+        .eq("status", "done")
+        .gte("updated_at", since)
+        .order("updated_at", { ascending: false }),
+    );
+    return (rows as unknown as CardRow[]).map(toCard);
+  });
+}
+
 export interface StockLevel {
   itemId: string;
   stateId: string;

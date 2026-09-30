@@ -138,3 +138,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] fix(web): drop the new order button from Pesanan
 - [x] feat(web): add the EggSalt logo to sign in and as the app icon
 - [x] fix(web): recolor the logo to the #3DB2FF theme blue
+- [x] fix(web): list finished orders under Selesai on Pesanan
