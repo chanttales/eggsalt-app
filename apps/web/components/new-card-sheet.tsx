@@ -46,12 +46,13 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
   const unitPrice = product ? sellPriceFor(product, qty) : null;
   const entry = board.graph.stages.find((s) => s.key === board.graph.entry);
   const needed = new Set([...(entry?.require ?? [])]);
-  const defs = (fieldDefs.data ?? []).filter(
-    (f) => f.required || needed.has(f.key) || f.type === "date",
-  );
+  // One date per order: the one this board's first stage needs (pre-order: tanggal acara),
+  // else the first date field (warung: tanggal kirim). It also sets the due date.
+  const allDefs = fieldDefs.data ?? [];
   const dateDef =
-    defs.find((f) => f.type === "date" && (needed.has(f.key) || f.required)) ??
-    defs.find((f) => f.type === "date");
+    allDefs.find((f) => f.type === "date" && (needed.has(f.key) || f.required)) ??
+    allDefs.find((f) => f.type === "date");
+  const defs = allDefs.filter((f) => f.required || needed.has(f.key) || f === dateDef);
   const party = (customers.data ?? []).find((p) => p.id === partyId);
   const name = isOrder ? (party?.name ?? newName.trim()) : title.trim();
   const missing = defs.filter(

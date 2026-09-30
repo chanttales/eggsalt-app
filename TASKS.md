@@ -129,4 +129,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 ## M2.2 Order entry
 
 - [x] feat(web): let the add button choose warung order or catering pre-order
-- [ ] fix(web): ask one date per order type in the new order form
+- [x] fix(web): ask one date per order type in the new order form
