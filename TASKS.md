@@ -134,3 +134,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] fix(web): center sign in on a full blue background
 - [x] feat(web): hide empty stage chips unless all stages are shown
 - [x] feat(web): switch the theme blue to #3DB2FF
+- [x] fix(web): make the light blue cards and progress ring stand out
