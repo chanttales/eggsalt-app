@@ -89,4 +89,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 
 - [x] feat(db): add minimum quantity to sell prices
 - [x] feat(engine): price order lines by quantity
-- [ ] feat(web): edit and preview quantity prices
+- [x] feat(web): edit and preview quantity prices

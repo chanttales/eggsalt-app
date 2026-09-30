@@ -370,6 +370,11 @@ const messages = {
     "guide.dasbor.2":
       "Grafik menunjukkan jumlah telur terjual per hari selama 14 hari terakhir. Tekan batang untuk melihat angkanya.",
     "guide.dasbor.3": "Stok siap jual menunjukkan telur yang belum terikat pesanan.",
+    "price.tier": "Harga grosir",
+    "price.tierMin": "Mulai dari (butir)",
+    "price.tierPrice": "Harga grosir per butir",
+    "price.tierHint":
+      "Pesanan sebanyak ini atau lebih memakai harga grosir. Kosongkan jumlahnya untuk menghapus.",
   },
   en: {
     "nav.label": "Main navigation",
@@ -731,6 +736,11 @@ const messages = {
     "guide.dasbor.2":
       "The chart shows eggs sold per day over the last 14 days. Tap a bar to see its number.",
     "guide.dasbor.3": "Stock ready to sell shows eggs not yet held for orders.",
+    "price.tier": "Bulk price",
+    "price.tierMin": "From (eggs)",
+    "price.tierPrice": "Bulk price per egg",
+    "price.tierHint":
+      "Orders of at least this many eggs get the bulk price. Clear the number to remove it.",
   },
 } as const;
 

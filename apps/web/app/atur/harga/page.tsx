@@ -11,7 +11,9 @@ import { useSession } from "@/lib/session";
 import { supabase } from "@/lib/supabase";
 
 type Kind = "sell" | "buy";
-type Edits = Record<string, Partial<Record<Kind, number>>>;
+type Field = Kind | "tierMin" | "tierPrice";
+type Edits = Record<string, Partial<Record<Field, number>>>;
+type Change = { product: Product; kind: Kind; minQty: number; price: number } | { drop: Product };
 
 // Harga: a new dated price per product. Orders already made keep the price they were made with.
 export default function PricesPage() {
@@ -24,13 +26,33 @@ export default function PricesPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const current = (p: Product, kind: Kind) => (kind === "sell" ? p.sellPrice : p.buyPrice);
-  const value = (p: Product, kind: Kind) => edits[p.id]?.[kind] ?? current(p, kind) ?? 0;
-  const changes = (products.data ?? []).flatMap((p) =>
-    (["sell", "buy"] as const)
-      .filter((kind) => edits[p.id]?.[kind] != null && edits[p.id]?.[kind] !== current(p, kind))
-      .map((kind) => ({ product: p, kind, price: value(p, kind) })),
-  );
+  const current = (p: Product, field: Field) =>
+    field === "sell"
+      ? p.sellPrice
+      : field === "buy"
+        ? p.buyPrice
+        : field === "tierMin"
+          ? (p.sellTiers[0]?.minQty ?? null)
+          : (p.sellTiers[0]?.price ?? null);
+  const value = (p: Product, field: Field) => edits[p.id]?.[field] ?? current(p, field) ?? 0;
+  const edited = (p: Product, field: Field) =>
+    edits[p.id]?.[field] != null && edits[p.id]?.[field] !== current(p, field);
+  const changes: Change[] = (products.data ?? []).flatMap((p): Change[] => {
+    const out: Change[] = (["sell", "buy"] as const)
+      .filter((kind) => edited(p, kind))
+      .map((kind) => ({ product: p, kind, minQty: 0, price: value(p, kind) }));
+    if (edited(p, "tierMin") || edited(p, "tierPrice")) {
+      const minQty = value(p, "tierMin");
+      const price = value(p, "tierPrice");
+      // A quantity price needs both numbers; clearing the minimum removes it.
+      if (minQty > 1 && price > 0) out.push({ product: p, kind: "sell", minQty, price });
+      else if (!minQty && p.sellTiers.length > 0) out.push({ drop: p });
+    }
+    return out;
+  });
+
+  const set = (p: Product, field: Field, n: number) =>
+    setEdits((e) => ({ ...e, [p.id]: { ...e[p.id], [field]: n } }));
 
   async function save() {
     if (!workspace) return;
@@ -39,13 +61,26 @@ export default function PricesPage() {
     const db = supabase();
     try {
       for (const c of changes) {
-        // One general price per product, kind and day: saving twice on a day replaces the first.
+        if ("drop" in c) {
+          // Order lines keep the price they were made with, so old quantity prices can go.
+          const dropped = await db
+            .from("price")
+            .delete()
+            .eq("product_id", c.drop.id)
+            .eq("kind", "sell")
+            .is("segment", null)
+            .gt("min_qty", 0);
+          if (dropped.error) throw dropped.error;
+          continue;
+        }
+        // One general price per product, kind, quantity and day: saving twice replaces the first.
         const cleared = await db
           .from("price")
           .delete()
           .eq("product_id", c.product.id)
           .eq("kind", c.kind)
           .is("segment", null)
+          .eq("min_qty", c.minQty)
           .eq("valid_from", from);
         if (cleared.error) throw cleared.error;
         const added = await db.from("price").insert({
@@ -53,6 +88,7 @@ export default function PricesPage() {
           product_id: c.product.id,
           kind: c.kind,
           unit_price: c.price,
+          min_qty: c.minQty,
           valid_from: from,
         });
         if (added.error) throw added.error;
@@ -94,10 +130,28 @@ export default function PricesPage() {
                 key={kind}
                 label={t(kind === "sell" ? "price.sell" : "price.buy")}
                 value={value(p, kind)}
-                onChange={(n) => setEdits((e) => ({ ...e, [p.id]: { ...e[p.id], [kind]: n } }))}
+                onChange={(n) => set(p, kind, n)}
               />
             ))}
           </div>
+          <p className="text-label font-medium">{t("price.tier")}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-1 text-label font-medium">
+              {t("price.tierMin")}
+              <input
+                inputMode="numeric"
+                value={value(p, "tierMin") || ""}
+                onChange={(e) => set(p, "tierMin", Number(e.target.value.replace(/\D/g, "")) || 0)}
+                className={inputClass}
+              />
+            </label>
+            <Money
+              label={t("price.tierPrice")}
+              value={value(p, "tierPrice")}
+              onChange={(n) => set(p, "tierPrice", n)}
+            />
+          </div>
+          <p className="text-label text-muted-foreground">{t("price.tierHint")}</p>
         </Section>
       ))}
       {message && (

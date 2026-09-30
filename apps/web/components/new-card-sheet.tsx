@@ -7,7 +7,14 @@ import { inputClass, primaryButton } from "@/components/ui";
 import { useEnqueue } from "@/lib/data";
 import { count, dayKey, rupiah, startOfDay } from "@/lib/format";
 import { t } from "@/lib/i18n";
-import { useFieldDefs, useParties, useProducts, type Board, type FieldDef } from "@/lib/queries";
+import {
+  sellPriceFor,
+  useFieldDefs,
+  useParties,
+  useProducts,
+  type Board,
+  type FieldDef,
+} from "@/lib/queries";
 import { useSession } from "@/lib/session";
 import { supabase } from "@/lib/supabase";
 
@@ -36,6 +43,7 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
 
   const sellable = products.data ?? [];
   const product = sellable.find((p) => p.id === productId) ?? sellable[0];
+  const unitPrice = product ? sellPriceFor(product, qty) : null;
   const entry = board.graph.stages.find((s) => s.key === board.graph.entry);
   const needed = new Set([...(entry?.require ?? [])]);
   const defs = (fieldDefs.data ?? []).filter(
@@ -153,12 +161,10 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
               <span className="font-normal text-muted-foreground">{t("order.pastHint")}</span>
             )}
           </label>
-          {product?.sellPrice != null && qty > 0 && (
+          {unitPrice != null && qty > 0 && (
             <p className="text-right text-label text-muted-foreground">
-              {count(qty)} × {rupiah(product.sellPrice)} ={" "}
-              <span className="font-semibold text-foreground">
-                {rupiah(qty * product.sellPrice)}
-              </span>
+              {count(qty)} × {rupiah(unitPrice)} ={" "}
+              <span className="font-semibold text-foreground">{rupiah(qty * unitPrice)}</span>
             </p>
           )}
         </>
