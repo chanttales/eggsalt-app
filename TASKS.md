@@ -88,5 +88,5 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 ## M1.7 Quantity prices
 
 - [x] feat(db): add minimum quantity to sell prices
-- [ ] feat(engine): price order lines by quantity
+- [x] feat(engine): price order lines by quantity
 - [ ] feat(web): edit and preview quantity prices
