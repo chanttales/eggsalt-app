@@ -54,6 +54,14 @@ const messages = {
     "card.dismiss": "Tutup",
     "toast.saved": "Tersimpan",
     "toast.undo": "Batalkan",
+    "error.title": "Halaman ini gagal dibuka",
+    "error.body":
+      "Data Anda aman. Coba buka lagi. Kalau masih gagal, muat ulang data di HP ini; perubahan yang belum terkirim tetap disimpan.",
+    "error.retry": "Coba lagi",
+    "error.refresh": "Muat ulang data",
+    "error.home": "Ke halaman utama",
+    "notFound.title": "Halaman tidak ditemukan",
+    "notFound.body": "Tautannya mungkin salah atau halamannya sudah dipindah.",
     "refused.conflict":
       "Tidak tersimpan: datanya sudah berubah, misalnya dicatat dari HP lain atau stoknya sudah terpakai. Tampilan sudah diperbarui.",
     "refused.forbidden": "Tidak tersimpan: akun ini tidak punya izin untuk perubahan ini.",
@@ -457,6 +465,14 @@ const messages = {
     "card.dismiss": "Dismiss",
     "toast.saved": "Saved",
     "toast.undo": "Undo",
+    "error.title": "This page couldn't open",
+    "error.body":
+      "Your data is safe. Try again. If it still fails, reload the data on this phone; changes not yet sent are kept.",
+    "error.retry": "Try again",
+    "error.refresh": "Reload data",
+    "error.home": "Go to the home page",
+    "notFound.title": "Page not found",
+    "notFound.body": "The link may be wrong or the page has moved.",
     "refused.conflict":
       "Not saved: the data changed first, for example from another phone or the stock was used. The screen has been refreshed.",
     "refused.forbidden": "Not saved: this account isn't allowed to make this change.",

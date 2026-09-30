@@ -30,8 +30,11 @@ const RETRY_EVERY = 20_000;
 
 const Context = createContext<Outbox | null>(null);
 
+/** Where the query cache lives in IndexedDB; the error page clears it. */
+export const QUERY_CACHE_KEY = "papan.query";
+
 const persister = createAsyncStoragePersister({
-  key: "papan.query",
+  key: QUERY_CACHE_KEY,
   // Undefined while Next.js prerenders pages at build time, which makes the persister a no-op.
   storage:
     typeof indexedDB === "undefined" ? undefined : { getItem: get, setItem: set, removeItem: del },
