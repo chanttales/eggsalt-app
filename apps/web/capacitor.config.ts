@@ -4,7 +4,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 // opens instantly and works offline; it never loads the site from a remote URL.
 const config: CapacitorConfig = {
   appId: "id.papan.app",
-  appName: "Papan",
+  appName: "EggSalt",
   webDir: "out",
   android: {
     allowMixedContent: false,

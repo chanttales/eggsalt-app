@@ -29,7 +29,7 @@ export default function SignInPage() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 p-4">
       <header className="flex flex-col gap-1">
-        <p className="text-title font-bold text-primary">Papan</p>
+        <p className="text-title font-bold text-primary">EggSalt</p>
         <h1 className="text-title-lg font-bold">{t("auth.title")}</h1>
         <p className="text-muted-foreground">{t("auth.intro")}</p>
       </header>

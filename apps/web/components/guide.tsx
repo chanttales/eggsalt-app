@@ -49,7 +49,7 @@ function wasSeen(page: GuidePage): boolean {
 }
 
 // Help button in the page header. Opens by itself on the first visit so early users see what the page does.
-export function GuideButton({ page }: { page: GuidePage }) {
+export function GuideButton({ page, className }: { page: GuidePage; className?: string }) {
   const seen = useSyncExternalStore(
     noSubscribe,
     () => wasSeen(page),
@@ -73,7 +73,7 @@ export function GuideButton({ page }: { page: GuidePage }) {
         type="button"
         aria-label={t("guide.open")}
         onClick={() => setChosen(true)}
-        className="flex min-h-touch min-w-touch items-center justify-center rounded-md text-muted-foreground"
+        className={`flex min-h-touch min-w-touch items-center justify-center rounded-md ${className ?? "text-muted-foreground"}`}
       >
         <CircleHelp aria-hidden size={22} />
       </button>
