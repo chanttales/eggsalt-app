@@ -18,6 +18,9 @@ export default function MorePage() {
         <Link href="/atur/harga" className={secondaryButton}>
           {t("price.title")}
         </Link>
+        <Link href="/atur/kontak" className={secondaryButton}>
+          {t("contact.title")}
+        </Link>
         <Link href="/atur/papan" className={secondaryButton}>
           {t("editor.boards")}
         </Link>

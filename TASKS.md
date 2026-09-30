@@ -81,6 +81,6 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(db): date a past order's stock and money rows
 - [x] feat(engine): add order date for past sales
 - [x] feat(web): add order date to the new order sheet
-- [ ] feat(web): add customer and supplier editor
+- [x] feat(web): add customer and supplier editor
 - [ ] feat(web): add settings menu
 - [ ] feat(web): add dashboard with sales, profit and stock trends
