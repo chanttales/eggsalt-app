@@ -94,5 +94,5 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 ## M1.8 Invites
 
 - [x] feat(db): add email invites
-- [ ] feat(web): join invited workspaces on sign-in
+- [x] feat(web): join invited workspaces on sign-in
 - [ ] feat(web): add invites screen
