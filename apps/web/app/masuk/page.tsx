@@ -39,7 +39,7 @@ export default function SignInPage() {
     >
       <div className="mx-auto flex w-full max-w-sm flex-col gap-8 py-8">
         <header className="flex flex-col items-center gap-4 text-center text-primary-foreground">
-          <Image src={logoMark} alt="EggSalt" width={96} height={96} priority />
+          <Image src={logoMark} alt="EggSalt" width={120} height={120} priority />
           <h1 className="text-[2rem] leading-tight font-bold">{t("auth.title")}</h1>
           <p className="opacity-90">{t("auth.intro")}</p>
         </header>
