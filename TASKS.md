@@ -124,3 +124,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] fix(web): add vertical padding to the bottom nav
 - [x] fix(web): tidy the Pesanan and Uang layouts
 - [x] fix(web): explain why the engine refused a change
+- [x] fix(engine): clear the stock shortage flag once stock covers the order
