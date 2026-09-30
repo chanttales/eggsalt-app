@@ -262,6 +262,60 @@ const messages = {
     "setup.creating": "Membuat…",
     "setup.skip": "Lewati, buat dengan angka bawaan",
     "setup.createFailed": "Usaha gagal dibuat. Periksa koneksi lalu coba lagi.",
+    "guide.open": "Panduan halaman ini",
+    "guide.done": "Mengerti",
+    "guide.all": "Panduan fitur",
+    "guide.intro": "Penjelasan singkat fitur di setiap halaman.",
+    "guide.today.title": "Hari ini",
+    "guide.today.1":
+      "Ringkasan kerja hari ini: pesanan jatuh tempo, siap diantar, dan belum dibayar.",
+    "guide.today.2":
+      "Kotak Rebus memberi tahu berapa telur perlu direbus, sudah termasuk perkiraan telur pecah.",
+    "guide.today.3":
+      "Pengingat retur muncul sehari sebelum telur mentah harus dikembalikan ke pemasok.",
+    "guide.today.4": "Tekan Pesanan baru untuk mencatat pesanan dari warung atau katering.",
+    "guide.papan.title": "Papan",
+    "guide.papan.1":
+      "Setiap papan adalah satu alur kerja, misalnya Pesanan atau Produksi. Pilih papan di bagian atas.",
+    "guide.papan.2":
+      "Kartu dikelompokkan per tahap. Tekan chip tahap untuk melihat tahap itu saja.",
+    "guide.papan.3": "Tekan kartu untuk melihat detail dan memindahkannya ke tahap berikutnya.",
+    "guide.papan.4": "Tekan Kartu baru di kanan atas untuk menambah pesanan atau pekerjaan.",
+    "guide.kartu.title": "Kartu",
+    "guide.kartu.1":
+      "Satu kartu adalah satu pesanan atau pekerjaan: pelanggan, barang, total, dan jatuh tempo.",
+    "guide.kartu.2":
+      "Deretan tahap menunjukkan posisi kartu. Pakai Pindah ke untuk lanjut; stok dan uang tercatat otomatis.",
+    "guide.kartu.3":
+      "Catat pembayaran untuk mengurangi sisa tagihan. Laba pesanan = penjualan dikurangi HPP dan biaya langsung.",
+    "guide.kartu.4": "Salah pindah? Tekan Batalkan. Semua perubahan tersimpan di Riwayat.",
+    "guide.stok.title": "Stok",
+    "guide.stok.1":
+      "Terima stok saat telur datang dari pemasok. Telur bonus ikut dihitung sehingga HPP per butir lebih murah.",
+    "guide.stok.2": "Rebus mengubah telur mentah menjadi telur rebus.",
+    "guide.stok.3": "Retur mengembalikan sisa telur mentah ke pemasok sebelum batas harinya.",
+    "guide.stok.4": "Bebas adalah stok yang bisa dijual; Dipesan sudah terikat pesanan.",
+    "guide.uang.title": "Uang",
+    "guide.uang.1": "Lihat uang masuk, uang keluar, dan selisihnya untuk periode yang dipilih.",
+    "guide.uang.2":
+      "Belum dibayar berisi pesanan yang masih punya tagihan. Tekan untuk mencatat pembayaran.",
+    "guide.uang.3":
+      "Tekan Pengeluaran untuk mencatat biaya seperti gas LPG, plastik, atau ongkir supaya laba akurat.",
+    "guide.uang.4": "Hanya pemilik yang bisa membuka halaman ini.",
+    "guide.laporan.title": "Laporan",
+    "guide.laporan.1":
+      "Laba kotor adalah penjualan dikurangi HPP. Laba bersih adalah laba kotor dikurangi pengeluaran.",
+    "guide.laporan.2":
+      "Lihat hasil per pesanan dan per pelanggan untuk tahu siapa yang paling menguntungkan.",
+    "guide.laporan.3": "Ganti periode untuk membandingkan hari, minggu, atau bulan.",
+    "guide.atur.title": "Atur papan",
+    "guide.atur.1":
+      "Ubah tahap tiap papan agar sesuai cara kerja usahamu: tambah, ganti nama, warna, atau urutan.",
+    "guide.atur.2":
+      "Aturan tahap menentukan apa yang terjadi otomatis saat kartu masuk tahap itu, misalnya stok berkurang.",
+    "guide.atur.3":
+      "Perubahan disimpan sebagai draf. Terbitkan agar dipakai; kartu yang sudah ada tetap aman.",
+    "guide.atur.4": "Hanya pemilik yang bisa mengatur papan.",
   },
   en: {
     "nav.label": "Main navigation",
@@ -525,6 +579,52 @@ const messages = {
     "setup.creating": "Creating…",
     "setup.skip": "Skip, use the defaults",
     "setup.createFailed": "Couldn't create the business. Check the connection and try again.",
+    "guide.open": "Guide for this page",
+    "guide.done": "Got it",
+    "guide.all": "Feature guide",
+    "guide.intro": "A short explanation of each page's features.",
+    "guide.today.title": "Today",
+    "guide.today.1": "Today's work at a glance: orders due, ready to deliver and unpaid.",
+    "guide.today.2": "The boil box says how many eggs to boil, including expected breakage.",
+    "guide.today.3": "A return reminder shows the day before raw eggs go back to the supplier.",
+    "guide.today.4": "Tap New order to record an order from a shop or caterer.",
+    "guide.papan.title": "Boards",
+    "guide.papan.1":
+      "Each board is one workflow, such as Orders or Production. Pick one at the top.",
+    "guide.papan.2": "Cards are grouped by stage. Tap a stage chip to see only that stage.",
+    "guide.papan.3": "Tap a card to see its details and move it to the next stage.",
+    "guide.papan.4": "Tap New card at the top right to add an order or job.",
+    "guide.kartu.title": "Card",
+    "guide.kartu.1": "A card is one order or job: customer, items, total and due date.",
+    "guide.kartu.2":
+      "The stage row shows where the card is. Use Move to go on; stock and money are recorded automatically.",
+    "guide.kartu.3":
+      "Record a payment to reduce what is owed. Order profit = sales minus cost of goods and direct costs.",
+    "guide.kartu.4": "Moved by mistake? Tap Undo. Every change is kept in History.",
+    "guide.stok.title": "Stock",
+    "guide.stok.1":
+      "Receive stock when eggs arrive. Free bonus eggs are counted, so the cost per egg drops.",
+    "guide.stok.2": "Boil turns raw eggs into boiled eggs.",
+    "guide.stok.3": "Return sends leftover raw eggs back to the supplier before the deadline.",
+    "guide.stok.4": "Available can be sold; Reserved is already held for orders.",
+    "guide.uang.title": "Money",
+    "guide.uang.1": "See money in, money out and the difference for the chosen period.",
+    "guide.uang.2": "Unpaid lists orders that still owe money. Tap one to record a payment.",
+    "guide.uang.3":
+      "Tap Expense to record costs like LPG, plastic or delivery so profit is accurate.",
+    "guide.uang.4": "Only the owner can open this page.",
+    "guide.laporan.title": "Reports",
+    "guide.laporan.1":
+      "Gross profit is sales minus cost of goods. Net profit is gross profit minus expenses.",
+    "guide.laporan.2": "See results per order and per customer to find who is most profitable.",
+    "guide.laporan.3": "Change the period to compare days, weeks or months.",
+    "guide.atur.title": "Board setup",
+    "guide.atur.1":
+      "Shape each board's stages to fit how you work: add, rename, recolor or reorder.",
+    "guide.atur.2":
+      "Stage rules decide what happens automatically when a card enters, such as stock going down.",
+    "guide.atur.3": "Changes are saved as a draft. Publish to use them; existing cards stay safe.",
+    "guide.atur.4": "Only the owner can set up boards.",
   },
 } as const;
 

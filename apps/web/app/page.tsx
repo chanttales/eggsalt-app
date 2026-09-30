@@ -70,7 +70,7 @@ export default function TodayPage() {
   const loading = boards.isPending || cards.isPending;
 
   return (
-    <Page title={t("nav.today")} subtitle={longDate()}>
+    <Page guide="today" title={t("nav.today")} subtitle={longDate()}>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile label={t("today.ordersDue")} value={count(dueNow.length)} href="/papan" />
         <StatTile

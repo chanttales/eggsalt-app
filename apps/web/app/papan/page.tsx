@@ -42,6 +42,7 @@ function BoardScreen() {
 
   return (
     <Page
+      guide="papan"
       title={t("nav.boards")}
       actions={
         board && (

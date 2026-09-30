@@ -69,14 +69,14 @@ function CardScreen() {
 
   if (card.isPending || boards.isPending) {
     return (
-      <Page title={t("card.title")}>
+      <Page guide="kartu" title={t("card.title")}>
         <EmptyState>{t("auth.loading")}</EmptyState>
       </Page>
     );
   }
   if (!card.data || !board) {
     return (
-      <Page title={t("card.title")}>
+      <Page guide="kartu" title={t("card.title")}>
         <EmptyState>{t("card.notFound")}</EmptyState>
       </Page>
     );
@@ -100,6 +100,7 @@ function CardScreen() {
 
   return (
     <Page
+      guide="kartu"
       title={`${c.title} #${c.number}`}
       subtitle={board.name}
       actions={
@@ -119,7 +120,7 @@ function CardScreen() {
         {c.flags.includes("shortage") && <span className="text-warning">{t("card.shortage")}</span>}
       </div>
 
-      <ol aria-label={t("card.stages")} className="-mx-4 flex gap-1 overflow-x-auto px-4">
+      <ol aria-label={t("card.stages")} className="flex flex-wrap gap-1">
         {g.stages.map((s, i) => {
           const done = i < stageIndex;
           const current = i === stageIndex;
