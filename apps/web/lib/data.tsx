@@ -13,6 +13,7 @@ import {
   type ReactNode,
 } from "react";
 import { useToast } from "@/components/toast";
+import { refusedText } from "@/lib/engine";
 import { t } from "@/lib/i18n";
 import { type FailedOp, indexedDbStore, Outbox, type OutboxItem, sendToEngine } from "@/lib/outbox";
 import { useSession } from "@/lib/session";
@@ -46,10 +47,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         },
       }),
   );
+  // Stable for the app's lifetime, so the outbox can keep this one.
+  const toast = useToast();
   const [outbox] = useState(
     () =>
-      // Whatever happened to an op, the server's version of the data may have changed.
-      new Outbox(indexedDbStore, sendToEngine, () => void queryClient.invalidateQueries()),
+      new Outbox(indexedDbStore, sendToEngine, ({ error }) => {
+        // Whatever happened to an op, the server's version of the data may have changed.
+        void queryClient.invalidateQueries();
+        // A refused change is said out loud wherever the user is, not only on its order.
+        if (error) toast({ text: refusedText(error), tone: "danger" });
+      }),
   );
 
   // Send queued ops when the app starts, comes back online or to the front, and every so often.

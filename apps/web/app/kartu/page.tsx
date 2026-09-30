@@ -26,6 +26,7 @@ import {
 } from "@/components/ui";
 import { boardMap, ruleData, stockReader } from "@/lib/board-model";
 import { useEnqueue, useFailedOps, usePendingOps } from "@/lib/data";
+import { refusedText } from "@/lib/engine";
 import { count, rupiah, shortDate, time } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import {
@@ -149,7 +150,7 @@ function CardScreen() {
           role="alert"
           className="rounded-md border border-danger p-2 text-label"
         >
-          <p className="text-danger">{f.error.message}</p>
+          <p className="text-danger">{refusedText(f.error)}</p>
           <button className={ghostButton} onClick={() => dismiss(f.item.id)}>
             {t("card.dismiss")}
           </button>

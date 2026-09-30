@@ -54,6 +54,12 @@ const messages = {
     "card.dismiss": "Tutup",
     "toast.saved": "Tersimpan",
     "toast.undo": "Batalkan",
+    "refused.conflict":
+      "Tidak tersimpan: datanya sudah berubah, misalnya dicatat dari HP lain atau stoknya sudah terpakai. Tampilan sudah diperbarui.",
+    "refused.forbidden": "Tidak tersimpan: akun ini tidak punya izin untuk perubahan ini.",
+    "refused.notFound": "Tidak tersimpan: datanya tidak ditemukan, mungkin sudah dihapus.",
+    "refused.badRequest": "Tidak tersimpan: ada isian yang belum benar. Periksa lalu coba lagi.",
+    "refused.other": "Tidak tersimpan karena gangguan di server. Coba lagi sebentar lagi.",
     "toast.undone": "Dibatalkan",
     "toast.undoFailed":
       "Tidak bisa dibatalkan. Periksa koneksi, atau batalkan dari riwayat pesanan.",
@@ -451,6 +457,12 @@ const messages = {
     "card.dismiss": "Dismiss",
     "toast.saved": "Saved",
     "toast.undo": "Undo",
+    "refused.conflict":
+      "Not saved: the data changed first, for example from another phone or the stock was used. The screen has been refreshed.",
+    "refused.forbidden": "Not saved: this account isn't allowed to make this change.",
+    "refused.notFound": "Not saved: the data wasn't found; it may have been deleted.",
+    "refused.badRequest": "Not saved: something entered isn't right. Check and try again.",
+    "refused.other": "Not saved because of a server problem. Try again shortly.",
     "toast.undone": "Undone",
     "toast.undoFailed": "Couldn't undo. Check your connection, or undo it from the order history.",
     "card.done": "Done.",
