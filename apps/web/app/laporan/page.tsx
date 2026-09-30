@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { EmptyState, Page, Section } from "@/components/ui";
 import { PERIODS, periodStart, rupiah, type Period } from "@/lib/format";
@@ -16,7 +16,6 @@ type Report = (typeof REPORTS)[number];
 // losing orders first so they stand out.
 function ReportScreen() {
   const params = useSearchParams();
-  const router = useRouter();
   const { state } = useSession();
   const isOwner = state.status === "signed_in" && state.workspace?.role === "owner";
   const report = (REPORTS as readonly string[]).includes(params.get("r") ?? "")
@@ -39,7 +38,7 @@ function ReportScreen() {
         label={t("report.title")}
         options={REPORTS}
         value={report}
-        onChange={(r) => router.replace(`/laporan?r=${r}`)}
+        onChange={(r) => window.history.replaceState(null, "", `?r=${r}`)}
         name={(r) => t(`report.${r}`)}
       />
       <Segmented

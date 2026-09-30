@@ -45,7 +45,8 @@ function BoardScreen() {
       if (next.s) q.set("s", next.s);
       else q.delete("s");
     }
-    router.replace(`/papan?${q.toString()}`);
+    // Only the query changes: update it in place so the list swaps without a page load.
+    window.history.replaceState(null, "", `?${q.toString()}`);
   }
 
   return (
