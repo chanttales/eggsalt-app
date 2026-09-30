@@ -45,7 +45,7 @@ export default function SignInPage() {
           <p className="opacity-90">{t("auth.intro")}</p>
         </header>
 
-        <div className="flex flex-col gap-4 rounded-[20px] bg-surface p-6 shadow-lg">
+        <div className="flex flex-col gap-4 rounded-[20px]">
           <button
             type="button"
             disabled={busy}
