@@ -23,6 +23,7 @@ import {
   primaryButton,
   secondaryButton,
   stageStyle,
+  ListSkeleton,
 } from "@/components/ui";
 import { boardMap, ruleData, stockReader } from "@/lib/board-model";
 import { useEnqueue, useFailedOps, usePendingOps } from "@/lib/data";
@@ -71,7 +72,7 @@ function CardScreen() {
   if (card.isPending || boards.isPending) {
     return (
       <Page guide="kartu" title={t("card.title")}>
-        <EmptyState>{t("auth.loading")}</EmptyState>
+        <ListSkeleton />
       </Page>
     );
   }

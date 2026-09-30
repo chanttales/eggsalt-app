@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { BoilSheet } from "@/components/boil-sheet";
 import { ReceiveSheet, ReturnSheet } from "@/components/stock-sheets";
-import { EmptyState, Page, Section, StagePill } from "@/components/ui";
+import { EmptyState, Page, Section, StagePill, ListSkeleton } from "@/components/ui";
 import { count, daysUntil, rupiah, shortDate } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
 import { useOpenLots, useStockLevels, type Lot, type StockLevel } from "@/lib/queries";
@@ -45,7 +45,7 @@ function StockScreen() {
       </div>
 
       {levels.isPending ? (
-        <EmptyState>{t("auth.loading")}</EmptyState>
+        <ListSkeleton />
       ) : (
         <div className="grid gap-3 sm:grid-cols-3">
           {(levels.data ?? []).map((l) => (

@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { BoardCanvas } from "@/components/board-editor/canvas";
 import { StageList } from "@/components/board-editor/stage-list";
-import { EmptyState, Page, ghostButton, primaryButton } from "@/components/ui";
+import { EmptyState, Page, ghostButton, primaryButton, ListSkeleton } from "@/components/ui";
 import { useBoardDraft, usePublishBoard } from "@/lib/board-editor";
 import { useToast } from "@/components/toast";
 import { t } from "@/lib/i18n";
@@ -29,7 +29,7 @@ function EditorScreen() {
   if (!board || state.status !== "signed_in" || !state.workspace) {
     return (
       <Page guide="atur" title={t("editor.title")}>
-        <EmptyState>{boards.isPending ? t("auth.loading") : t("editor.notFound")}</EmptyState>
+        {boards.isPending ? <ListSkeleton /> : <EmptyState>{t("editor.notFound")}</EmptyState>}
       </Page>
     );
   }

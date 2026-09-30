@@ -4,7 +4,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useConfirm } from "@/components/sheet";
 import { saveFailed, useToast } from "@/components/toast";
-import { EmptyState, ghostButton, inputClass, Page, primaryButton, Section } from "@/components/ui";
+import {
+  EmptyState,
+  ghostButton,
+  inputClass,
+  Page,
+  primaryButton,
+  Section,
+  ListSkeleton,
+} from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useTeam, type TeamEntry } from "@/lib/queries";
 import { useSession } from "@/lib/session";
@@ -134,7 +142,11 @@ export default function InvitesPage() {
       </form>
       <Section title={t("invite.list")}>
         {(team.data ?? []).length === 0 ? (
-          <EmptyState>{team.isPending ? t("auth.loading") : t("contact.none")}</EmptyState>
+          team.isPending ? (
+            <ListSkeleton />
+          ) : (
+            <EmptyState>{t("contact.none")}</EmptyState>
+          )
         ) : (
           <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-surface">
             {(team.data ?? []).map((entry) => (

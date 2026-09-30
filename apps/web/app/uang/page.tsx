@@ -14,6 +14,7 @@ import {
   segment,
   segmented,
   secondaryButton,
+  ListSkeleton,
 } from "@/components/ui";
 import { PERIODS, periodStart, rupiah, shortDate, time, type Period } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
@@ -108,7 +109,7 @@ function MoneyScreen() {
 
       <Section title={t("money.entries")}>
         {entries.isPending ? (
-          <EmptyState>{t("auth.loading")}</EmptyState>
+          <ListSkeleton />
         ) : (entries.data ?? []).length === 0 ? (
           <EmptyState>{t("money.noEntries")}</EmptyState>
         ) : (
