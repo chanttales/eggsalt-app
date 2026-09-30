@@ -55,8 +55,6 @@ export class Outbox {
   private failed: readonly FailedOp[] = [];
   private loaded: Promise<void>;
   private flushing = false;
-  /** The op being sent right now; it can no longer be cancelled. */
-  private inFlight: string | null = null;
   private listeners = new Set<Listener>();
 
   constructor(
@@ -96,7 +94,6 @@ export class Outbox {
     try {
       while (this.items.length > 0) {
         const item = this.items[0]!;
-        this.inFlight = item.id;
         try {
           const result = await this.send(item);
           this.items.shift();
@@ -119,7 +116,6 @@ export class Outbox {
         }
       }
     } finally {
-      this.inFlight = null;
       this.flushing = false;
     }
   }
@@ -130,21 +126,6 @@ export class Outbox {
     this.items = [];
     this.failed = [];
     await this.persist();
-  }
-
-  /** Drops an op that hasn't been sent yet; false if it was sent already or is being sent. */
-  async cancel(id: string): Promise<boolean> {
-    await this.loaded;
-    if (id === this.inFlight || !this.items.some((i) => i.id === id)) return false;
-    this.items = this.items.filter((i) => i.id !== id);
-    await this.persist();
-    return true;
-  }
-
-  /** Resolves once whatever is queued now has been sent or has to wait for a connection. */
-  async settle(): Promise<void> {
-    while (this.flushing) await new Promise((r) => setTimeout(r, 100));
-    await this.flush();
   }
 
   dismiss(id: string): void {

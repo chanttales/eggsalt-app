@@ -17,7 +17,6 @@ import { refusedText } from "@/lib/engine";
 import { t } from "@/lib/i18n";
 import { type FailedOp, indexedDbStore, Outbox, type OutboxItem, sendToEngine } from "@/lib/outbox";
 import { useSession } from "@/lib/session";
-import { supabase } from "@/lib/supabase";
 
 // Server data and the write queue. Reads are cached by TanStack Query and kept in IndexedDB, so
 // the app opens instantly with the last data it saw, even offline. Writes go through the outbox.
@@ -53,28 +52,34 @@ export function DataProvider({ children }: { children: ReactNode }) {
   // Stable for the app's lifetime, so the outbox can keep this one.
   const toast = useToast();
   const [outbox] = useState(() => {
+    /** Ops sent again from Coba lagi, so a second failure offers the developer instead. */
+    const retriedKeys = new Set<string>();
     const box: Outbox = new Outbox(indexedDbStore, sendToEngine, ({ item, error }) => {
       // Whatever happened to an op, the server's version of the data may have changed.
       void queryClient.invalidateQueries();
-      if (!error) return;
-      // A refused change is said out loud wherever the user is, not only on its order. A server
-      // hiccup is worth sending again as a new op; a conflict or a bad entry is not.
-      const retry = !["conflict", "forbidden", "not_found", "bad_request"].includes(error.code);
+      if (!error) {
+        if (retriedKeys.delete(item.id)) {
+          toast({ title: t("toast.saved"), text: t("toast.savedBody") });
+        }
+        return;
+      }
+      // A refused change is said out loud wherever the user is. The first failure offers Coba lagi
+      // (as a new op, or the engine would treat it as the refused one); a failed retry or a server
+      // error offers to contact the developer instead.
+      const serverDown = error.code === "internal" || error.status >= 500;
+      const retried = retriedKeys.delete(item.id);
       toast({
+        tone: "danger",
         title: t("toast.failed"),
         text: refusedText(error),
-        tone: "danger",
-        primary: retry
-          ? {
-              label: t("result.retry"),
-              run: () => {
-                box.dismiss(item.id);
-                // A new idempotency key, or the engine would treat it as the refused op.
-                const input = { ...item.input, idempotencyKey: crypto.randomUUID() };
-                void box.enqueue(item.op, item.workspaceId, input);
-              },
-            }
-          : undefined,
+        contact: serverDown || retried,
+        detail: `${item.op} ${error.code} ${error.status}: ${error.message}`,
+        retry: () => {
+          box.dismiss(item.id);
+          const key = crypto.randomUUID();
+          retriedKeys.add(key);
+          void box.enqueue(item.op, item.workspaceId, { ...item.input, idempotencyKey: key });
+        },
       });
     });
     return box;
@@ -121,24 +126,18 @@ function useOutbox(): Outbox {
 }
 
 export interface EnqueueOptions {
-  /** No "Tersimpan" message, for the first op of a step that sends several. */
+  /** No "Berhasil disimpan", for the first op of a step that sends several. */
   quiet?: boolean;
-  /** Earlier ops of the same step, newest first, that Batalkan undoes together with this one. */
-  undoAlso?: string[];
 }
 
-/**
- * Queue an engine op for the active workspace; resolves with its idempotency key. Shows
- * "Tersimpan" with Batalkan: an op still in the queue is dropped, a sent one is undone by the
- * engine (it records every op as a card event under the op's idempotency key).
- */
+/** Queue an engine op for the active workspace and say so; resolves with its idempotency key. */
 export function useEnqueue() {
   const outbox = useOutbox();
   const toast = useToast();
   const { state } = useSession();
   const workspaceId = state.status === "signed_in" ? state.workspace?.id : undefined;
 
-  const enqueue = async (
+  return async (
     op: string,
     input: Record<string, unknown>,
     options: EnqueueOptions = {},
@@ -146,40 +145,14 @@ export function useEnqueue() {
     if (!workspaceId) throw new Error("No active workspace");
     const key = await outbox.enqueue(op, workspaceId, input);
     if (options.quiet) return key;
-    const keys = [key, ...(options.undoAlso ?? [])];
     if (op === "undo") toast({ title: t("toast.undone"), text: t("toast.undoneBody") });
     else
       toast({
         title: t("toast.saved"),
         text: t(navigator.onLine ? "toast.savedBody" : "toast.savedOffline"),
-        action: { label: t("toast.undo"), run: () => void undo(keys) },
       });
     return key;
   };
-
-  /** Undoes the ops newest first: drops the ones still queued, asks the engine to reverse the rest. */
-  async function undo(keys: string[]) {
-    if (!workspaceId) return;
-    const sent: string[] = [];
-    for (const key of keys) if (!(await outbox.cancel(key))) sent.push(key);
-    if (sent.length > 0) await outbox.settle();
-    for (const key of sent) {
-      const { data } = await supabase()
-        .from("card_event")
-        .select("id")
-        .eq("workspace_id", workspaceId)
-        .eq("idempotency_key", key)
-        .maybeSingle();
-      if (!data) {
-        toast({ title: t("toast.undoFailedTitle"), text: t("toast.undoFailed"), tone: "danger" });
-        return;
-      }
-      await outbox.enqueue("undo", workspaceId, { eventId: Number(data.id) });
-    }
-    toast({ title: t("toast.undone"), text: t("toast.undoneBody") });
-  }
-
-  return enqueue;
 }
 
 /** Ops still waiting to be sent, for the "belum terkirim" indicator. */

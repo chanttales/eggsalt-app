@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Sheet, useConfirm } from "@/components/sheet";
-import { useToast } from "@/components/toast";
+import { saveFailed, useToast } from "@/components/toast";
 import { EmptyState, ghostButton, inputClass, Page, primaryButton } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useParties, type Party } from "@/lib/queries";
@@ -85,15 +85,21 @@ function PartySheet({
   const toast = useToast();
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
 
-  async function write(change: Record<string, unknown>) {
+  async function write(change: Record<string, unknown>, attempt = 1) {
     setBusy(true);
     const db = supabase().from("party");
-    const { error } = party
+    const { error, status } = party
       ? await db.update(change).eq("id", party.id)
       : await db.insert({ ...change, workspace_id: workspaceId, kind } as never);
     setBusy(false);
     if (error) {
-      toast({ title: t("toast.failed"), text: t("contact.failed"), tone: "danger" });
+      toast(
+        saveFailed(t("contact.failed"), {
+          attempt,
+          status,
+          retry: () => void write(change, attempt + 1),
+        }),
+      );
       return;
     }
     await queryClient.invalidateQueries();

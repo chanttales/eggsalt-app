@@ -3,7 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useConfirm } from "@/components/sheet";
-import { useToast } from "@/components/toast";
+import { saveFailed, useToast } from "@/components/toast";
 import { EmptyState, ghostButton, inputClass, Page, primaryButton, Section } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useTeam, type TeamEntry } from "@/lib/queries";
@@ -34,19 +34,26 @@ export default function InvitesPage() {
   }
 
   async function run(
-    write: () => PromiseLike<{ error: { code?: string } | null }>,
+    write: () => PromiseLike<{ error: { code?: string } | null; status: number }>,
     savedText: string,
-  ) {
+    attempt = 1,
+  ): Promise<boolean> {
     setBusy(true);
     setError(null);
-    const { error } = await write();
+    const { error, status } = await write();
     setBusy(false);
     if (error?.code === "23505") {
       setError(t("invite.exists"));
       return false;
     }
     if (error) {
-      toast({ title: t("toast.failed"), text: t("invite.failed"), tone: "danger" });
+      toast(
+        saveFailed(t("invite.failed"), {
+          attempt,
+          status,
+          retry: () => void run(write, savedText, attempt + 1),
+        }),
+      );
       return false;
     }
     await queryClient.invalidateQueries({ queryKey: [workspace?.id, "team"] });

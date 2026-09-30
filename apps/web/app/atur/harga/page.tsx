@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Money } from "@/components/stock-sheets";
 import { EmptyState, inputClass, Page, primaryButton, Section } from "@/components/ui";
 import { dayKey } from "@/lib/format";
-import { useToast } from "@/components/toast";
+import { saveFailed, useToast } from "@/components/toast";
 import { t } from "@/lib/i18n";
 import { useProducts, type Product } from "@/lib/queries";
 import { useSession } from "@/lib/session";
@@ -55,10 +55,15 @@ export default function PricesPage() {
   const set = (p: Product, field: Field, n: number) =>
     setEdits((e) => ({ ...e, [p.id]: { ...e[p.id], [field]: n } }));
 
-  async function save() {
+  async function save(attempt = 1) {
     if (!workspace) return;
     setSaving(true);
     const db = supabase();
+    let status = 0;
+    const check = (r: { error: unknown; status: number }) => {
+      status = r.status;
+      if (r.error) throw r.error;
+    };
     try {
       for (const c of changes) {
         if ("drop" in c) {
@@ -70,7 +75,7 @@ export default function PricesPage() {
             .eq("kind", "sell")
             .is("segment", null)
             .gt("min_qty", 0);
-          if (dropped.error) throw dropped.error;
+          check(dropped);
           continue;
         }
         // One general price per product, kind, quantity and day: saving twice replaces the first.
@@ -82,7 +87,7 @@ export default function PricesPage() {
           .is("segment", null)
           .eq("min_qty", c.minQty)
           .eq("valid_from", from);
-        if (cleared.error) throw cleared.error;
+        check(cleared);
         const added = await db.from("price").insert({
           workspace_id: workspace.id,
           product_id: c.product.id,
@@ -91,13 +96,15 @@ export default function PricesPage() {
           min_qty: c.minQty,
           valid_from: from,
         });
-        if (added.error) throw added.error;
+        check(added);
       }
       setEdits({});
       toast({ title: t("toast.saved"), text: t("price.saved") });
       await queryClient.invalidateQueries();
     } catch {
-      toast({ title: t("toast.failed"), text: t("price.failed"), tone: "danger" });
+      toast(
+        saveFailed(t("price.failed"), { attempt, status, retry: () => void save(attempt + 1) }),
+      );
     } finally {
       setSaving(false);
     }
