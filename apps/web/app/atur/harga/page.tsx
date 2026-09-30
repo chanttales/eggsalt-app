@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Money } from "@/components/stock-sheets";
 import { EmptyState, inputClass, Page, primaryButton, Section } from "@/components/ui";
 import { dayKey } from "@/lib/format";
+import { useToast } from "@/components/toast";
 import { t } from "@/lib/i18n";
 import { useProducts, type Product } from "@/lib/queries";
 import { useSession } from "@/lib/session";
@@ -24,7 +25,7 @@ export default function PricesPage() {
   const [from, setFrom] = useState(dayKey());
   const [edits, setEdits] = useState<Edits>({});
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const toast = useToast();
 
   const current = (p: Product, field: Field) =>
     field === "sell"
@@ -57,7 +58,6 @@ export default function PricesPage() {
   async function save() {
     if (!workspace) return;
     setSaving(true);
-    setMessage(null);
     const db = supabase();
     try {
       for (const c of changes) {
@@ -94,10 +94,10 @@ export default function PricesPage() {
         if (added.error) throw added.error;
       }
       setEdits({});
-      setMessage(t("price.saved"));
+      toast({ title: t("toast.saved"), text: t("price.saved") });
       await queryClient.invalidateQueries();
     } catch {
-      setMessage(t("price.failed"));
+      toast({ title: t("toast.failed"), text: t("price.failed"), tone: "danger" });
     } finally {
       setSaving(false);
     }
@@ -154,11 +154,6 @@ export default function PricesPage() {
           <p className="text-label text-muted-foreground">{t("price.tierHint")}</p>
         </Section>
       ))}
-      {message && (
-        <p role="status" className="text-label">
-          {message}
-        </p>
-      )}
       <button
         disabled={saving || changes.length === 0}
         onClick={() => void save()}

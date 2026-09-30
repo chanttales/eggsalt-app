@@ -3,6 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useConfirm } from "@/components/sheet";
+import { useToast } from "@/components/toast";
 import { EmptyState, ghostButton, inputClass, Page, primaryButton, Section } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useTeam, type TeamEntry } from "@/lib/queries";
@@ -22,6 +23,7 @@ export default function InvitesPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { ask, dialog } = useConfirm();
+  const toast = useToast();
 
   if (workspace?.role !== "owner") {
     return (
@@ -31,16 +33,24 @@ export default function InvitesPage() {
     );
   }
 
-  async function run(write: () => PromiseLike<{ error: { code?: string } | null }>) {
+  async function run(
+    write: () => PromiseLike<{ error: { code?: string } | null }>,
+    savedText: string,
+  ) {
     setBusy(true);
     setError(null);
     const { error } = await write();
     setBusy(false);
+    if (error?.code === "23505") {
+      setError(t("invite.exists"));
+      return false;
+    }
     if (error) {
-      setError(t(error.code === "23505" ? "invite.exists" : "invite.failed"));
+      toast({ title: t("toast.failed"), text: t("invite.failed"), tone: "danger" });
       return false;
     }
     await queryClient.invalidateQueries({ queryKey: [workspace?.id, "team"] });
+    toast({ title: t("toast.saved"), text: savedText });
     return true;
   }
 
@@ -50,10 +60,12 @@ export default function InvitesPage() {
       setError(t("invite.invalid"));
       return;
     }
-    const ok = await run(() =>
-      supabase()
-        .from("invite")
-        .insert({ workspace_id: workspace?.id, email: address, invited_by: me } as never),
+    const ok = await run(
+      () =>
+        supabase()
+          .from("invite")
+          .insert({ workspace_id: workspace?.id, email: address, invited_by: me } as never),
+      t("invite.sent").replace("{email}", address),
     );
     if (ok) setEmail("");
   }
@@ -69,14 +81,16 @@ export default function InvitesPage() {
       confirmLabel: label,
     });
     if (!ok) return;
-    void run(() =>
-      entry.status === "invited"
-        ? supabase().from("invite").delete().eq("id", entry.id)
-        : supabase()
-            .from("member")
-            .delete()
-            .eq("workspace_id", workspace?.id as string)
-            .eq("user_id", entry.id),
+    void run(
+      () =>
+        entry.status === "invited"
+          ? supabase().from("invite").delete().eq("id", entry.id)
+          : supabase()
+              .from("member")
+              .delete()
+              .eq("workspace_id", workspace?.id as string)
+              .eq("user_id", entry.id),
+      t("invite.updated"),
     );
   }
 
