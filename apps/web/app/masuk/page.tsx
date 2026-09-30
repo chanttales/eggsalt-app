@@ -31,14 +31,12 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="relative min-h-dvh bg-surface-muted">
-      {/* Blue top half with the title; the white card overlaps its bottom edge. */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-[48dvh] bg-primary"
-        style={{ backgroundImage: grid, backgroundSize: "32px 32px" }}
-      />
-      <div className="relative mx-auto flex max-w-sm flex-col gap-8 px-4 pt-[calc(env(safe-area-inset-top)+4rem)] pb-8">
+    // All blue, with the title and the white card centered on the screen.
+    <main
+      className="flex min-h-dvh flex-col justify-center bg-primary px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+      style={{ backgroundImage: grid, backgroundSize: "32px 32px" }}
+    >
+      <div className="mx-auto flex w-full max-w-sm flex-col gap-8 py-8">
         <header className="flex flex-col items-center gap-4 text-center text-primary-foreground">
           <span className="flex size-14 items-center justify-center rounded-2xl bg-primary-foreground text-primary">
             <Egg aria-hidden size={30} strokeWidth={2.25} />
