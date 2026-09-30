@@ -70,6 +70,42 @@ async function setShortage(ctx: OpContext, card: CardRow, short: boolean): Promi
      where id = ${card.id}`;
 }
 
+/**
+ * Clears "Stok kurang" on open cards once it no longer holds: free stock plus what the card
+ * reserved covers what its last stock check needed, or the card already took its stock.
+ * The flag is derived, so this leaves row_version alone and can't make an open screen stale.
+ */
+export async function refreshShortages(ctx: OpContext): Promise<void> {
+  const { tx, workspaceId } = ctx;
+  await tx`
+    update card c set flags = array_remove(c.flags, 'shortage'), updated_at = now()
+      from (
+        select c2.id, e.payload->>'state' as state,
+               coalesce((e.payload->>'needed')::integer, (e.payload->>'qty')::integer, 0) as needed
+          from card c2
+          join lateral (
+            select payload from card_event
+             where card_id = c2.id and type = 'action_run'
+               and payload->>'action' in ('check_stock', 'reserve_stock')
+               and payload->>'short' = 'true'
+             order by id desc limit 1
+          ) e on true
+         where c2.workspace_id = ${workspaceId} and c2.status = 'open'
+           and 'shortage' = any(c2.flags)
+      ) s
+     where c.id = s.id
+       and (
+         exists (select 1 from stock_movement m where m.card_id = s.id and m.reason = 'sale')
+         or (select coalesce(sum(v.available), 0) from v_stock_on_hand v
+               join item_state st on st.id = v.state_id
+              where v.workspace_id = ${workspaceId} and st.key = s.state)
+          + (select coalesce(sum(r.qty), 0) from reservation r
+               join item_state st on st.id = r.state_id
+              where r.card_id = s.id and r.status = 'active' and st.key = s.state)
+          >= s.needed
+       )`;
+}
+
 export async function reserve(
   ctx: OpContext,
   card: CardRow,

@@ -6,6 +6,7 @@ import type { Sql } from "postgres";
 import { z } from "zod";
 import { CORS_HEADERS, EngineError, fail, ok } from "./http.ts";
 import { type Op, type Role } from "./ops.ts";
+import { refreshShortages } from "./stock.ts";
 
 export interface Deps {
   sql: Sql;
@@ -50,7 +51,11 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
       const [member] = await tx<{ role: Role }[]>`
         select role from member where workspace_id = ${workspaceId} and user_id = ${userId}`;
       if (!member) throw new EngineError("forbidden", "Not a member of this workspace");
-      return op({ tx, userId, workspaceId, role: member.role }, input);
+      const ctx = { tx, userId, workspaceId, role: member.role };
+      const out = await op(ctx, input);
+      // Stock may have changed, so orders flagged short may be covered now.
+      await refreshShortages(ctx);
+      return out;
     });
     return ok(result);
   } catch (err) {
