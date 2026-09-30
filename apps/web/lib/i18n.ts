@@ -3,6 +3,7 @@ const messages = {
   id: {
     "nav.label": "Navigasi utama",
     "nav.today": "Hari ini",
+    "nav.home": "Home",
     "nav.boards": "Papan",
     "nav.orders": "Pesanan",
     "nav.stock": "Stok",
@@ -448,6 +449,7 @@ const messages = {
   en: {
     "nav.label": "Main navigation",
     "nav.today": "Today",
+    "nav.home": "Home",
     "nav.boards": "Boards",
     "nav.orders": "Orders",
     "nav.stock": "Stock",
