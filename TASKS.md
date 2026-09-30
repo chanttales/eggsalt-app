@@ -106,4 +106,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): show save results in a dialog
 - [x] fix(web): show the result dialog on settings pages
 - [x] feat(web): close success dialogs by themselves and escalate failures
-- [ ] ci(web): pass the developer contact to web and apk builds
+- [x] ci(web): pass the developer contact to web and apk builds
