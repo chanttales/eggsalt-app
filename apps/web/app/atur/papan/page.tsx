@@ -13,7 +13,7 @@ export default function BoardSetupPage() {
   const boards = useBoards();
 
   return (
-    <Page title={t("editor.boards")}>
+    <Page guide="atur" title={t("editor.boards")}>
       {!isOwner ? (
         <EmptyState>{t("editor.ownerOnly")}</EmptyState>
       ) : (boards.data ?? []).length === 0 ? (

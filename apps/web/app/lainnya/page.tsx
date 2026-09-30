@@ -9,6 +9,9 @@ export default function MorePage() {
     <>
       <PagePlaceholder title={t("nav.more")} />
       <section className="mx-auto flex max-w-md flex-col gap-2 p-4">
+        <Link href="/panduan" className={secondaryButton}>
+          {t("guide.all")}
+        </Link>
         <Link href="/laporan" className={secondaryButton}>
           {t("report.title")}
         </Link>

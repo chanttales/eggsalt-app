@@ -20,14 +20,14 @@ function EditorScreen() {
 
   if (!isOwner) {
     return (
-      <Page title={t("editor.title")}>
+      <Page guide="atur" title={t("editor.title")}>
         <EmptyState>{t("editor.ownerOnly")}</EmptyState>
       </Page>
     );
   }
   if (!board || state.status !== "signed_in" || !state.workspace) {
     return (
-      <Page title={t("editor.title")}>
+      <Page guide="atur" title={t("editor.title")}>
         <EmptyState>{boards.isPending ? t("auth.loading") : t("editor.notFound")}</EmptyState>
       </Page>
     );
@@ -61,7 +61,7 @@ function Editor({ board, workspaceId }: { board: Board; workspaceId: string }) {
   }
 
   return (
-    <Page title={board.name} subtitle={t("editor.title")}>
+    <Page guide="atur" title={board.name} subtitle={t("editor.title")}>
       <p className="text-label text-muted-foreground">{t("editor.draftNote")}</p>
       {/* Phones get the stage list; wider screens get the canvas with arrows. */}
       <div className="lg:hidden">

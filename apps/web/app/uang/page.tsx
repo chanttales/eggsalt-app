@@ -30,7 +30,7 @@ function MoneyScreen() {
 
   if (!isOwner) {
     return (
-      <Page title={t("nav.money")}>
+      <Page guide="uang" title={t("nav.money")}>
         <EmptyState>{t("money.ownerOnly")}</EmptyState>
       </Page>
     );
@@ -48,6 +48,7 @@ function MoneyScreen() {
 
   return (
     <Page
+      guide="uang"
       title={t("nav.money")}
       actions={
         <Link href="/uang?aksi=keluar" className={primaryButton}>

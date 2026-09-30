@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { GuideButton, type GuidePage } from "@/components/guide";
 
 // Small shared building blocks from the design system (section 3).
 
@@ -119,11 +120,13 @@ export function Page({
   title,
   subtitle,
   actions,
+  guide,
   children,
 }: {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  guide?: GuidePage;
   children: ReactNode;
 }) {
   return (
@@ -133,7 +136,10 @@ export function Page({
           {subtitle && <p className="text-label text-muted-foreground">{subtitle}</p>}
           <h1 className="text-title-lg font-bold">{title}</h1>
         </div>
-        {actions}
+        <div className="flex items-center gap-1">
+          {actions}
+          {guide && <GuideButton page={guide} />}
+        </div>
       </header>
       {children}
     </main>

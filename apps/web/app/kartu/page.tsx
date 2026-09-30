@@ -69,14 +69,14 @@ function CardScreen() {
 
   if (card.isPending || boards.isPending) {
     return (
-      <Page title={t("card.title")}>
+      <Page guide="kartu" title={t("card.title")}>
         <EmptyState>{t("auth.loading")}</EmptyState>
       </Page>
     );
   }
   if (!card.data || !board) {
     return (
-      <Page title={t("card.title")}>
+      <Page guide="kartu" title={t("card.title")}>
         <EmptyState>{t("card.notFound")}</EmptyState>
       </Page>
     );
@@ -100,6 +100,7 @@ function CardScreen() {
 
   return (
     <Page
+      guide="kartu"
       title={`${c.title} #${c.number}`}
       subtitle={board.name}
       actions={
