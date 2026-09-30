@@ -52,15 +52,33 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
   // Stable for the app's lifetime, so the outbox can keep this one.
   const toast = useToast();
-  const [outbox] = useState(
-    () =>
-      new Outbox(indexedDbStore, sendToEngine, ({ error }) => {
-        // Whatever happened to an op, the server's version of the data may have changed.
-        void queryClient.invalidateQueries();
-        // A refused change is said out loud wherever the user is, not only on its order.
-        if (error) toast({ text: refusedText(error), tone: "danger" });
-      }),
-  );
+  const [outbox] = useState(() => {
+    const box: Outbox = new Outbox(indexedDbStore, sendToEngine, ({ item, error }) => {
+      // Whatever happened to an op, the server's version of the data may have changed.
+      void queryClient.invalidateQueries();
+      if (!error) return;
+      // A refused change is said out loud wherever the user is, not only on its order. A server
+      // hiccup is worth sending again as a new op; a conflict or a bad entry is not.
+      const retry = !["conflict", "forbidden", "not_found", "bad_request"].includes(error.code);
+      toast({
+        title: t("toast.failed"),
+        text: refusedText(error),
+        tone: "danger",
+        primary: retry
+          ? {
+              label: t("result.retry"),
+              run: () => {
+                box.dismiss(item.id);
+                // A new idempotency key, or the engine would treat it as the refused op.
+                const input = { ...item.input, idempotencyKey: crypto.randomUUID() };
+                void box.enqueue(item.op, item.workspaceId, input);
+              },
+            }
+          : undefined,
+      });
+    });
+    return box;
+  });
 
   // Send queued ops when the app starts, comes back online or to the front, and every so often.
   useEffect(() => {
@@ -129,10 +147,11 @@ export function useEnqueue() {
     const key = await outbox.enqueue(op, workspaceId, input);
     if (options.quiet) return key;
     const keys = [key, ...(options.undoAlso ?? [])];
-    if (op === "undo") toast({ text: t("toast.undone") });
+    if (op === "undo") toast({ title: t("toast.undone"), text: t("toast.undoneBody") });
     else
       toast({
-        text: t("toast.saved"),
+        title: t("toast.saved"),
+        text: t(navigator.onLine ? "toast.savedBody" : "toast.savedOffline"),
         action: { label: t("toast.undo"), run: () => void undo(keys) },
       });
     return key;
@@ -152,12 +171,12 @@ export function useEnqueue() {
         .eq("idempotency_key", key)
         .maybeSingle();
       if (!data) {
-        toast({ text: t("toast.undoFailed"), tone: "danger" });
+        toast({ title: t("toast.undoFailedTitle"), text: t("toast.undoFailed"), tone: "danger" });
         return;
       }
       await outbox.enqueue("undo", workspaceId, { eventId: Number(data.id) });
     }
-    toast({ text: t("toast.undone") });
+    toast({ title: t("toast.undone"), text: t("toast.undoneBody") });
   }
 
   return enqueue;
