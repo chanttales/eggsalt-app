@@ -90,3 +90,9 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(db): add minimum quantity to sell prices
 - [x] feat(engine): price order lines by quantity
 - [x] feat(web): edit and preview quantity prices
+
+## M1.8 Invites
+
+- [x] feat(db): add email invites
+- [ ] feat(web): join invited workspaces on sign-in
+- [ ] feat(web): add invites screen
