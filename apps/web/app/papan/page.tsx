@@ -12,7 +12,7 @@ import { useBoards, useOpenCards, type Board, type Card } from "@/lib/queries";
 
 type View = "kanban" | "list";
 
-// S04 Board. Phones get no sideways scrolling: boards in a 2-column grid, stage filter chips that
+// Pesanan (was the board screen). Phones get no sideways scrolling: boards in a 2-column grid, stage filter chips that
 // wrap, and the cards stacked by stage. Wide screens keep the kanban columns and a list view.
 function BoardScreen() {
   const params = useSearchParams();
@@ -20,8 +20,11 @@ function BoardScreen() {
   const boards = useBoards();
   const cards = useOpenCards();
 
-  const list = boards.data ?? [];
-  const board = list.find((b) => b.id === params.get("b")) ?? list[0];
+  // Pesanan: the order boards (warung, catering). An old link to another board still opens it.
+  const all = boards.data ?? [];
+  const orderBoards = all.filter((b) => b.kind === "order");
+  const board = all.find((b) => b.id === params.get("b")) ?? orderBoards[0] ?? all[0];
+  const list = board && !orderBoards.includes(board) ? [...orderBoards, board] : orderBoards;
   const view: View = params.get("v") === "list" ? "list" : "kanban";
   const stageFilter = params.get("s");
   const onBoard = (cards.data ?? []).filter((c) => c.boardId === board?.id);
@@ -43,7 +46,7 @@ function BoardScreen() {
   return (
     <Page
       guide="papan"
-      title={t("nav.boards")}
+      title={t("nav.orders")}
       actions={
         board && (
           <Link
