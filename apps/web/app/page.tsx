@@ -22,8 +22,8 @@ import {
 import { useSession } from "@/lib/session";
 
 const DAYS_SHOWN = 5;
-/** Days before today in the strip, to look back at recent orders. */
-const PAST_DAYS = 2;
+/** Days before today in the strip; other days are picked with the calendar button. */
+const PAST_DAYS = 0;
 
 function greeting(): string {
   const hour = Number(
@@ -39,7 +39,7 @@ function greeting(): string {
   return t("home.evening");
 }
 
-/** A couple of days back, today and the next few days, as YYYY-MM-DD in Jakarta. */
+/** Today and the next few days, as YYYY-MM-DD in Jakarta. */
 function stripDays(): string[] {
   const start = Date.parse(`${dayKey()}T00:00:00Z`) - PAST_DAYS * 86_400_000;
   return Array.from({ length: DAYS_SHOWN }, (_, i) =>
@@ -208,7 +208,27 @@ export default function HomePage() {
       <Header />
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 pt-6 pb-4">
         <section className="flex flex-col gap-3">
-          <h2 className="text-title font-medium">{t("home.pickDate")}</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-title font-medium">{t("home.pickDate")}</h2>
+            {/* Any other day, past or future: the native date picker behind a calendar button. */}
+            <label
+              className={`relative flex size-10 items-center justify-center rounded-full ${
+                days.includes(day)
+                  ? "bg-surface-muted text-primary"
+                  : "bg-primary text-primary-foreground"
+              }`}
+            >
+              <CalendarDays aria-hidden size={20} />
+              <span className="sr-only">{t("home.otherDate")}</span>
+              <input
+                type="date"
+                value={day}
+                onChange={(e) => e.target.value && setDay(e.target.value)}
+                onClick={(e) => e.currentTarget.showPicker?.()}
+                className="absolute inset-0 cursor-pointer opacity-0"
+              />
+            </label>
+          </div>
           <div className="grid grid-cols-5 items-center gap-2">
             {days.map((d) => {
               const active = d === day;
