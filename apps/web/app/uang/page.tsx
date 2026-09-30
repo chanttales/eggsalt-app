@@ -71,14 +71,16 @@ function MoneyScreen() {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <StatTile label={t("money.in")} value={rupiah(moneyIn)} />
         <StatTile label={t("money.out")} value={rupiah(moneyOut)} />
-        <StatTile
-          label={t("money.net")}
-          value={rupiah(moneyIn - moneyOut)}
-          tone={moneyIn < moneyOut ? "warning" : undefined}
-        />
+        <div className="col-span-2 grid sm:col-span-1">
+          <StatTile
+            label={t("money.net")}
+            value={rupiah(moneyIn - moneyOut)}
+            tone={moneyIn < moneyOut ? "warning" : undefined}
+          />
+        </div>
       </div>
       <Link href="/laporan" className={secondaryButton}>
         {t("report.open")}
