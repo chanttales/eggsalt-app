@@ -316,6 +316,16 @@ const messages = {
     "guide.atur.3":
       "Perubahan disimpan sebagai draf. Terbitkan agar dipakai; kartu yang sudah ada tetap aman.",
     "guide.atur.4": "Hanya pemilik yang bisa mengatur papan.",
+    "price.title": "Harga",
+    "price.intro":
+      "Harga baru berlaku mulai tanggal yang dipilih. Pesanan lama tetap memakai harga lamanya.",
+    "price.from": "Berlaku mulai",
+    "price.sell": "Harga jual per butir",
+    "price.buy": "Harga beli per butir",
+    "price.save": "Simpan harga",
+    "price.saved": "Harga tersimpan.",
+    "price.failed": "Harga gagal disimpan. Periksa koneksi lalu coba lagi.",
+    "price.ownerOnly": "Hanya pemilik yang bisa mengubah harga.",
   },
   en: {
     "nav.label": "Main navigation",
@@ -625,6 +635,15 @@ const messages = {
       "Stage rules decide what happens automatically when a card enters, such as stock going down.",
     "guide.atur.3": "Changes are saved as a draft. Publish to use them; existing cards stay safe.",
     "guide.atur.4": "Only the owner can set up boards.",
+    "price.title": "Prices",
+    "price.intro": "New prices apply from the chosen date. Earlier orders keep their price.",
+    "price.from": "Applies from",
+    "price.sell": "Sell price per egg",
+    "price.buy": "Buy price per egg",
+    "price.save": "Save prices",
+    "price.saved": "Prices saved.",
+    "price.failed": "Couldn't save prices. Check the connection and try again.",
+    "price.ownerOnly": "Only the owner can change prices.",
   },
 } as const;
 
