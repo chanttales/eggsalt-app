@@ -489,6 +489,14 @@ export interface Product {
   /** Latest general sell and buy prices valid today (segment prices are applied by the engine). */
   sellPrice: number | null;
   buyPrice: number | null;
+  /** General quantity prices valid today, lowest minimum first (e.g. from 100 eggs). */
+  sellTiers: { minQty: number; price: number }[];
+}
+
+/** The general sell price for a quantity: the highest quantity price it reaches, else the base. */
+export function sellPriceFor(product: Product, qty: number): number | null {
+  const tier = product.sellTiers.filter((t) => qty >= t.minQty).at(-1);
+  return tier?.price ?? product.sellPrice;
 }
 
 export function useProducts() {
@@ -502,17 +510,26 @@ export function useProducts() {
         .order("name"),
       supabase()
         .from("price")
-        .select("product_id, kind, unit_price, valid_from")
+        .select("product_id, kind, unit_price, valid_from, min_qty")
         .eq("workspace_id", workspaceId)
         .is("segment", null)
         .order("valid_from", { ascending: false }),
     ]);
     const today = dayKey();
+    const valid = must(prices).filter((x) => x.valid_from <= today);
     const latest = (productId: string, kind: "sell" | "buy") => {
-      const p = must(prices).find(
-        (x) => x.product_id === productId && x.kind === kind && x.valid_from <= today,
-      );
+      const p = valid.find((x) => x.product_id === productId && x.kind === kind && !x.min_qty);
       return p ? Number(p.unit_price) : null;
+    };
+    const tiers = (productId: string) => {
+      const byMin = new Map<number, number>();
+      for (const x of valid) {
+        if (x.product_id !== productId || x.kind !== "sell" || !x.min_qty) continue;
+        if (!byMin.has(x.min_qty)) byMin.set(x.min_qty, Number(x.unit_price));
+      }
+      return [...byMin]
+        .map(([minQty, price]) => ({ minQty, price }))
+        .sort((a, b) => a.minQty - b.minQty);
     };
     return must(products).map((p): Product => ({
       id: p.id,
@@ -521,6 +538,7 @@ export function useProducts() {
       stateId: p.state_id,
       sellPrice: latest(p.id, "sell"),
       buyPrice: latest(p.id, "buy"),
+      sellTiers: tiers(p.id),
     }));
   });
 }

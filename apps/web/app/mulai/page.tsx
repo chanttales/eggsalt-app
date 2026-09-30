@@ -25,7 +25,7 @@ const STATES = ["setup.state.raw", "setup.state.boiled", "setup.state.broken"] a
 
 // Prices per egg from the template; the owner can change them here or later in settings.
 const DEFAULT_PRICES = {
-  telur_asin_mentah: { sell: 3300, buy: 2300 },
+  telur_asin_mentah: { sell: 3500, buy: 2300 },
   telur_asin_matang: { sell: 3500, buy: 2500 },
 };
 

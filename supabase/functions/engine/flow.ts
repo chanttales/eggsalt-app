@@ -47,14 +47,17 @@ async function unitPrice(
   productId: string,
   segment: string | null,
   on: string | null,
+  qty: number,
 ): Promise<number> {
-  // Latest sell price valid on the order day; a price for the customer's segment beats the general one.
+  // Latest sell price valid on the order day. A price for the customer's segment beats the general
+  // one, then the highest minimum quantity the line reaches (e.g. from 100 eggs) wins.
   const [price] = await tx<{ unit_price: string }[]>`
     select p.unit_price from price p join workspace w on w.id = p.workspace_id
      where p.workspace_id = ${workspaceId} and p.product_id = ${productId} and p.kind = 'sell'
        and p.valid_from <= coalesce(${on}::date, (now() at time zone w.timezone)::date)
        and (p.segment is null or p.segment = ${segment})
-     order by (p.segment is not null) desc, p.valid_from desc
+       and p.min_qty <= ${qty}
+     order by (p.segment is not null) desc, p.min_qty desc, p.valid_from desc
      limit 1`;
   if (!price) throw new EngineError("bad_request", "Product has no sell price; enter a unit price");
   return Number(price.unit_price);
@@ -118,7 +121,8 @@ export async function createCard(
       select 1 from product where id = ${line.productId} and workspace_id = ${workspaceId}`;
     if (!product) throw new EngineError("not_found", "Product not found");
     const price =
-      line.unitPrice ?? (await unitPrice(ctx, line.productId, segment, spec.orderedOn ?? null));
+      line.unitPrice ??
+      (await unitPrice(ctx, line.productId, segment, spec.orderedOn ?? null, line.qty));
     await tx`
       insert into card_line (workspace_id, card_id, product_id, qty, unit_price)
       values (${workspaceId}, ${card.id}, ${line.productId}, ${line.qty}, ${price})`;
