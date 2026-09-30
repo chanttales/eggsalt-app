@@ -815,3 +815,46 @@ function nextDay(day: string): string {
   d.setUTCDate(d.getUTCDate() + 1);
   return d.toISOString().slice(0, 10);
 }
+
+export interface TeamEntry {
+  /** member user id, or invite id while the invite is open */
+  id: string;
+  name: string;
+  status: "member" | "invited";
+  isMe: boolean;
+}
+
+// Undangan: members who joined plus invites still waiting for that email to sign in.
+export function useTeam() {
+  const { state } = useSession();
+  const me = state.status === "signed_in" ? state.session.user.id : undefined;
+  return useWorkspaceQuery("team", async (workspaceId): Promise<TeamEntry[]> => {
+    const [members, invites] = await Promise.all([
+      supabase()
+        .from("member")
+        .select("user_id, display_name, created_at")
+        .eq("workspace_id", workspaceId)
+        .order("created_at"),
+      supabase()
+        .from("invite")
+        .select("id, email, created_at")
+        .eq("workspace_id", workspaceId)
+        .is("accepted_at", null)
+        .order("created_at"),
+    ]);
+    return [
+      ...must(members).map((m) => ({
+        id: m.user_id as string,
+        name: (m.display_name as string | null) ?? "",
+        status: "member" as const,
+        isMe: m.user_id === me,
+      })),
+      ...must(invites).map((i) => ({
+        id: i.id as string,
+        name: i.email as string,
+        status: "invited" as const,
+        isMe: false,
+      })),
+    ];
+  });
+}

@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   SquareKanban,
   Tag,
+  UserPlus,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -50,6 +51,13 @@ const groups: { title: MessageKey; entries: Entry[] }[] = [
         icon: SquareKanban,
         owner: true,
       },
+      {
+        href: "/atur/undangan",
+        label: "invite.title",
+        hint: "menu.inviteHint",
+        icon: UserPlus,
+        owner: true,
+      },
     ],
   },
   {
@@ -58,7 +66,7 @@ const groups: { title: MessageKey; entries: Entry[] }[] = [
   },
 ];
 
-// Menu: reports, the business settings (prices, contacts, boards) and help, grouped.
+// Menu: reports, the business settings (prices, contacts, boards, invites) and help, grouped.
 export default function MorePage() {
   const { state } = useSession();
   const isOwner = state.status === "signed_in" && state.workspace?.role === "owner";
