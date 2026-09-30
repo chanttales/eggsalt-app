@@ -54,6 +54,7 @@ const messages = {
     "card.dismiss": "Tutup",
     "toast.saved": "Tersimpan",
     "toast.undo": "Batalkan",
+    "confirm.back": "Kembali",
     "error.title": "Halaman ini gagal dibuka",
     "error.body":
       "Data Anda aman. Coba buka lagi. Kalau masih gagal, muat ulang data di HP ini; perubahan yang belum terkirim tetap disimpan.",
@@ -465,6 +466,7 @@ const messages = {
     "card.dismiss": "Dismiss",
     "toast.saved": "Saved",
     "toast.undo": "Undo",
+    "confirm.back": "Go back",
     "error.title": "This page couldn't open",
     "error.body":
       "Your data is safe. Try again. If it still fails, reload the data on this phone; changes not yet sent are kept.",

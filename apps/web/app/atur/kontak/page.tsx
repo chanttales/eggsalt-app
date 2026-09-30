@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { Sheet } from "@/components/sheet";
+import { Sheet, useConfirm } from "@/components/sheet";
 import { EmptyState, ghostButton, inputClass, Page, primaryButton } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useParties, type Party } from "@/lib/queries";
@@ -81,6 +81,7 @@ function PartySheet({
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { ask, dialog } = useConfirm();
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
 
   async function write(change: Record<string, unknown>) {
@@ -178,16 +179,20 @@ function PartySheet({
       {party && (
         <button
           disabled={busy}
-          onClick={() => {
-            if (window.confirm(t("contact.archiveConfirm"))) {
-              void write({ archived_at: new Date().toISOString() });
-            }
+          onClick={async () => {
+            const ok = await ask({
+              title: t("contact.archive"),
+              message: t("contact.archiveConfirm"),
+              confirmLabel: t("contact.archive"),
+            });
+            if (ok) void write({ archived_at: new Date().toISOString() });
           }}
           className={`${ghostButton} text-danger`}
         >
           {t("contact.archive")}
         </button>
       )}
+      {dialog}
     </Sheet>
   );
 }

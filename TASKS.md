@@ -102,4 +102,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): show saved message with undo after each change
 - [x] feat(web): explain refused changes on every page
 - [x] feat(web): add friendly error and not found pages
-- [ ] feat(web): replace browser confirm dialogs with a sheet
+- [x] feat(web): replace browser confirm dialogs with a sheet

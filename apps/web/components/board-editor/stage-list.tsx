@@ -4,6 +4,7 @@ import { STAGE_COLORS } from "@domain";
 import { ArrowDown, ArrowUp, ChevronDown, Trash2, Zap } from "lucide-react";
 import { useState } from "react";
 import { RuleEditor } from "@/components/board-editor/rule-editor";
+import { useConfirm } from "@/components/sheet";
 import { StagePill, inputClass, secondaryButton, stageStyle } from "@/components/ui";
 import type { BoardDraft } from "@/lib/board-editor";
 import { t } from "@/lib/i18n";
@@ -116,6 +117,7 @@ export function StageSettings({
   cards: number;
 }) {
   const { graph } = draft;
+  const { ask, dialog } = useConfirm();
   const s = graph.stages.find((x) => x.key === stageKey);
   if (!s) return null;
   const nameOf = (k: string) => graph.stages.find((x) => x.key === k)?.name ?? k;
@@ -246,12 +248,17 @@ export function StageSettings({
           const msg = cards
             ? t("editor.removeWithCards").replace("{n}", String(cards))
             : t("editor.removeConfirm");
-          if (window.confirm(msg)) draft.removeStage(s.key);
+          void ask({
+            title: t("editor.removeStage"),
+            message: msg,
+            confirmLabel: t("editor.removeStage"),
+          }).then((ok) => ok && draft.removeStage(s.key));
         }}
         className="flex min-h-touch items-center gap-2 self-start text-label text-danger"
       >
         <Trash2 aria-hidden size={16} /> {t("editor.removeStage")}
       </button>
+      {dialog}
     </div>
   );
 }
