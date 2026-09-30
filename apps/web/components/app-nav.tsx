@@ -27,7 +27,7 @@ export function AppNav() {
       aria-label={t("nav.label")}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] lg:inset-y-0 lg:right-auto lg:w-56 lg:border-t-0 lg:border-r lg:pb-0"
     >
-      <p className="hidden px-6 pt-6 pb-4 text-title font-bold text-primary lg:block">Papan</p>
+      <p className="hidden px-6 pt-6 pb-4 text-title font-bold text-primary lg:block">EggSalt</p>
       <ul className="flex lg:flex-col lg:gap-1 lg:px-3">
         {tabs.map(({ href, label, icon: Icon }) => {
           const active = isActive(pathname, href);

@@ -111,7 +111,7 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 ## M2.0 EggSalt redesign
 
 - [x] feat(web): switch to the EggSalt blue theme, light mode only
-- [ ] feat(web): rename the app to EggSalt
+- [x] feat(web): rename the app to EggSalt
 - [ ] feat(web): add bottom nav with Home, Pesanan, add, Uang and Profil
 - [ ] feat(web): add Home with greeting, dates, shortcuts and ongoing orders
 - [ ] feat(web): add Profil with account, invites, settings and sign out

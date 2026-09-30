@@ -16,8 +16,8 @@ const jakarta = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Papan",
-  description: "Papan usaha: pesanan, stok dan uang dalam satu alur.",
+  title: "EggSalt",
+  description: "EggSalt: pesanan, stok, dan uang usaha telur asin dalam satu aplikasi.",
 };
 
 export const viewport: Viewport = {

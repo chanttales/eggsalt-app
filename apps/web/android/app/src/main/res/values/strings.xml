@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Papan</string>
-    <string name="title_activity_main">Papan</string>
+    <string name="app_name">EggSalt</string>
+    <string name="title_activity_main">EggSalt</string>
     <string name="package_name">id.papan.app</string>
     <string name="custom_url_scheme">id.papan.app</string>
 </resources>
