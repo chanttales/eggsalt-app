@@ -358,6 +358,18 @@ const messages = {
     "menu.priceHint": "Ubah harga jual dan beli per butir",
     "menu.contactHint": "Daftar pelanggan, pemasok, dan syarat retur",
     "menu.boardHint": "Tahap dan aturan tiap papan",
+    "dash.title": "Dasbor",
+    "dash.orders": "Pesanan terjual",
+    "dash.soldChart": "Telur terjual per hari (14 hari)",
+    "dash.today": "Hari ini",
+    "dash.stock": "Stok siap jual",
+    "menu.dashHint": "Penjualan, laba, dan stok sekilas",
+    "guide.dasbor.title": "Dasbor",
+    "guide.dasbor.1":
+      "Ringkasan penjualan, jumlah pesanan, laba kotor, dan laba bersih untuk periode yang dipilih.",
+    "guide.dasbor.2":
+      "Grafik menunjukkan jumlah telur terjual per hari selama 14 hari terakhir. Tekan batang untuk melihat angkanya.",
+    "guide.dasbor.3": "Stok siap jual menunjukkan telur yang belum terikat pesanan.",
   },
   en: {
     "nav.label": "Main navigation",
@@ -708,6 +720,17 @@ const messages = {
     "menu.priceHint": "Change sell and buy prices per egg",
     "menu.contactHint": "Customers, suppliers and return terms",
     "menu.boardHint": "Stages and rules of each board",
+    "dash.title": "Dashboard",
+    "dash.orders": "Orders sold",
+    "dash.soldChart": "Eggs sold per day (14 days)",
+    "dash.today": "Today",
+    "dash.stock": "Stock ready to sell",
+    "menu.dashHint": "Sales, profit and stock at a glance",
+    "guide.dasbor.title": "Dashboard",
+    "guide.dasbor.1": "Sales, order count, gross and net profit for the chosen period.",
+    "guide.dasbor.2":
+      "The chart shows eggs sold per day over the last 14 days. Tap a bar to see its number.",
+    "guide.dasbor.3": "Stock ready to sell shows eggs not yet held for orders.",
   },
 } as const;
 

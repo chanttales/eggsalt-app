@@ -2,7 +2,7 @@
 
 import { parseBoardGraph, type BoardGraph } from "@domain";
 import { useQuery } from "@tanstack/react-query";
-import { dayKey } from "@/lib/format";
+import { dayKey, startOfDay } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import { supabase } from "@/lib/supabase";
 
@@ -763,4 +763,37 @@ export function useProfitReport(since: string) {
       expenses: [...byCategory].map(([name, amount]) => ({ name, amount })),
     };
   });
+}
+
+/** Eggs sold per business day since a day (oldest first, every day present), undone sales left out. */
+export function useDailySold(sinceDay: string) {
+  return useWorkspaceQuery(`daily-sold:${sinceDay}`, async (workspaceId) => {
+    const moves = must(
+      await supabase()
+        .from("stock_movement")
+        .select("id, qty, created_at, reverses_id")
+        .eq("workspace_id", workspaceId)
+        .in("reason", ["sale", "reversal"])
+        .gte("created_at", startOfDay(sinceDay))
+        .not("card_id", "is", null),
+    );
+    const undone = new Set(moves.map((m) => m.reverses_id).filter(Boolean));
+    const byDay = new Map<string, number>();
+    for (const m of moves) {
+      if (m.reverses_id || undone.has(m.id)) continue;
+      const day = dayKey(m.created_at);
+      byDay.set(day, (byDay.get(day) ?? 0) + Math.abs(Number(m.qty)));
+    }
+    const days: { day: string; qty: number }[] = [];
+    for (let d = sinceDay, today = dayKey(); d <= today; d = nextDay(d)) {
+      days.push({ day: d, qty: byDay.get(d) ?? 0 });
+    }
+    return days;
+  });
+}
+
+function nextDay(day: string): string {
+  const d = new Date(`${day}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
 }

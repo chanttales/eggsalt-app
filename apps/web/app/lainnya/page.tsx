@@ -5,6 +5,7 @@ import {
   ChartColumn,
   ChevronRight,
   Contact,
+  LayoutDashboard,
   SquareKanban,
   Tag,
   type LucideIcon,
@@ -21,6 +22,13 @@ const groups: { title: MessageKey; entries: Entry[] }[] = [
   {
     title: "menu.summary",
     entries: [
+      {
+        href: "/dasbor",
+        label: "dash.title",
+        hint: "menu.dashHint",
+        icon: LayoutDashboard,
+        owner: true,
+      },
       { href: "/laporan", label: "report.title", hint: "menu.reportHint", icon: ChartColumn },
     ],
   },
