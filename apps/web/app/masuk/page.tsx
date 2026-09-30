@@ -1,8 +1,9 @@
 "use client";
 
-import { Egg } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { listenForAppCallback, signInWithGoogle } from "@/lib/google-sign-in";
+import logoMark from "@/components/logo-mark.png";
 import { t } from "@/lib/i18n";
 
 const googleButton =
@@ -38,9 +39,7 @@ export default function SignInPage() {
     >
       <div className="mx-auto flex w-full max-w-sm flex-col gap-8 py-8">
         <header className="flex flex-col items-center gap-4 text-center text-primary-foreground">
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-primary-foreground text-primary">
-            <Egg aria-hidden size={30} strokeWidth={2.25} />
-          </span>
+          <Image src={logoMark} alt="EggSalt" width={96} height={96} priority />
           <h1 className="text-[2rem] leading-tight font-bold">{t("auth.title")}</h1>
           <p className="opacity-90">{t("auth.intro")}</p>
         </header>
