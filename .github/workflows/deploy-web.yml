@@ -49,6 +49,8 @@ jobs:
       - run: pnpm build
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          # Optional repo variable: a https://wa.me/… or mailto: link for "Hubungi pengembang".
+          NEXT_PUBLIC_DEVELOPER_CONTACT: ${{ vars.DEVELOPER_CONTACT }}
 
       - uses: actions/upload-pages-artifact@v5
         with:
