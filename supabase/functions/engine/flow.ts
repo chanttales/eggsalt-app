@@ -35,6 +35,7 @@ export interface NewCard {
   title: string;
   partyId?: string;
   dueAt?: string;
+  orderedOn?: string;
   flags?: string[];
   fields?: Record<string, unknown>;
   lines?: { productId: string; qty: number; unitPrice?: number }[];
@@ -45,12 +46,13 @@ async function unitPrice(
   { tx, workspaceId }: OpContext,
   productId: string,
   segment: string | null,
+  on: string | null,
 ): Promise<number> {
-  // Latest sell price valid today; a price for the customer's segment beats the general one.
+  // Latest sell price valid on the order day; a price for the customer's segment beats the general one.
   const [price] = await tx<{ unit_price: string }[]>`
     select p.unit_price from price p join workspace w on w.id = p.workspace_id
      where p.workspace_id = ${workspaceId} and p.product_id = ${productId} and p.kind = 'sell'
-       and p.valid_from <= (now() at time zone w.timezone)::date
+       and p.valid_from <= coalesce(${on}::date, (now() at time zone w.timezone)::date)
        and (p.segment is null or p.segment = ${segment})
      order by (p.segment is not null) desc, p.valid_from desc
      limit 1`;
@@ -85,6 +87,12 @@ export async function createCard(
       select 1 from card where id = ${spec.parentCardId} and workspace_id = ${workspaceId}`;
     if (!parent) throw new EngineError("not_found", "Parent card not found");
   }
+  if (spec.orderedOn) {
+    const [future] = await tx`
+      select 1 from workspace
+       where id = ${workspaceId} and ${spec.orderedOn}::date > (now() at time zone timezone)::date`;
+    if (future) throw new EngineError("bad_request", "Order date can't be in the future");
+  }
   const entry = stageOf(graph, graph.entry);
   if (opts.enforceRequire) {
     const missing = missingRequiredFields(entry, { fields });
@@ -96,9 +104,10 @@ export async function createCard(
     returning next_card_no - 1 as number`;
   const [card] = await tx<CardRow[]>`
     insert into card (workspace_id, number, board_id, board_version_id, stage_key, title, party_id,
-                      due_at, flags, fields, parent_card_id, created_by)
+                      due_at, ordered_on, flags, fields, parent_card_id, created_by)
     values (${workspaceId}, ${number}, ${spec.boardId}, ${board.version_id}, ${graph.entry},
-            ${spec.title}, ${spec.partyId ?? null}, ${spec.dueAt ?? null}, ${spec.flags ?? []},
+            ${spec.title}, ${spec.partyId ?? null}, ${spec.dueAt ?? null}, ${spec.orderedOn ?? null},
+            ${spec.flags ?? []},
             ${tx.json(fields as never)}, ${spec.parentCardId ?? null}, ${userId})
     returning id, number, board_id, board_version_id, stage_key, status, title, party_id, flags,
               fields, row_version`;
@@ -108,7 +117,8 @@ export async function createCard(
     const [product] = await tx`
       select 1 from product where id = ${line.productId} and workspace_id = ${workspaceId}`;
     if (!product) throw new EngineError("not_found", "Product not found");
-    const price = line.unitPrice ?? (await unitPrice(ctx, line.productId, segment));
+    const price =
+      line.unitPrice ?? (await unitPrice(ctx, line.productId, segment, spec.orderedOn ?? null));
     await tx`
       insert into card_line (workspace_id, card_id, product_id, qty, unit_price)
       values (${workspaceId}, ${card.id}, ${line.productId}, ${line.qty}, ${price})`;

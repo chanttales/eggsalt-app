@@ -29,6 +29,8 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
   const [productId, setProductId] = useState("");
   const [qty, setQty] = useState(0);
   const [fields, setFields] = useState<Record<string, unknown>>({});
+  const today = dayKey();
+  const [orderedOn, setOrderedOn] = useState(today);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,6 +77,7 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
       title: name,
       ...(id ? { partyId: id } : {}),
       ...(day ? { dueAt: startOfDay(day) } : {}),
+      ...(isOrder && orderedOn !== today ? { orderedOn } : {}),
       fields,
       ...(isOrder && product ? { lines: [{ productId: product.id, qty }] } : {}),
     });
@@ -135,6 +138,21 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
             ))}
           </div>
           <QtyStepper value={qty} onChange={setQty} />
+          <label className="flex flex-col gap-1 text-label font-medium">
+            {t("order.date")}
+            <input
+              type="date"
+              value={orderedOn}
+              max={today}
+              onChange={(e) =>
+                setOrderedOn(e.target.value && e.target.value <= today ? e.target.value : today)
+              }
+              className={inputClass}
+            />
+            {orderedOn !== today && (
+              <span className="font-normal text-muted-foreground">{t("order.pastHint")}</span>
+            )}
+          </label>
           {product?.sellPrice != null && qty > 0 && (
             <p className="text-right text-label text-muted-foreground">
               {count(qty)} × {rupiah(product.sellPrice)} ={" "}

@@ -6,7 +6,16 @@ import { Sheet } from "@/components/sheet";
 import { primaryButton } from "@/components/ui";
 import { t, tOr } from "@/lib/i18n";
 
-export const GUIDE_PAGES = ["today", "papan", "kartu", "stok", "uang", "laporan", "atur"] as const;
+export const GUIDE_PAGES = [
+  "today",
+  "dasbor",
+  "papan",
+  "kartu",
+  "stok",
+  "uang",
+  "laporan",
+  "atur",
+] as const;
 export type GuidePage = (typeof GUIDE_PAGES)[number];
 
 function guideItems(page: GuidePage): string[] {

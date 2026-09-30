@@ -71,3 +71,16 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] build(mobile): add capacitor with android project
 - [x] feat(mobile): add back button, network status and local notifications
 - [x] ci(mobile): build and attach signed apk to github releases
+
+## M1.6 Settings and dashboard
+
+- [x] feat(web): add price editor with an effective date
+- [x] feat(db): let receive_purchase take a purchase date
+- [x] feat(engine): accept a purchase date on receive-stock
+- [x] feat(web): add purchase date to receive stock
+- [x] feat(db): date a past order's stock and money rows
+- [x] feat(engine): add order date for past sales
+- [x] feat(web): add order date to the new order sheet
+- [x] feat(web): add customer and supplier editor
+- [x] feat(web): add settings menu
+- [x] feat(web): add dashboard with sales, profit and stock trends

@@ -84,6 +84,8 @@ const receiveInput = z.strictObject({
   unitPrice: z.int().nonnegative().optional(),
   method: method.default("cash"),
   cardId: z.guid().optional(),
+  /** Day the eggs were bought (business time), for purchases entered late; defaults to today. */
+  receivedOn: z.iso.date().optional(),
 });
 
 const produceInput = z
@@ -169,7 +171,8 @@ export const ledgerOps: Record<string, Op> = {
                                            join workspace w on w.id = p.workspace_id
            where p.workspace_id = ${workspaceId} and p.kind = 'buy' and d.state_id = ${input.stateId}
              and (p.supplier_id is null or p.supplier_id = ${input.supplierId})
-             and p.valid_from <= (now() at time zone w.timezone)::date
+             and p.valid_from <= coalesce(${input.receivedOn ?? null}::date,
+                                          (now() at time zone w.timezone)::date)
            order by (p.supplier_id is not null) desc, p.valid_from desc
            limit 1`;
         if (!price) throw new EngineError("bad_request", "No buy price saved; enter the price");
@@ -179,7 +182,8 @@ export const ledgerOps: Record<string, Op> = {
       const [row] = await tx<{ lot: string }[]>`
         select receive_purchase(${workspaceId}, ${input.supplierId}, ${state.itemId},
                                 ${input.stateId}, ${input.qtyPaid}, ${bonus}, ${unitPrice},
-                                ${input.method}, ${input.cardId ?? null}) as lot`;
+                                ${input.method}, ${input.cardId ?? null}, null,
+                                ${input.receivedOn ?? null}::date) as lot`;
       const [lot] = await tx<{ qty: number; unitCost: string; returnBy: string | null }[]>`
         select qty_in as qty, unit_cost as "unitCost", return_by::text as "returnBy"
           from stock_lot where id = ${row?.lot ?? null}`;
