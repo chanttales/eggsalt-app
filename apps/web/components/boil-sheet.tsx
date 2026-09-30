@@ -179,9 +179,14 @@ function SortBatch({
 
   async function sort() {
     setSent(true);
-    await enqueue("move-card", { cardId: card.id, to: sortKey, fields: values });
-    // Sorting is the last real step; the batch is then ready.
-    if (after) await enqueue("move-card", { cardId: card.id, to: after });
+    const move = { cardId: card.id, to: sortKey, fields: values };
+    // Sorting is the last real step; the batch is then ready. Batalkan undoes both moves.
+    if (!after) {
+      await enqueue("move-card", move);
+      return;
+    }
+    const sorted = await enqueue("move-card", move, { quiet: true });
+    await enqueue("move-card", { cardId: card.id, to: after }, { undoAlso: [sorted] });
   }
 
   return (

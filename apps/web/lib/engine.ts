@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n";
 import { supabase } from "@/lib/supabase";
 
 // Calls the engine Edge Function: the only way the app changes cards, stock and money.
@@ -16,6 +17,22 @@ export type EngineErrorCode =
   | "not_implemented"
   | "internal"
   | "network";
+
+/** Plain words for a change the engine refused, keyed by what went wrong. */
+export function refusedText(error: EngineRequestError): string {
+  switch (error.code) {
+    case "conflict":
+      return t("refused.conflict");
+    case "forbidden":
+      return t("refused.forbidden");
+    case "not_found":
+      return t("refused.notFound");
+    case "bad_request":
+      return t("refused.badRequest");
+    default:
+      return t("refused.other");
+  }
+}
 
 export class EngineRequestError extends Error {
   code: EngineErrorCode;

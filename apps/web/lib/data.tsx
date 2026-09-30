@@ -12,8 +12,12 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { useToast } from "@/components/toast";
+import { refusedText } from "@/lib/engine";
+import { t } from "@/lib/i18n";
 import { type FailedOp, indexedDbStore, Outbox, type OutboxItem, sendToEngine } from "@/lib/outbox";
 import { useSession } from "@/lib/session";
+import { supabase } from "@/lib/supabase";
 
 // Server data and the write queue. Reads are cached by TanStack Query and kept in IndexedDB, so
 // the app opens instantly with the last data it saw, even offline. Writes go through the outbox.
@@ -26,8 +30,11 @@ const RETRY_EVERY = 20_000;
 
 const Context = createContext<Outbox | null>(null);
 
+/** Where the query cache lives in IndexedDB; the error page clears it. */
+export const QUERY_CACHE_KEY = "papan.query";
+
 const persister = createAsyncStoragePersister({
-  key: "papan.query",
+  key: QUERY_CACHE_KEY,
   // Undefined while Next.js prerenders pages at build time, which makes the persister a no-op.
   storage:
     typeof indexedDB === "undefined" ? undefined : { getItem: get, setItem: set, removeItem: del },
@@ -43,10 +50,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         },
       }),
   );
+  // Stable for the app's lifetime, so the outbox can keep this one.
+  const toast = useToast();
   const [outbox] = useState(
     () =>
-      // Whatever happened to an op, the server's version of the data may have changed.
-      new Outbox(indexedDbStore, sendToEngine, () => void queryClient.invalidateQueries()),
+      new Outbox(indexedDbStore, sendToEngine, ({ error }) => {
+        // Whatever happened to an op, the server's version of the data may have changed.
+        void queryClient.invalidateQueries();
+        // A refused change is said out loud wherever the user is, not only on its order.
+        if (error) toast({ text: refusedText(error), tone: "danger" });
+      }),
   );
 
   // Send queued ops when the app starts, comes back online or to the front, and every so often.
@@ -89,15 +102,65 @@ function useOutbox(): Outbox {
   return outbox;
 }
 
-/** Queue an engine op for the active workspace; resolves with its idempotency key. */
+export interface EnqueueOptions {
+  /** No "Tersimpan" message, for the first op of a step that sends several. */
+  quiet?: boolean;
+  /** Earlier ops of the same step, newest first, that Batalkan undoes together with this one. */
+  undoAlso?: string[];
+}
+
+/**
+ * Queue an engine op for the active workspace; resolves with its idempotency key. Shows
+ * "Tersimpan" with Batalkan: an op still in the queue is dropped, a sent one is undone by the
+ * engine (it records every op as a card event under the op's idempotency key).
+ */
 export function useEnqueue() {
   const outbox = useOutbox();
+  const toast = useToast();
   const { state } = useSession();
   const workspaceId = state.status === "signed_in" ? state.workspace?.id : undefined;
-  return (op: string, input: Record<string, unknown>) => {
+
+  const enqueue = async (
+    op: string,
+    input: Record<string, unknown>,
+    options: EnqueueOptions = {},
+  ): Promise<string> => {
     if (!workspaceId) throw new Error("No active workspace");
-    return outbox.enqueue(op, workspaceId, input);
+    const key = await outbox.enqueue(op, workspaceId, input);
+    if (options.quiet) return key;
+    const keys = [key, ...(options.undoAlso ?? [])];
+    if (op === "undo") toast({ text: t("toast.undone") });
+    else
+      toast({
+        text: t("toast.saved"),
+        action: { label: t("toast.undo"), run: () => void undo(keys) },
+      });
+    return key;
   };
+
+  /** Undoes the ops newest first: drops the ones still queued, asks the engine to reverse the rest. */
+  async function undo(keys: string[]) {
+    if (!workspaceId) return;
+    const sent: string[] = [];
+    for (const key of keys) if (!(await outbox.cancel(key))) sent.push(key);
+    if (sent.length > 0) await outbox.settle();
+    for (const key of sent) {
+      const { data } = await supabase()
+        .from("card_event")
+        .select("id")
+        .eq("workspace_id", workspaceId)
+        .eq("idempotency_key", key)
+        .maybeSingle();
+      if (!data) {
+        toast({ text: t("toast.undoFailed"), tone: "danger" });
+        return;
+      }
+      await outbox.enqueue("undo", workspaceId, { eventId: Number(data.id) });
+    }
+    toast({ text: t("toast.undone") });
+  }
+
+  return enqueue;
 }
 
 /** Ops still waiting to be sent, for the "belum terkirim" indicator. */

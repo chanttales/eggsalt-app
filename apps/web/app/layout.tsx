@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import { AuthGate } from "@/components/auth-gate";
+import { ToastProvider } from "@/components/toast";
 import { DataProvider } from "@/lib/data";
 import { SessionProvider } from "@/lib/session";
 import "./globals.css";
@@ -34,9 +35,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="id" className={jakarta.variable}>
       <body className="font-sans">
         <SessionProvider>
-          <DataProvider>
-            <AuthGate>{children}</AuthGate>
-          </DataProvider>
+          <ToastProvider>
+            <DataProvider>
+              <AuthGate>{children}</AuthGate>
+            </DataProvider>
+          </ToastProvider>
         </SessionProvider>
       </body>
     </html>

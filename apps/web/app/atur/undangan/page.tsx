@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useConfirm } from "@/components/sheet";
 import { EmptyState, ghostButton, inputClass, Page, primaryButton, Section } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useTeam, type TeamEntry } from "@/lib/queries";
@@ -20,6 +21,7 @@ export default function InvitesPage() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { ask, dialog } = useConfirm();
 
   if (workspace?.role !== "owner") {
     return (
@@ -56,12 +58,17 @@ export default function InvitesPage() {
     if (ok) setEmail("");
   }
 
-  function drop(entry: TeamEntry) {
-    const question =
-      entry.status === "invited"
+  async function drop(entry: TeamEntry) {
+    const invited = entry.status === "invited";
+    const label = t(invited ? "invite.cancel" : "invite.remove");
+    const ok = await ask({
+      title: label,
+      message: invited
         ? t("invite.cancelConfirm").replace("{email}", entry.name)
-        : t("invite.removeConfirm").replace("{name}", entry.name || t("invite.member"));
-    if (!window.confirm(question)) return;
+        : t("invite.removeConfirm").replace("{name}", entry.name || t("invite.member")),
+      confirmLabel: label,
+    });
+    if (!ok) return;
     void run(() =>
       entry.status === "invited"
         ? supabase().from("invite").delete().eq("id", entry.id)
@@ -128,7 +135,7 @@ export default function InvitesPage() {
                   <button
                     type="button"
                     disabled={busy}
-                    onClick={() => drop(entry)}
+                    onClick={() => void drop(entry)}
                     className={`${ghostButton} text-danger`}
                   >
                     {t(entry.status === "invited" ? "invite.cancel" : "invite.remove")}
@@ -139,6 +146,7 @@ export default function InvitesPage() {
           </ul>
         )}
       </Section>
+      {dialog}
     </Page>
   );
 }

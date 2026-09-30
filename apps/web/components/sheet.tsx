@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { t } from "@/lib/i18n";
 
 // Bottom sheet on phone, side panel on desktop (design system 3.1). Escape or the backdrop closes it.
@@ -102,4 +102,52 @@ export function QtyStepper({
       </div>
     </div>
   );
+}
+
+export interface ConfirmOptions {
+  title: string;
+  message: string;
+  confirmLabel: string;
+}
+
+/**
+ * A sheet that asks before something hard to take back, in place of the browser's confirm box.
+ * `ask` resolves true when the user confirms; render `dialog` somewhere in the component.
+ */
+export function useConfirm(): {
+  ask: (options: ConfirmOptions) => Promise<boolean>;
+  dialog: ReactNode;
+} {
+  const [open, setOpen] = useState<(ConfirmOptions & { resolve: (ok: boolean) => void }) | null>(
+    null,
+  );
+  const ask = useCallback(
+    (options: ConfirmOptions) =>
+      new Promise<boolean>((resolve) => setOpen({ ...options, resolve })),
+    [],
+  );
+  const close = (ok: boolean) => {
+    open?.resolve(ok);
+    setOpen(null);
+  };
+  const dialog = open && (
+    <Sheet title={open.title} onClose={() => close(false)}>
+      <p>{open.message}</p>
+      <button
+        type="button"
+        onClick={() => close(true)}
+        className="min-h-touch w-full rounded-md bg-danger px-4 font-semibold text-white"
+      >
+        {open.confirmLabel}
+      </button>
+      <button
+        type="button"
+        onClick={() => close(false)}
+        className="min-h-touch w-full rounded-md border border-border px-4 font-semibold"
+      >
+        {t("confirm.back")}
+      </button>
+    </Sheet>
+  );
+  return { ask, dialog };
 }
