@@ -109,7 +109,7 @@ function OrderCard({ card, board }: { card: Card; board: Board | undefined }) {
   return (
     <Link
       href={`/kartu?id=${card.id}`}
-      className="relative flex items-center gap-3 overflow-hidden rounded-[14px] bg-linear-[111deg] from-[#eaefff] to-[#faf9ff] py-4 pr-4 pl-6"
+      className="relative flex items-center gap-3 overflow-hidden rounded-[14px] bg-linear-[111deg] from-[#e3f3ff] to-[#f7fbff] py-4 pr-4 pl-6"
     >
       <span aria-hidden className="absolute top-5 left-0 h-7 w-1 rounded-r-[10px] bg-primary" />
       <div className="flex min-w-0 flex-1 flex-col gap-3">

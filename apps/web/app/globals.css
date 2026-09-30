@@ -3,22 +3,24 @@
 /* Design tokens from docs/design/02-design-system.md. Names follow shadcn/ui. Light mode only. */
 
 :root {
-  /* EggSalt: blue from the owner's Figma reference (Color-Primary/060), orange accent. */
+  /* EggSalt: sky blue #3DB2FF chosen by the owner, orange accent. */
   --background: #fcfcfc;
   --surface: #ffffff;
   --surface-muted: #f0f2f6;
   --border: #e3e7ef;
   --foreground: #0d1829;
   --muted-foreground: #445668;
-  --primary: #2051e5;
+  --primary: #3db2ff;
+  /* #3DB2FF is 2.3:1 on white, too light for text; blue text uses this deeper shade (4.9:1). */
+  --primary-ink: #0a74c2;
   --primary-foreground: #ffffff;
-  --primary-soft: #eef2ff;
+  --primary-soft: #eaf6ff;
   --accent: #f97316;
   --accent-foreground: #ffffff;
   --success: #15803d;
   --warning: #b45309;
   --danger: #c62d1f;
-  --info: #2051e5;
+  --info: #0a74c2;
 
   /* Stage colors: soft background + strong text, owner picks one per stage. */
   --stage-gray-bg: #eeede8;
@@ -37,6 +39,11 @@
   --stage-amber-fg: #854d0e;
   --stage-green-bg: #e1f5e6;
   --stage-green-fg: #166534;
+}
+
+/* Unlayered, so it wins over the generated utility: blue text stays readable. */
+.text-primary {
+  color: var(--primary-ink);
 }
 
 @theme inline {
