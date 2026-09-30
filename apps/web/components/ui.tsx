@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { GuideButton, type GuidePage } from "@/components/guide";
+import { t } from "@/lib/i18n";
 
 // Small shared building blocks from the design system (section 3).
 
@@ -90,6 +91,24 @@ export function Section({
       </div>
       {children}
     </section>
+  );
+}
+
+/** Grey placeholder rows shown where a list is still loading, instead of a "Memuat" line. */
+export function ListSkeleton({ rows = 3 }: { rows?: number }) {
+  return (
+    <div role="status" aria-label={t("auth.loading")} className="flex flex-col gap-2">
+      {Array.from({ length: rows }, (_, i) => (
+        <div
+          key={i}
+          aria-hidden
+          className="flex animate-pulse flex-col gap-2 rounded-lg border border-border bg-surface p-4"
+        >
+          <div className="h-4 w-2/5 rounded bg-surface-muted" />
+          <div className="h-3 w-3/5 rounded bg-surface-muted" />
+        </div>
+      ))}
+    </div>
   );
 }
 

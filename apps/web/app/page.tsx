@@ -4,7 +4,7 @@ import { ArrowRight, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { ProgressRing } from "@/components/progress-ring";
-import { Banner, EmptyState, primaryButton } from "@/components/ui";
+import { Banner, EmptyState, primaryButton, ListSkeleton } from "@/components/ui";
 import { batchQty, boardMap, dueDay, isTerminal } from "@/lib/board-model";
 import { count, dayKey, shortDate, TIME_ZONE } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -302,7 +302,7 @@ export default function HomePage() {
               : `${t("home.ordersOn")} ${shortDate(`${day}T12:00:00+07:00`)}`}
           </h2>
           {loading ? (
-            <EmptyState>{t("auth.loading")}</EmptyState>
+            <ListSkeleton />
           ) : onDay.length ? (
             onDay.map((c) => <OrderCard key={c.id} card={c} board={byBoard.get(c.boardId)} />)
           ) : (

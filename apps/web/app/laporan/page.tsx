@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { EmptyState, Page, Section } from "@/components/ui";
+import { EmptyState, Page, Section, ListSkeleton } from "@/components/ui";
 import { PERIODS, periodStart, rupiah, type Period } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
 import { useProfitReport, type OrderProfit } from "@/lib/queries";
@@ -49,7 +49,7 @@ function ReportScreen() {
         name={(p) => t(`money.period.${p}`)}
       />
       {data.isPending ? (
-        <EmptyState>{t("auth.loading")}</EmptyState>
+        <ListSkeleton />
       ) : !data.data ? (
         <EmptyState>{t("report.failed")}</EmptyState>
       ) : report === "laba-rugi" ? (

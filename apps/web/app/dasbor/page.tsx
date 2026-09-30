@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Choice } from "@/components/stock-sheets";
-import { EmptyState, Page, Section, StatTile } from "@/components/ui";
+import { EmptyState, Page, Section, StatTile, ListSkeleton } from "@/components/ui";
 import { count, dayKey, PERIODS, periodStart, rupiah, shortDate, type Period } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { useDailySold, useProfitReport, useStockLevels } from "@/lib/queries";
@@ -104,12 +104,16 @@ export default function DashboardPage() {
       </div>
 
       <Section title={t("dash.soldChart")}>
-        {sold.data ? <SoldChart days={sold.data} /> : <EmptyState>{t("auth.loading")}</EmptyState>}
+        {sold.data ? <SoldChart days={sold.data} /> : <ListSkeleton />}
       </Section>
 
       <Section title={t("dash.stock")}>
         {stock.length === 0 ? (
-          <EmptyState>{levels.isPending ? t("auth.loading") : t("stock.noLots")}</EmptyState>
+          levels.isPending ? (
+            <ListSkeleton rows={2} />
+          ) : (
+            <EmptyState>{t("stock.noLots")}</EmptyState>
+          )
         ) : (
           <div className="grid grid-cols-2 gap-2">
             {stock.map((l) => (

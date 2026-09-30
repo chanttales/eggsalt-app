@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { EmptyState, Page, StagePill } from "@/components/ui";
+import { EmptyState, Page, StagePill, ListSkeleton } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useBoards } from "@/lib/queries";
 import { useSession } from "@/lib/session";
@@ -17,7 +17,11 @@ export default function BoardSetupPage() {
       {!isOwner ? (
         <EmptyState>{t("editor.ownerOnly")}</EmptyState>
       ) : (boards.data ?? []).length === 0 ? (
-        <EmptyState>{boards.isPending ? t("auth.loading") : t("board.none")}</EmptyState>
+        boards.isPending ? (
+          <ListSkeleton />
+        ) : (
+          <EmptyState>{t("board.none")}</EmptyState>
+        )
       ) : (
         (boards.data ?? []).map((b) => (
           <Link

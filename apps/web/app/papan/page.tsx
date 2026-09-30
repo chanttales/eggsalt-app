@@ -7,7 +7,15 @@ import { Suspense, useState } from "react";
 import { CardRow } from "@/components/card-row";
 import { NewCardSheet } from "@/components/new-card-sheet";
 import { Sheet } from "@/components/sheet";
-import { EmptyState, Page, segment, segmented, StagePill, stageStyle } from "@/components/ui";
+import {
+  EmptyState,
+  Page,
+  segment,
+  segmented,
+  StagePill,
+  stageStyle,
+  ListSkeleton,
+} from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useBoards, useDoneCards, useOpenCards, type Board, type Card } from "@/lib/queries";
 
@@ -82,7 +90,7 @@ function BoardScreen() {
       </div>
 
       {boards.isPending || cards.isPending ? (
-        <EmptyState>{t("auth.loading")}</EmptyState>
+        <ListSkeleton />
       ) : !board ? (
         <EmptyState>{t("board.none")}</EmptyState>
       ) : (

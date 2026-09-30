@@ -6,7 +6,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Sheet, useConfirm } from "@/components/sheet";
 import { saveFailed, useToast } from "@/components/toast";
-import { EmptyState, ghostButton, inputClass, Page, primaryButton } from "@/components/ui";
+import {
+  EmptyState,
+  ghostButton,
+  inputClass,
+  Page,
+  primaryButton,
+  ListSkeleton,
+} from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useParties, type Party } from "@/lib/queries";
 import { useSession } from "@/lib/session";
@@ -249,7 +256,11 @@ function ContactsPageContent() {
         ))}
       </div>
       {(parties.data ?? []).length === 0 ? (
-        <EmptyState>{parties.isPending ? t("auth.loading") : t("contact.none")}</EmptyState>
+        parties.isPending ? (
+          <ListSkeleton />
+        ) : (
+          <EmptyState>{t("contact.none")}</EmptyState>
+        )
       ) : (
         <ul className="flex flex-col gap-2">
           {(parties.data ?? []).map((p) => (
