@@ -74,6 +74,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       return;
     }
     try {
+      // Join any workspace that invited this email; an error is returned, not thrown, so it never blocks sign-in.
+      await supabase().rpc("accept_invites");
       const workspaces = await loadWorkspaces(session.user.id);
       const workspace = pick(workspaces, readActive());
       setState({ status: "signed_in", session, workspaces, workspace });
