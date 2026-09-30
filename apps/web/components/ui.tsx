@@ -7,9 +7,18 @@ import { GuideButton, type GuidePage } from "@/components/guide";
 export const inputClass =
   "min-h-touch w-full rounded-md border border-border bg-surface px-3 text-body outline-none focus:border-primary";
 export const primaryButton =
-  "min-h-touch w-full rounded-md bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-60";
+  "flex min-h-touch w-full items-center justify-center gap-2 rounded-md bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-60";
 export const secondaryButton =
-  "min-h-touch w-full rounded-md bg-primary-soft px-4 font-semibold text-primary disabled:opacity-60";
+  "flex min-h-touch w-full items-center justify-center gap-2 rounded-md bg-primary-soft px-4 font-semibold text-primary disabled:opacity-60";
+/** The one main action beside a page title: stays on one line. */
+export const headerButton =
+  "flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-label font-semibold whitespace-nowrap text-primary-foreground";
+/** Pill tabs (period, order list): the same look on every page. */
+export const segmented = "flex gap-1 rounded-full bg-surface-muted p-1";
+export const segment = (active: boolean) =>
+  `min-h-touch flex-1 truncate rounded-full px-3 font-medium ${
+    active ? "bg-surface text-foreground shadow-sm" : "text-muted-foreground"
+  }`;
 export const ghostButton =
   "min-h-touch rounded-md px-3 font-semibold text-primary disabled:opacity-60";
 
@@ -131,12 +140,12 @@ export function Page({
 }) {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 p-4">
-      <header className="flex items-start justify-between gap-2">
-        <div>
+      <header className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
           {subtitle && <p className="text-label text-muted-foreground">{subtitle}</p>}
-          <h1 className="text-title-lg font-bold">{title}</h1>
+          <h1 className="truncate text-title-lg font-bold">{title}</h1>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           {actions}
           {guide && <GuideButton page={guide} />}
         </div>

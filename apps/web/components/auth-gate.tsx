@@ -53,7 +53,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (!hasWorkspace) return <>{children}</>;
   return (
     <>
-      <div className="pb-20 lg:pb-0 lg:pl-56">
+      <div className="pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-0 lg:pl-56">
         <NativeBridge />
         {children}
       </div>

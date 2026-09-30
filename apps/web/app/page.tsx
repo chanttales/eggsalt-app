@@ -3,7 +3,6 @@
 import { ArrowRight, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { GuideButton } from "@/components/guide";
 import { ProgressRing } from "@/components/progress-ring";
 import { Banner, EmptyState, primaryButton } from "@/components/ui";
 import { batchQty, boardMap, dueDay, isTerminal } from "@/lib/board-model";
@@ -65,7 +64,6 @@ function Header() {
           <p className="text-label opacity-90">{greeting()}</p>
           <h1 className="truncate text-title-lg font-semibold">{name}</h1>
         </div>
-        <GuideButton page="today" className="text-primary-foreground" />
         <Link href="/profil" aria-label={t("nav.profile")} className="shrink-0">
           {avatar ? (
             // Google's avatar URL; referrer hidden so it loads outside Google's own sites.
