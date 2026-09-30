@@ -7,15 +7,7 @@ import { Suspense, useState } from "react";
 import { CardRow } from "@/components/card-row";
 import { NewCardSheet } from "@/components/new-card-sheet";
 import { Sheet } from "@/components/sheet";
-import {
-  EmptyState,
-  headerButton,
-  Page,
-  segment,
-  segmented,
-  StagePill,
-  stageStyle,
-} from "@/components/ui";
+import { EmptyState, Page, segment, segmented, StagePill, stageStyle } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { useBoards, useOpenCards, type Board, type Card } from "@/lib/queries";
 
@@ -53,18 +45,8 @@ function BoardScreen() {
   }
 
   return (
-    <Page
-      guide="papan"
-      title={t("nav.orders")}
-      actions={
-        board && (
-          <Link href={`/papan?b=${board.id}&aksi=baru`} className={headerButton}>
-            <Plus aria-hidden size={18} />
-            {t("board.newCard")}
-          </Link>
-        )
-      }
-    >
+    // No add button here: the + in the nav adds orders.
+    <Page guide="papan" title={t("nav.orders")}>
       <div role="tablist" className={segmented}>
         {list.map((b) => (
           <button
