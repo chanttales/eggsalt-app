@@ -1,51 +1,29 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
+import { listenForAppCallback, signInWithGoogle } from "@/lib/google-sign-in";
 import { t } from "@/lib/i18n";
-import { supabase } from "@/lib/supabase";
 
-const input =
-  "min-h-touch w-full rounded-md border border-border bg-surface px-3 text-body outline-none focus:border-primary";
 const primary =
-  "min-h-touch w-full rounded-md bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-60";
+  "flex min-h-touch w-full items-center justify-center gap-3 rounded-md border border-border bg-surface px-4 font-semibold disabled:opacity-60";
 
-// Sign in with a 6-digit code sent by email. It works the same on the web and inside the Android
-// app, where a magic link would need deep links. New emails get an account on first sign-in.
+// Sign in (or sign up) with Google. The first sign-in creates the account.
 export default function SignInPage() {
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [step, setStep] = useState<"email" | "code">("email");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function sendCode(event?: FormEvent) {
-    event?.preventDefault();
-    setBusy(true);
-    setError(null);
-    const { error } = await supabase().auth.signInWithOtp({
-      email: email.trim(),
-      options: { shouldCreateUser: true },
-    });
-    setBusy(false);
-    if (error) {
-      setError(t(error.status === 429 ? "auth.tooManyRequests" : "auth.sendFailed"));
-      return;
-    }
-    setStep("code");
-  }
+  useEffect(() => listenForAppCallback(), []);
 
-  async function verify(event: FormEvent) {
-    event.preventDefault();
+  async function start() {
     setBusy(true);
     setError(null);
-    const { error } = await supabase().auth.verifyOtp({
-      email: email.trim(),
-      token: code.trim(),
-      type: "email",
-    });
-    setBusy(false);
-    // On success the session provider sees the sign-in and the guard opens the app.
-    if (error) setError(t("auth.codeInvalid"));
+    try {
+      await signInWithGoogle();
+    } catch {
+      setError(t("auth.googleFailed"));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -53,70 +31,30 @@ export default function SignInPage() {
       <header className="flex flex-col gap-1">
         <p className="text-title font-bold text-primary">Papan</p>
         <h1 className="text-title-lg font-bold">{t("auth.title")}</h1>
-        <p className="text-muted-foreground">
-          {step === "email" ? t("auth.intro") : `${t("auth.codeSentTo")} ${email.trim()}`}
-        </p>
+        <p className="text-muted-foreground">{t("auth.intro")}</p>
       </header>
 
-      {step === "email" ? (
-        <form onSubmit={sendCode} className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1 text-label font-medium">
-            {t("auth.email")}
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              inputMode="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={input}
-            />
-          </label>
-          <button type="submit" disabled={busy} className={primary}>
-            {busy ? t("auth.sending") : t("auth.sendCode")}
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={verify} className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1 text-label font-medium">
-            {t("auth.code")}
-            <input
-              required
-              autoComplete="one-time-code"
-              inputMode="numeric"
-              pattern="[0-9]{6}"
-              maxLength={6}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              className={`${input} text-center text-title-lg tracking-[0.4em]`}
-            />
-          </label>
-          <button type="submit" disabled={busy || code.length !== 6} className={primary}>
-            {busy ? t("auth.checking") : t("auth.signIn")}
-          </button>
-          <div className="flex justify-between text-label">
-            <button
-              type="button"
-              onClick={() => {
-                setStep("email");
-                setCode("");
-                setError(null);
-              }}
-              className="min-h-touch font-medium text-primary"
-            >
-              {t("auth.changeEmail")}
-            </button>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => void sendCode()}
-              className="min-h-touch font-medium text-primary"
-            >
-              {t("auth.resend")}
-            </button>
-          </div>
-        </form>
-      )}
+      <button type="button" disabled={busy} onClick={() => void start()} className={primary}>
+        <svg aria-hidden viewBox="0 0 48 48" className="size-5">
+          <path
+            fill="#FFC107"
+            d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"
+          />
+          <path
+            fill="#FF3D00"
+            d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+          />
+          <path
+            fill="#4CAF50"
+            d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"
+          />
+          <path
+            fill="#1976D2"
+            d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"
+          />
+        </svg>
+        {busy ? t("auth.googleOpening") : t("auth.google")}
+      </button>
 
       {error && (
         <p role="alert" className="text-label text-danger">

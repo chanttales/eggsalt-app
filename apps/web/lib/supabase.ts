@@ -13,7 +13,13 @@ let client: SupabaseClient | undefined;
 export function supabase(): SupabaseClient {
   if (!url || !anonKey) throw new Error("Supabase is not configured");
   client ??= createClient(url, anonKey, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      // PKCE: Google sends the browser back with ?code=, which the client exchanges on load.
+      flowType: "pkce",
+      detectSessionInUrl: true,
+    },
   });
   return client;
 }
