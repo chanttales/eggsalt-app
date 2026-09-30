@@ -19,6 +19,8 @@ import { useSession } from "@/lib/session";
 // the app opens instantly with the last data it saw, even offline. Writes go through the outbox.
 
 const DAY = 24 * 60 * 60 * 1000;
+/** Bump when a cached query changes shape, so data saved by an older app version is dropped. */
+const CACHE_VERSION = "v2";
 const NONE: readonly never[] = [];
 const RETRY_EVERY = 20_000;
 
@@ -74,7 +76,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   return (
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister, maxAge: 7 * DAY, buster: "v1" }}
+      persistOptions={{ persister, maxAge: 7 * DAY, buster: CACHE_VERSION }}
     >
       <Context.Provider value={outbox}>{children}</Context.Provider>
     </PersistQueryClientProvider>
