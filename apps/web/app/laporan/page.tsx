@@ -1,6 +1,6 @@
 "use client";
 
-import { Download } from "lucide-react";
+import { Download, ExternalLink, Sheet } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -9,6 +9,7 @@ import { PERIODS, periodStart, rupiah, type Period } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
 import { useProfitReport, type OrderProfit } from "@/lib/queries";
 import { downloadReportCsv } from "@/lib/report-csv";
+import { sheetUrl, startSheetsSync } from "@/lib/sheets";
 import { useSession } from "@/lib/session";
 
 const REPORTS = ["laba-rugi", "pesanan", "pelanggan"] as const;
@@ -73,7 +74,44 @@ function ReportScreen() {
           {t("export.download")}
         </button>
       )}
+      {state.status === "signed_in" && state.workspace && (
+        <SheetsBox workspaceId={state.workspace.id} />
+      )}
     </Page>
+  );
+}
+
+// Google Sheets: Sinkron goes to Google for a Drive token and the app writes the sheet on return.
+function SheetsBox({ workspaceId }: { workspaceId: string }) {
+  const [busy, setBusy] = useState(false);
+  const url = sheetUrl(workspaceId);
+  return (
+    <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-3">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => {
+          setBusy(true);
+          void startSheetsSync(workspaceId).catch(() => setBusy(false));
+        }}
+        className={secondaryButton}
+      >
+        <Sheet aria-hidden size={18} />
+        {t("sheets.sync")}
+      </button>
+      <p className="text-label text-muted-foreground">{t("sheets.hint")}</p>
+      {url && (
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-1 self-start text-label font-semibold text-primary"
+        >
+          <ExternalLink aria-hidden size={16} />
+          {t("sheets.open")}
+        </a>
+      )}
+    </div>
   );
 }
 

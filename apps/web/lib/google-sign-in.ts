@@ -31,6 +31,25 @@ export async function signInWithGoogle(): Promise<void> {
   if (native && data.url) await Browser.open({ url: data.url });
 }
 
+/**
+ * Signs in again with Google asking for access to files EggSalt creates in Drive (drive.file).
+ * The Google access token then sits on the session as provider_token for about an hour.
+ */
+export async function signInWithDriveAccess(): Promise<void> {
+  const native = Capacitor.isNativePlatform();
+  const { data, error } = await supabase().auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: native ? APP_CALLBACK : webCallback(),
+      skipBrowserRedirect: native,
+      scopes: "https://www.googleapis.com/auth/drive.file",
+      queryParams: { include_granted_scopes: "true" },
+    },
+  });
+  if (error) throw error;
+  if (native && data.url) await Browser.open({ url: data.url });
+}
+
 /** Android: finish the sign-in when the browser hands the deep link back to the app. */
 export function listenForAppCallback(): () => void {
   if (!Capacitor.isNativePlatform()) return () => {};
