@@ -144,3 +144,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] fix(web): let the Home date strip show the last two days
 - [x] feat(web): add a calendar button to pick any date on Home
 - [x] fix(web): keep the Home date button from widening the page
+- [x] feat(web): download Laporan as a CSV file for Excel or Google Sheets
