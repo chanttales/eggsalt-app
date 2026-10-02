@@ -1,12 +1,14 @@
 "use client";
 
+import { Download } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { EmptyState, Page, Section, ListSkeleton } from "@/components/ui";
+import { EmptyState, Page, Section, ListSkeleton, secondaryButton } from "@/components/ui";
 import { PERIODS, periodStart, rupiah, type Period } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
 import { useProfitReport, type OrderProfit } from "@/lib/queries";
+import { downloadReportCsv } from "@/lib/report-csv";
 import { useSession } from "@/lib/session";
 
 const REPORTS = ["laba-rugi", "pesanan", "pelanggan"] as const;
@@ -58,6 +60,18 @@ function ReportScreen() {
         <PerOrder orders={data.data.orders} />
       ) : (
         <PerCustomer orders={data.data.orders} />
+      )}
+      {data.data && (
+        <button
+          type="button"
+          onClick={() =>
+            data.data && downloadReportCsv(data.data, t(`money.period.${period}`), period)
+          }
+          className={secondaryButton}
+        >
+          <Download aria-hidden size={18} />
+          {t("export.download")}
+        </button>
       )}
     </Page>
   );
