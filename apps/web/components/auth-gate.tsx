@@ -5,6 +5,7 @@ import { useEffect, type ReactNode } from "react";
 import { AppNav } from "@/components/app-nav";
 import { t } from "@/lib/i18n";
 import { NativeBridge } from "@/lib/native";
+import { SheetsSync } from "@/components/sheets-sync";
 import { useSession } from "@/lib/session";
 
 /** Pages anyone can open. */
@@ -55,6 +56,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     <>
       <div className="pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-0 lg:pl-56">
         <NativeBridge />
+        <SheetsSync />
         {children}
       </div>
       <AppNav />
