@@ -149,3 +149,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 ## M2.3 Google Sheets
 
 - [x] feat(web): sync Laporan to Google Sheets when the owner taps Sinkron
+- [x] feat(web): download Laporan as an Excel file instead of CSV

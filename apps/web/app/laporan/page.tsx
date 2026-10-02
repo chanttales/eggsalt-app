@@ -8,7 +8,7 @@ import { EmptyState, Page, Section, ListSkeleton, secondaryButton } from "@/comp
 import { PERIODS, periodStart, rupiah, type Period } from "@/lib/format";
 import { t, tOr } from "@/lib/i18n";
 import { useProfitReport, type OrderProfit } from "@/lib/queries";
-import { downloadReportCsv } from "@/lib/report-csv";
+import { downloadReport } from "@/lib/report-file";
 import { sheetUrl, startSheetsSync } from "@/lib/sheets";
 import { useSession } from "@/lib/session";
 
@@ -66,7 +66,7 @@ function ReportScreen() {
         <button
           type="button"
           onClick={() =>
-            data.data && downloadReportCsv(data.data, t(`money.period.${period}`), period)
+            data.data && downloadReport(data.data, t(`money.period.${period}`), period)
           }
           className={secondaryButton}
         >
