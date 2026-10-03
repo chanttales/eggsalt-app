@@ -50,14 +50,16 @@ async function unitPrice(
   qty: number,
 ): Promise<number> {
   // Latest sell price valid on the order day. A price for the customer's segment beats the general
-  // one, then the highest minimum quantity the line reaches (e.g. from 100 eggs) wins.
+  // one, then the highest minimum quantity the line reaches (e.g. from 100 eggs) wins. An order
+  // dated before the first price was entered (past sales typed in late) uses the earliest price.
   const [price] = await tx<{ unit_price: string }[]>`
-    select p.unit_price from price p join workspace w on w.id = p.workspace_id
+    select p.unit_price from price p join workspace w on w.id = p.workspace_id,
+           lateral (select coalesce(${on}::date, (now() at time zone w.timezone)::date) as day) d
      where p.workspace_id = ${workspaceId} and p.product_id = ${productId} and p.kind = 'sell'
-       and p.valid_from <= coalesce(${on}::date, (now() at time zone w.timezone)::date)
        and (p.segment is null or p.segment = ${segment})
        and p.min_qty <= ${qty}
-     order by (p.segment is not null) desc, p.min_qty desc, p.valid_from desc
+     order by (p.valid_from <= d.day) desc, (p.segment is not null) desc, p.min_qty desc,
+              case when p.valid_from <= d.day then d.day - p.valid_from else p.valid_from - d.day end
      limit 1`;
   if (!price) throw new EngineError("bad_request", "Product has no sell price; enter a unit price");
   return Number(price.unit_price);
