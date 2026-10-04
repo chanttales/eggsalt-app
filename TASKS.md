@@ -152,3 +152,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): download Laporan as an Excel file instead of CSV
 - [x] fix(engine): use the earliest price for orders dated before it
 - [x] feat(web): show each product's price periods as coloured blocks
+- [x] feat(web): show price periods on a coloured month calendar
