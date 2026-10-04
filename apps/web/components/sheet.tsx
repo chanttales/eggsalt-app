@@ -2,12 +2,28 @@
 
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { X } from "lucide-react";
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Drawer } from "vaul";
 import { t } from "@/lib/i18n";
 
-// Drawer in the style of shadcn/ui (vaul): slides up from the bottom and closes with a swipe
-// down, the close button, the backdrop or Escape. Callers mount it while open.
+const desktop = "(min-width: 64rem)";
+
+/** True from Tailwind's `lg` breakpoint up, where the sidebar replaces the bottom bar. */
+function useIsDesktop() {
+  return useSyncExternalStore(
+    (onChange) => {
+      const query = window.matchMedia(desktop);
+      query.addEventListener("change", onChange);
+      return () => query.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia(desktop).matches,
+    () => false,
+  );
+}
+
+// Drawer in the style of shadcn/ui (vaul): slides up from the bottom on phones and in from the
+// right on desktop, and closes with a swipe, the close button, the backdrop or Escape. Callers
+// mount it while open.
 export function Sheet({
   title,
   onClose,
@@ -17,16 +33,29 @@ export function Sheet({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const isDesktop = useIsDesktop();
   return (
-    <Drawer.Root open onOpenChange={(open) => !open && onClose()}>
+    <Drawer.Root
+      open
+      direction={isDesktop ? "right" : "bottom"}
+      onOpenChange={(open) => !open && onClose()}
+    >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-50 bg-black/40" />
         <Drawer.Content
           aria-describedby={undefined}
-          className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[90dvh] w-full max-w-lg flex-col rounded-t-xl bg-background pb-[env(safe-area-inset-bottom)] outline-none"
+          className={`fixed z-50 flex flex-col bg-background outline-none ${
+            isDesktop
+              ? "inset-y-0 right-0 w-full max-w-md rounded-l-xl shadow-xl"
+              : "inset-x-0 bottom-0 mx-auto max-h-[90dvh] w-full max-w-lg rounded-t-xl pb-[env(safe-area-inset-bottom)]"
+          }`}
         >
-          <div aria-hidden className="mx-auto mt-2 h-1.5 w-12 shrink-0 rounded-full bg-border" />
-          <div className="flex items-center justify-between border-b border-border px-4 pt-1 pb-3">
+          {!isDesktop && (
+            <div aria-hidden className="mx-auto mt-2 h-1.5 w-12 shrink-0 rounded-full bg-border" />
+          )}
+          <div
+            className={`flex items-center justify-between border-b border-border px-4 pb-3 ${isDesktop ? "pt-4" : "pt-1"}`}
+          >
             <Drawer.Title className="text-title font-bold">{title}</Drawer.Title>
             <Drawer.Close aria-label={t("sheet.close")} className="min-h-touch px-2">
               <X aria-hidden size={24} />
