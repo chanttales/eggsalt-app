@@ -3,6 +3,7 @@
 import { STAGE_COLORS } from "@domain";
 import { ArrowDown, ArrowUp, ChevronDown, Trash2, Zap } from "lucide-react";
 import { useState } from "react";
+import { Checkbox, Radio } from "@/components/checkbox";
 import { Select } from "@/components/select";
 import { RuleEditor } from "@/components/board-editor/rule-editor";
 import { useConfirm } from "@/components/sheet";
@@ -154,20 +155,13 @@ export function StageSettings({
 
       <div className="flex flex-wrap gap-4 text-label">
         <label className="flex min-h-touch items-center gap-2">
-          <input
-            type="radio"
-            checked={graph.entry === s.key}
-            onChange={() => draft.setEntry(s.key)}
-            className="size-5 accent-[var(--primary)]"
-          />
+          <Radio value={s.key} selected={graph.entry ?? ""} onSelect={draft.setEntry} />
           {t("editor.isFirst")}
         </label>
         <label className="flex min-h-touch items-center gap-2">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={graph.terminal.includes(s.key)}
-            onChange={(e) => draft.setTerminal(s.key, e.target.checked)}
-            className="size-5 accent-[var(--primary)]"
+            onChange={(on) => draft.setTerminal(s.key, on)}
           />
           {t("editor.isLast")}
         </label>
@@ -178,17 +172,13 @@ export function StageSettings({
           <legend className="text-label font-medium">{t("editor.required")}</legend>
           {defs.map((d) => (
             <label key={d.key} className="flex min-h-touch items-center gap-2">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={s.require.includes(d.key)}
-                onChange={(e) =>
+                onChange={(on) =>
                   draft.setStage(s.key, {
-                    require: e.target.checked
-                      ? [...s.require, d.key]
-                      : s.require.filter((k) => k !== d.key),
+                    require: on ? [...s.require, d.key] : s.require.filter((k) => k !== d.key),
                   })
                 }
-                className="size-5 accent-[var(--primary)]"
               />
               {d.label}
             </label>
