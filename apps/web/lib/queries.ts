@@ -568,14 +568,14 @@ export interface PriceRow {
 }
 
 /** Every general sell price (no customer segment), oldest first, for the price timeline. */
-export function useSellPriceHistory() {
-  return useWorkspaceQuery("sell-price-history", async (workspaceId) => {
+export function usePriceHistory(kind: "sell" | "buy") {
+  return useWorkspaceQuery(`${kind}-price-history`, async (workspaceId) => {
     const rows = must(
       await supabase()
         .from("price")
         .select("product_id, unit_price, valid_from, min_qty")
         .eq("workspace_id", workspaceId)
-        .eq("kind", "sell")
+        .eq("kind", kind)
         .is("segment", null)
         .order("valid_from"),
     );

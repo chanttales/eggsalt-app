@@ -151,14 +151,24 @@ export function PriceTimeline({ title, rows }: { title: string; rows: PriceRow[]
 }
 
 /** One timeline for the normal price and one per quantity price (e.g. from 100 eggs). */
-export function ProductPriceTimelines({ rows }: { rows: PriceRow[] }) {
+export function ProductPriceTimelines({
+  rows,
+  kind = "sell",
+}: {
+  rows: PriceRow[];
+  kind?: "sell" | "buy";
+}) {
   const mins = [...new Set(rows.map((r) => r.minQty))].sort((a, b) => a - b);
   return (
     <>
       {mins.map((min) => (
         <PriceTimeline
           key={min}
-          title={min ? t("price.historyTier").replace("{n}", count(min)) : t("price.history")}
+          title={
+            min
+              ? t("price.historyTier").replace("{n}", count(min))
+              : t(kind === "buy" ? "price.buyHistory" : "price.history")
+          }
           rows={rows.filter((r) => r.minQty === min)}
         />
       ))}
