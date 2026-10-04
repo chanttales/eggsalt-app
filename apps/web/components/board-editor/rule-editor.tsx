@@ -1,6 +1,7 @@
 "use client";
 
 import type { Condition } from "@domain";
+import { Select } from "@/components/select";
 import { inputClass } from "@/components/ui";
 import { simpleRule, type Compare } from "@/lib/board-editor";
 import { t } from "@/lib/i18n";
@@ -69,30 +70,18 @@ export function RuleEditor({
     <div className="flex flex-col gap-2 rounded-md bg-surface-muted p-2">
       <span className="text-caption text-muted-foreground">{t("editor.onlyWhen")}</span>
       <div className="grid grid-cols-[1fr_auto_1fr] gap-2">
-        <select
-          aria-label={t("editor.ruleField")}
+        <Select
+          ariaLabel={t("editor.ruleField")}
           value={rule.field}
-          onChange={(e) => set({ field: e.target.value })}
-          className={inputClass}
-        >
-          {fields.map((f) => (
-            <option key={f.path} value={f.path}>
-              {f.label}
-            </option>
-          ))}
-        </select>
-        <select
-          aria-label={t("editor.ruleOp")}
+          onChange={(field) => set({ field })}
+          options={fields.map((f) => ({ value: f.path, label: f.label }))}
+        />
+        <Select
+          ariaLabel={t("editor.ruleOp")}
           value={rule.op}
-          onChange={(e) => set({ op: e.target.value as Compare["op"] })}
-          className={inputClass}
-        >
-          {OPS.map((op) => (
-            <option key={op} value={op}>
-              {t(`editor.op.${op}`)}
-            </option>
-          ))}
-        </select>
+          onChange={(op) => set({ op: op as Compare["op"] })}
+          options={OPS.map((op) => ({ value: op, label: t(`editor.op.${op}`) }))}
+        />
         <input
           aria-label={t("editor.ruleValue")}
           inputMode={numeric ? "numeric" : "text"}

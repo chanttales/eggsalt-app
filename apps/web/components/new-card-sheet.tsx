@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Select } from "@/components/select";
 import { DatePicker } from "@/components/date-picker";
 import { FieldInput } from "@/components/field-input";
 import { QtyStepper, Sheet } from "@/components/sheet";
@@ -104,22 +105,21 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
     >
       {isOrder ? (
         <>
-          <label className="flex flex-col gap-1 text-label font-medium">
+          <div className="flex flex-col gap-1 text-label font-medium">
             {t("order.customer")}
-            <select
+            <Select
+              ariaLabel={t("order.customer")}
               value={partyId}
-              onChange={(e) => setPartyId(e.target.value)}
-              className={inputClass}
-            >
-              <option value="">{isOwner ? t("order.newCustomer") : t("field.choose")}</option>
-              {(customers.data ?? []).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                  {p.segment ? ` · ${p.segment}` : ""}
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={setPartyId}
+              options={[
+                { value: "", label: isOwner ? t("order.newCustomer") : t("field.choose") },
+                ...(customers.data ?? []).map((p) => ({
+                  value: p.id,
+                  label: p.segment ? `${p.name} · ${p.segment}` : p.name,
+                })),
+              ]}
+            />
+          </div>
           {!partyId && isOwner && (
             <input
               aria-label={t("order.customerName")}

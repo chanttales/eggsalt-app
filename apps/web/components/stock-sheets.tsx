@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Select } from "@/components/select";
 import { DatePicker } from "@/components/date-picker";
 import { QtyStepper, Sheet } from "@/components/sheet";
 import { EmptyState, inputClass, primaryButton } from "@/components/ui";
@@ -123,20 +124,15 @@ export function ReceiveSheet({ onClose }: { onClose: () => void }) {
   return (
     <Sheet title={t("stock.receive")} onClose={onClose}>
       {(suppliers.data ?? []).length > 1 && (
-        <label className="flex flex-col gap-1 text-label font-medium">
+        <div className="flex flex-col gap-1 text-label font-medium">
           {t("receive.supplier")}
-          <select
+          <Select
+            ariaLabel={t("receive.supplier")}
             value={supplier?.id ?? ""}
-            onChange={(e) => setSupplierId(e.target.value)}
-            className={inputClass}
-          >
-            {(suppliers.data ?? []).map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={setSupplierId}
+            options={(suppliers.data ?? []).map((s) => ({ value: s.id, label: s.name }))}
+          />
+        </div>
       )}
       {state && (
         <Choice
@@ -232,25 +228,22 @@ export function ReturnSheet({ lotId, onClose }: { lotId: string | null; onClose:
         <EmptyState>{t("return.none")}</EmptyState>
       ) : (
         <>
-          <label className="flex flex-col gap-1 text-label font-medium">
+          <div className="flex flex-col gap-1 text-label font-medium">
             {t("return.lot")}
-            <select
+            <Select
+              ariaLabel={t("return.lot")}
               value={lot.id}
-              onChange={(e) => {
-                setChosen(e.target.value);
+              onChange={(id) => {
+                setChosen(id);
                 setQty(null);
                 setRefund(null);
               }}
-              className={inputClass}
-            >
-              {candidates.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {shortDate(l.receivedAt)} · {l.supplierName} · {count(l.qtyRemaining)}{" "}
-                  {t("unit.egg")}
-                </option>
-              ))}
-            </select>
-          </label>
+              options={candidates.map((l) => ({
+                value: l.id,
+                label: `${shortDate(l.receivedAt)} · ${l.supplierName} · ${count(l.qtyRemaining)} ${t("unit.egg")}`,
+              }))}
+            />
+          </div>
           <div className="flex flex-col gap-1">
             <span className="text-label font-medium">{t("return.qty")}</span>
             <QtyStepper

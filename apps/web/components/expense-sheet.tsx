@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Select } from "@/components/select";
 import { PAY_METHODS, type PayMethod } from "@/components/payment";
 import { Sheet } from "@/components/sheet";
 import { Choice, Money } from "@/components/stock-sheets";
@@ -45,17 +46,18 @@ export function ExpenseSheet({ onClose }: { onClose: () => void }) {
         onChange={setMethod}
         name={(m) => tOr(`method.${m}`, m)}
       />
-      <label className="flex flex-col gap-1 text-label font-medium">
+      <div className="flex flex-col gap-1 text-label font-medium">
         {t("expense.for")}
-        <select value={cardId} onChange={(e) => setCardId(e.target.value)} className={inputClass}>
-          <option value="">{t("expense.general")}</option>
-          {(cards.data ?? []).map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.title} #{c.number}
-            </option>
-          ))}
-        </select>
-      </label>
+        <Select
+          ariaLabel={t("expense.for")}
+          value={cardId}
+          onChange={setCardId}
+          options={[
+            { value: "", label: t("expense.general") },
+            ...(cards.data ?? []).map((c) => ({ value: c.id, label: `${c.title} #${c.number}` })),
+          ]}
+        />
+      </div>
       <label className="flex flex-col gap-1 text-label font-medium">
         {t("expense.note")}
         <input value={note} onChange={(e) => setNote(e.target.value)} className={inputClass} />
