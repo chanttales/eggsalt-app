@@ -165,3 +165,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(ui): use shadcn-style checkbox, switch and radio controls
 - [x] feat(ui): ask for confirmation in a shadcn-style alert dialog
 - [x] feat(ui): turn bottom sheets into a swipeable shadcn-style drawer
+- [x] fix(web): tidy the order detail header and left-align the stages switch

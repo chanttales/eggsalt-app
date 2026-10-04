@@ -172,7 +172,7 @@ function Stacked({
     }`;
   return (
     <div className="flex flex-col gap-4">
-      <label className="flex items-center gap-2 self-end text-label text-muted-foreground">
+      <label className="flex items-center gap-2 self-start text-label text-muted-foreground">
         <Switch checked={allStages} onChange={setAllStages} />
         {t("board.allStages")}
       </label>
