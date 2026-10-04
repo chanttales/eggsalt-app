@@ -155,8 +155,8 @@ export function Page({
 }: {
   title: string;
   subtitle?: string;
-  /** Where the back button goes when there is no history; tab pages have none. */
-  back?: string;
+  /** Shows a back button when there is an earlier page in the app; tab pages have none. */
+  back?: boolean;
   actions?: ReactNode;
   guide?: GuidePage;
   children: ReactNode;
@@ -167,7 +167,7 @@ export function Page({
         <div className="min-w-0 flex-1">
           {subtitle && <p className="text-center text-label text-muted-foreground">{subtitle}</p>}
           <div className="flex min-w-0 items-center gap-1">
-            {back && <BackButton fallback={back} />}
+            {back && <BackButton />}
             <h1 className="truncate text-title-lg font-bold">{title}</h1>
           </div>
         </div>

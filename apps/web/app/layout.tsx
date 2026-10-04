@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import { AuthGate } from "@/components/auth-gate";
+import { NavigationTracker } from "@/components/back-button";
 import { ToastProvider } from "@/components/toast";
 import { DataProvider } from "@/lib/data";
 import { SessionProvider } from "@/lib/session";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SessionProvider>
           <ToastProvider>
             <DataProvider>
+              <NavigationTracker />
               <AuthGate>{children}</AuthGate>
             </DataProvider>
           </ToastProvider>
