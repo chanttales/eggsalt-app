@@ -162,7 +162,7 @@ export function Page({
   children: ReactNode;
 }) {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 p-4">
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 p-4 lg:max-w-4xl lg:gap-6 lg:px-8 lg:py-8">
       <header className="flex items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           {subtitle && <p className="text-center text-label text-muted-foreground">{subtitle}</p>}

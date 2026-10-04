@@ -62,8 +62,8 @@ function Header() {
   const avatar = meta.avatar_url ?? meta.picture;
 
   return (
-    <header className="rounded-b-[20px] bg-primary px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-7 text-primary-foreground">
-      <div className="mx-auto flex max-w-2xl items-center gap-3">
+    <header className="rounded-b-[20px] bg-primary px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-7 text-primary-foreground lg:mx-[max(2rem,calc((100%-60rem)/2))] lg:mt-8 lg:rounded-[20px] lg:px-8 lg:pt-7">
+      <div className="mx-auto flex max-w-2xl items-center gap-3 lg:max-w-none">
         <div className="min-w-0 flex-1">
           <p className="text-label opacity-90">{greeting()}</p>
           <h1 className="truncate text-title-lg font-semibold">{name}</h1>
@@ -207,120 +207,125 @@ export default function HomePage() {
   return (
     <>
       <Header />
-      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 pt-6 pb-4">
-        <section className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-title font-medium">{t("home.pickDate")}</h2>
-            {/* Any other day, past or future, from a calendar behind this button. */}
-            <DatePicker
-              value={day}
-              onChange={setDay}
-              trigger={
-                <button
-                  type="button"
-                  aria-label={t("home.otherDate")}
-                  className={`flex size-10 items-center justify-center rounded-full ${
-                    days.includes(day)
-                      ? "bg-surface-muted text-primary"
-                      : "bg-primary text-primary-foreground"
-                  }`}
-                >
-                  <CalendarDays aria-hidden size={20} />
-                </button>
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 pt-6 pb-4 lg:grid lg:max-w-5xl lg:grid-cols-2 lg:items-start lg:gap-8 lg:px-8 lg:pb-8">
+        {/* Desktop: dates, shortcuts and reminders on the left, the day's orders on the right. */}
+        <div className="flex flex-col gap-6">
+          <section className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-title font-medium">{t("home.pickDate")}</h2>
+              {/* Any other day, past or future, from a calendar behind this button. */}
+              <DatePicker
+                value={day}
+                onChange={setDay}
+                trigger={
+                  <button
+                    type="button"
+                    aria-label={t("home.otherDate")}
+                    className={`flex size-10 items-center justify-center rounded-full ${
+                      days.includes(day)
+                        ? "bg-surface-muted text-primary"
+                        : "bg-primary text-primary-foreground"
+                    }`}
+                  >
+                    <CalendarDays aria-hidden size={20} />
+                  </button>
+                }
+              />
+            </div>
+            <div className="grid grid-cols-5 items-center gap-2">
+              {days.map((d) => {
+                const active = d === day;
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setDay(d)}
+                    className={`flex flex-col items-center justify-center rounded-[15px] ${
+                      active
+                        ? "h-[87px] bg-primary text-primary-foreground"
+                        : "h-[73px] bg-surface-muted text-muted-foreground"
+                    }`}
+                  >
+                    <span className="text-body capitalize">{weekday(d)}</span>
+                    <span
+                      className={`text-title-lg font-medium ${active ? "" : "text-foreground"}`}
+                    >
+                      {Number(d.slice(8))}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-title font-medium">{t("home.shortcuts")}</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <Shortcut
+                href={warung ? `/papan?b=${warung.id}` : "/papan"}
+                title={t("home.warung")}
+                status={t("home.running").replace("{n}", count(openOn(warung)))}
+              />
+              <Shortcut
+                href={catering ? `/papan?b=${catering.id}` : "/papan"}
+                title={t("home.catering")}
+                status={t("home.running").replace("{n}", count(openOn(catering)))}
+              />
+              <Shortcut
+                href="/stok?aksi=rebus"
+                title={t("home.boil")}
+                status={`${count(toBoil > 0 ? toBoil + loss : 0)} ${t("unit.egg")}`}
+              />
+              <Shortcut
+                href="/stok"
+                title={t("nav.stock")}
+                status={t("home.sellable").replace("{n}", count(sellable))}
+              />
+            </div>
+          </section>
+
+          {returnToday.map((lot) => (
+            <Banner
+              key={lot.id}
+              tone="warning"
+              title={`${t("today.returnToday")}: ${count(lot.qtyRemaining)} ${t("unit.egg")}`}
+              action={
+                isOwner && (
+                  <Link href={`/stok?aksi=retur&lot=${lot.id}`} className={primaryButton}>
+                    {t("today.returnNow")}
+                  </Link>
+                )
               }
-            />
-          </div>
-          <div className="grid grid-cols-5 items-center gap-2">
-            {days.map((d) => {
-              const active = d === day;
-              return (
-                <button
-                  key={d}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => setDay(d)}
-                  className={`flex flex-col items-center justify-center rounded-[15px] ${
-                    active
-                      ? "h-[87px] bg-primary text-primary-foreground"
-                      : "h-[73px] bg-surface-muted text-muted-foreground"
-                  }`}
-                >
-                  <span className="text-body capitalize">{weekday(d)}</span>
-                  <span className={`text-title-lg font-medium ${active ? "" : "text-foreground"}`}>
-                    {Number(d.slice(8))}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="flex flex-col gap-3">
-          <h2 className="text-title font-medium">{t("home.shortcuts")}</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <Shortcut
-              href={warung ? `/papan?b=${warung.id}` : "/papan"}
-              title={t("home.warung")}
-              status={t("home.running").replace("{n}", count(openOn(warung)))}
-            />
-            <Shortcut
-              href={catering ? `/papan?b=${catering.id}` : "/papan"}
-              title={t("home.catering")}
-              status={t("home.running").replace("{n}", count(openOn(catering)))}
-            />
-            <Shortcut
-              href="/stok?aksi=rebus"
-              title={t("home.boil")}
-              status={`${count(toBoil > 0 ? toBoil + loss : 0)} ${t("unit.egg")}`}
-            />
-            <Shortcut
-              href="/stok"
-              title={t("nav.stock")}
-              status={t("home.sellable").replace("{n}", count(sellable))}
-            />
-          </div>
-        </section>
-
-        {returnToday.map((lot) => (
-          <Banner
-            key={lot.id}
-            tone="warning"
-            title={`${t("today.returnToday")}: ${count(lot.qtyRemaining)} ${t("unit.egg")}`}
-            action={
-              isOwner && (
-                <Link href={`/stok?aksi=retur&lot=${lot.id}`} className={primaryButton}>
-                  {t("today.returnNow")}
+            >
+              {t("today.returnBody").replace("{date}", shortDate(lot.receivedAt))}
+            </Banner>
+          ))}
+          {returnTomorrow.map((lot) => (
+            <Banner
+              key={lot.id}
+              tone="warning"
+              title={`${t("today.returnTomorrow")}: ${count(lot.qtyRemaining)} ${t("unit.egg")}`}
+            >
+              {t("today.returnBody").replace("{date}", shortDate(lot.receivedAt))}
+            </Banner>
+          ))}
+          {toBoil > 0 && (
+            <Banner
+              tone="suggest"
+              title={t("today.boilTitle").replace("{n}", count(toBoil + loss))}
+              action={
+                <Link href="/stok?aksi=rebus" className={primaryButton}>
+                  {t("today.boilStart")}
                 </Link>
-              )
-            }
-          >
-            {t("today.returnBody").replace("{date}", shortDate(lot.receivedAt))}
-          </Banner>
-        ))}
-        {returnTomorrow.map((lot) => (
-          <Banner
-            key={lot.id}
-            tone="warning"
-            title={`${t("today.returnTomorrow")}: ${count(lot.qtyRemaining)} ${t("unit.egg")}`}
-          >
-            {t("today.returnBody").replace("{date}", shortDate(lot.receivedAt))}
-          </Banner>
-        ))}
-        {toBoil > 0 && (
-          <Banner
-            tone="suggest"
-            title={t("today.boilTitle").replace("{n}", count(toBoil + loss))}
-            action={
-              <Link href="/stok?aksi=rebus" className={primaryButton}>
-                {t("today.boilStart")}
-              </Link>
-            }
-          >
-            {t("today.boilBody")
-              .replace("{orders}", count(waitingBatches.length))
-              .replace("{loss}", count(loss))}
-          </Banner>
-        )}
+              }
+            >
+              {t("today.boilBody")
+                .replace("{orders}", count(waitingBatches.length))
+                .replace("{loss}", count(loss))}
+            </Banner>
+          )}
+        </div>
 
         <section className="flex flex-col gap-3">
           <h2 className="text-title font-medium">

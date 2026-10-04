@@ -170,3 +170,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] docs(repo): rewrite README with stack, architecture, structure and flows
 - [x] fix(web): name automatic steps in the order history
 - [x] feat(web): desktop sidebar lists stock, reports and settings
+- [x] feat(web): wider desktop pages and a two-column Home
