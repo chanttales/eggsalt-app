@@ -14,6 +14,8 @@ export const GUIDE_PAGES = [
   "stok",
   "uang",
   "laporan",
+  "harga",
+  "hargaRiwayat",
   "atur",
 ] as const;
 export type GuidePage = (typeof GUIDE_PAGES)[number];

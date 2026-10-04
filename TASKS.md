@@ -158,3 +158,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] fix(ui): keep the back button on the same line as the page title
 - [x] fix(ui): centre the note above page titles
 - [x] feat(ui): use a shadcn-style calendar date picker for every date field
+- [x] fix(web): move page notes into the ? help button
