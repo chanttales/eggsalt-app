@@ -27,7 +27,7 @@ function StockScreen() {
   const stateOf = new Map((levels.data ?? []).map((l) => [l.stateId, l]));
 
   return (
-    <Page back="/" guide="stok" title={t("nav.stock")}>
+    <Page back guide="stok" title={t("nav.stock")}>
       <div className="grid grid-cols-3 gap-2">
         {isOwner && (
           <ActionLink href="/stok?aksi=terima" icon={<PackagePlus aria-hidden size={20} />}>

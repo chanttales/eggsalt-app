@@ -29,14 +29,14 @@ function ReportScreen() {
 
   if (!isOwner) {
     return (
-      <Page back="/profil" guide="laporan" title={t("report.title")}>
+      <Page back guide="laporan" title={t("report.title")}>
         <EmptyState>{t("money.ownerOnly")}</EmptyState>
       </Page>
     );
   }
 
   return (
-    <Page back="/profil" guide="laporan" title={t("report.title")}>
+    <Page back guide="laporan" title={t("report.title")}>
       <Segmented
         label={t("report.title")}
         options={REPORTS}

@@ -122,14 +122,14 @@ export default function PricesPage() {
 
   if (workspace?.role !== "owner") {
     return (
-      <Page back="/profil" title={t("price.title")}>
+      <Page back title={t("price.title")}>
         <EmptyState>{t("price.ownerOnly")}</EmptyState>
       </Page>
     );
   }
 
   return (
-    <Page back="/profil" guide="harga" title={t("price.title")}>
+    <Page back guide="harga" title={t("price.title")}>
       <Link href="/atur/harga/riwayat" className={secondaryButton}>
         <History className="size-5" aria-hidden />
         {t("price.historyOpen")}

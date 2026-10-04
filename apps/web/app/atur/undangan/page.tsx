@@ -35,7 +35,7 @@ export default function InvitesPage() {
 
   if (workspace?.role !== "owner") {
     return (
-      <Page back="/profil" title={t("invite.title")}>
+      <Page back title={t("invite.title")}>
         <EmptyState>{t("contact.ownerOnly")}</EmptyState>
       </Page>
     );
@@ -110,7 +110,7 @@ export default function InvitesPage() {
   }
 
   return (
-    <Page back="/profil" title={t("invite.title")}>
+    <Page back title={t("invite.title")}>
       <p className="text-muted-foreground">{t("invite.intro")}</p>
       <form
         className="flex flex-col gap-2"

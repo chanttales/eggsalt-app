@@ -19,14 +19,14 @@ export default function PriceHistoryPage() {
 
   if (workspace?.role !== "owner") {
     return (
-      <Page back="/atur/harga" title={t("price.historyTitle")}>
+      <Page back title={t("price.historyTitle")}>
         <EmptyState>{t("price.ownerOnly")}</EmptyState>
       </Page>
     );
   }
 
   return (
-    <Page back="/atur/harga" guide="hargaRiwayat" title={t("price.historyTitle")}>
+    <Page back guide="hargaRiwayat" title={t("price.historyTitle")}>
       <div role="tablist" aria-label={t("price.historyTitle")} className={segmented}>
         {KINDS.map((k) => (
           <button
