@@ -10,7 +10,7 @@ import { useEnqueue } from "@/lib/data";
 import { t, tOr } from "@/lib/i18n";
 import { useExpenseCategories, useOpenCards } from "@/lib/queries";
 
-// F8 Record an expense: category, amount, method, and optionally the order or batch it was for,
+// Record an expense: category, amount, method, and optionally the order or batch it was for,
 // so its cost lands on that card's profit. Unlinked expenses are operating costs.
 export function ExpenseSheet({ onClose }: { onClose: () => void }) {
   const enqueue = useEnqueue();

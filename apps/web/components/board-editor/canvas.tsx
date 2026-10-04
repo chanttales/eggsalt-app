@@ -53,7 +53,7 @@ function arrowPath([x1, y1]: Point, [x2, y2]: Point): string {
   return `M${a[0]},${a[1]} C${a[0] + bend},${a[1]} ${b[0] - bend},${b[1]} ${b[0]},${b[1]}`;
 }
 
-// S21 on the web: stages as boxes on a canvas. Drag a box to move it, drag from its right dot to
+// Board editor on wide screens: stages as boxes on a canvas. Drag a box to move it, drag from its right dot to
 // another box to draw an arrow, click a box or an arrow to edit it below.
 export function BoardCanvas({
   draft,

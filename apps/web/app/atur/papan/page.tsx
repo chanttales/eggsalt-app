@@ -6,7 +6,7 @@ import { t } from "@/lib/i18n";
 import { useBoards } from "@/lib/queries";
 import { useSession } from "@/lib/session";
 
-// S20 Atur papan: the boards, each opening the editor.
+// Atur papan: the boards, each opening the editor.
 export default function BoardSetupPage() {
   const { state } = useSession();
   const isOwner = state.status === "signed_in" && state.workspace?.role === "owner";

@@ -21,7 +21,7 @@ import { t, tOr } from "@/lib/i18n";
 import { useMoneyEntries, useOrderMoney, type MoneyEntry } from "@/lib/queries";
 import { useSession } from "@/lib/session";
 
-// S12 Uang: money in and out for the period, orders still owed, and the ledger itself.
+// Uang: money in and out for the period, orders still owed, and the ledger itself.
 function MoneyScreen() {
   const params = useSearchParams();
   const router = useRouter();

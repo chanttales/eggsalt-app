@@ -20,7 +20,7 @@ import {
 import { useSession } from "@/lib/session";
 import { supabase } from "@/lib/supabase";
 
-// S06 New card. On an order board: customer, product, quantity and the date; on other boards: a
+// New card. On an order board: customer, product, quantity and the date; on other boards: a
 // title and the fields the first stage needs. The engine prices the lines (segment prices first).
 export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => void }) {
   const enqueue = useEnqueue();
@@ -48,8 +48,8 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
   const unitPrice = product ? sellPriceFor(product, qty) : null;
   const entry = board.graph.stages.find((s) => s.key === board.graph.entry);
   const needed = new Set([...(entry?.require ?? [])]);
-  // One date per order: the one this board's first stage needs (pre-order: tanggal acara),
-  // else the first date field (warung: tanggal kirim). It also sets the due date.
+  // One date per order: the one this board's first stage needs (Pre-order: tanggal acara),
+  // else the first date field (Pesanan: tanggal kirim). It also sets the due date.
   const allDefs = fieldDefs.data ?? [];
   const dateDef =
     allDefs.find((f) => f.type === "date" && (needed.has(f.key) || f.required)) ??

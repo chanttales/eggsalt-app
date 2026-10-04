@@ -4,7 +4,7 @@ import { BackButton } from "@/components/back-button";
 import { GuideButton, type GuidePage } from "@/components/guide";
 import { t } from "@/lib/i18n";
 
-// Small shared building blocks from the design system (section 3).
+// Small shared building blocks from the design system.
 
 export const inputClass =
   "min-h-touch w-full rounded-md border border-border bg-surface px-3 text-body outline-none focus:border-primary";

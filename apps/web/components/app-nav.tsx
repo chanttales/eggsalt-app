@@ -15,7 +15,7 @@ const right: Tab[] = [
   { href: "/uang", label: "nav.money", icon: Wallet },
   { href: "/profil", label: "nav.profile", icon: UserRound },
 ];
-/** The centre button: record a new order (a quicker sale screen comes later). */
+/** The centre button: record a new order. */
 const ADD_HREF = "/papan?aksi=baru";
 
 function isActive(pathname: string, href: string) {

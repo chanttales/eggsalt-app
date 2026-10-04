@@ -15,7 +15,7 @@ import { useSession } from "@/lib/session";
 const REPORTS = ["laba-rugi", "pesanan", "pelanggan"] as const;
 type Report = (typeof REPORTS)[number];
 
-// S19 Laporan: profit and loss for the period, then profit per order and per customer, with
+// Laporan: profit and loss for the period, then profit per order and per customer, with
 // losing orders first so they stand out.
 function ReportScreen() {
   const params = useSearchParams();

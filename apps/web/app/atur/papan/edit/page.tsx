@@ -11,7 +11,7 @@ import { t } from "@/lib/i18n";
 import { useBoards, useFieldDefs, useOpenCards, type Board } from "@/lib/queries";
 import { useSession } from "@/lib/session";
 
-// S21 Board editor. Changes stay in a draft until published as a new version.
+// Board editor. Changes stay in a draft until published as a new version.
 function EditorScreen() {
   const id = useSearchParams().get("id");
   const { state } = useSession();
