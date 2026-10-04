@@ -164,8 +164,8 @@ export function Page({
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-5 p-4">
       <header className="flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          {subtitle && <p className="text-label text-muted-foreground">{subtitle}</p>}
+        <div className="min-w-0 flex-1">
+          {subtitle && <p className="text-center text-label text-muted-foreground">{subtitle}</p>}
           <div className="flex min-w-0 items-center gap-1">
             {back && <BackButton fallback={back} />}
             <h1 className="truncate text-title-lg font-bold">{title}</h1>
