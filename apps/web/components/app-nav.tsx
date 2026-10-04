@@ -1,11 +1,24 @@
 "use client";
 
-import { ClipboardList, House, Plus, UserRound, Wallet, type LucideIcon } from "lucide-react";
+import {
+  ChartColumn,
+  ClipboardList,
+  Contact,
+  Egg,
+  House,
+  LayoutDashboard,
+  Plus,
+  Tag,
+  UserRound,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { t, type MessageKey } from "@/lib/i18n";
+import { useSession } from "@/lib/session";
 
-type Tab = { href: string; label: MessageKey; icon: LucideIcon };
+type Tab = { href: string; label: MessageKey; icon: LucideIcon; owner?: true };
 
 const left: Tab[] = [
   { href: "/", label: "nav.home", icon: House },
@@ -14,6 +27,24 @@ const left: Tab[] = [
 const right: Tab[] = [
   { href: "/uang", label: "nav.money", icon: Wallet },
   { href: "/profil", label: "nav.profile", icon: UserRound },
+];
+/** Desktop only: the pages a phone reaches from Home or Profil, one click away in the sidebar. */
+const desktopGroups: { title: MessageKey; tabs: Tab[] }[] = [
+  {
+    title: "menu.summary",
+    tabs: [
+      { href: "/stok", label: "nav.stock", icon: Egg },
+      { href: "/laporan", label: "report.title", icon: ChartColumn },
+      { href: "/dasbor", label: "dash.title", icon: LayoutDashboard, owner: true },
+    ],
+  },
+  {
+    title: "menu.settings",
+    tabs: [
+      { href: "/atur/harga", label: "price.title", icon: Tag, owner: true },
+      { href: "/atur/kontak", label: "contact.title", icon: Contact, owner: true },
+    ],
+  },
 ];
 /** The centre button: record a new order. */
 const ADD_HREF = "/papan?aksi=baru";
@@ -42,14 +73,17 @@ function TabLink({ tab, pathname }: { tab: Tab; pathname: string }) {
   );
 }
 
-// Bottom bar on phone and tablet (Home, Pesanan, +, Uang, Profil), left sidebar on desktop.
+// Bottom bar on phone and tablet (Home, Pesanan, +, Uang, Profil). On desktop a left sidebar
+// that also lists Stok, Laporan and the owner settings.
 export function AppNav() {
   const pathname = usePathname();
+  const { state } = useSession();
+  const isOwner = state.status === "signed_in" && state.workspace?.role === "owner";
 
   return (
     <nav
       aria-label={t("nav.label")}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] lg:inset-y-0 lg:right-auto lg:w-56 lg:border-t-0 lg:border-r lg:pb-0"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] lg:inset-y-0 lg:right-auto lg:w-56 lg:overflow-y-auto lg:border-t-0 lg:border-r lg:pb-6"
     >
       <p className="hidden px-6 pt-6 pb-4 text-title font-bold text-primary lg:block">EggSalt</p>
       <ul className="flex items-center py-2 lg:flex-col lg:items-stretch lg:gap-1 lg:px-3 lg:py-0">
@@ -70,6 +104,22 @@ export function AppNav() {
           <TabLink key={tab.href} tab={tab} pathname={pathname} />
         ))}
       </ul>
+      {desktopGroups.map((group) => {
+        const tabs = group.tabs.filter((tab) => isOwner || !tab.owner);
+        if (!tabs.length) return null;
+        return (
+          <div key={group.title} className="hidden px-3 pt-6 lg:block">
+            <p className="px-3 pb-2 text-caption font-semibold text-muted-foreground uppercase">
+              {t(group.title)}
+            </p>
+            <ul className="flex flex-col gap-1">
+              {tabs.map((tab) => (
+                <TabLink key={tab.href} tab={tab} pathname={pathname} />
+              ))}
+            </ul>
+          </div>
+        );
+      })}
     </nav>
   );
 }
