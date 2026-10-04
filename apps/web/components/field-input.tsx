@@ -1,3 +1,4 @@
+import { Select } from "@/components/select";
 import { DatePicker } from "@/components/date-picker";
 import { inputClass } from "@/components/ui";
 import { t, tOr } from "@/lib/i18n";
@@ -61,18 +62,14 @@ export function FieldInput({
     );
   } else if (def.type === "select") {
     control = (
-      <select
+      <Select
         value={typeof value === "string" ? value : ""}
-        onChange={(e) => onChange(e.target.value || undefined)}
-        className={inputClass}
-      >
-        <option value="">{t("field.choose")}</option>
-        {def.options.map((o) => (
-          <option key={o} value={o}>
-            {tOr(`method.${o}`, o)}
-          </option>
-        ))}
-      </select>
+        onChange={(v) => onChange(v || undefined)}
+        options={[
+          { value: "", label: t("field.choose") },
+          ...def.options.map((o) => ({ value: o, label: tOr(`method.${o}`, o) })),
+        ]}
+      />
     );
   } else {
     control = (

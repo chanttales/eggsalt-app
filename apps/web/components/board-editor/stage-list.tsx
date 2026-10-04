@@ -3,6 +3,7 @@
 import { STAGE_COLORS } from "@domain";
 import { ArrowDown, ArrowUp, ChevronDown, Trash2, Zap } from "lucide-react";
 import { useState } from "react";
+import { Select } from "@/components/select";
 import { RuleEditor } from "@/components/board-editor/rule-editor";
 import { useConfirm } from "@/components/sheet";
 import { StagePill, inputClass, secondaryButton, stageStyle } from "@/components/ui";
@@ -225,19 +226,13 @@ export function StageSettings({
           </div>
         ))}
         {targets.length > 0 && (
-          <select
-            aria-label={t("editor.addArrow")}
+          <Select
+            ariaLabel={t("editor.addArrow")}
             value=""
-            onChange={(e) => e.target.value && draft.addArrow(s.key, e.target.value)}
-            className={inputClass}
-          >
-            <option value="">+ {t("editor.addArrow")}</option>
-            {targets.map((x) => (
-              <option key={x.key} value={x.key}>
-                {x.name}
-              </option>
-            ))}
-          </select>
+            placeholder={`+ ${t("editor.addArrow")}`}
+            onChange={(to) => draft.addArrow(s.key, to)}
+            options={targets.map((x) => ({ value: x.key, label: x.name }))}
+          />
         )}
       </div>
 

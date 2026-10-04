@@ -161,3 +161,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] fix(web): move page notes into the ? help button
 - [x] fix(ui): hide the back button when there is no earlier page in the app
 - [x] feat(template): rename the order boards to Pesanan and Pre-order
+- [x] feat(ui): use a shadcn-style select for every dropdown
