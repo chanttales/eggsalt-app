@@ -1,3 +1,4 @@
+import { Switch } from "@/components/checkbox";
 import { Select } from "@/components/select";
 import { DatePicker } from "@/components/date-picker";
 import { inputClass } from "@/components/ui";
@@ -25,12 +26,7 @@ export function FieldInput({
   if (def.type === "boolean") {
     return (
       <label className="flex min-h-touch items-center gap-3 text-label font-medium">
-        <input
-          type="checkbox"
-          checked={value === true}
-          onChange={(e) => onChange(e.target.checked)}
-          className="size-5 accent-[var(--primary)]"
-        />
+        <Switch checked={value === true} onChange={onChange} />
         {label}
       </label>
     );

@@ -4,6 +4,7 @@ import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { Switch } from "@/components/checkbox";
 import { CardRow } from "@/components/card-row";
 import { NewCardSheet } from "@/components/new-card-sheet";
 import { Sheet } from "@/components/sheet";
@@ -172,12 +173,7 @@ function Stacked({
   return (
     <div className="flex flex-col gap-4">
       <label className="flex items-center gap-2 self-end text-label text-muted-foreground">
-        <input
-          type="checkbox"
-          checked={allStages}
-          onChange={(e) => setAllStages(e.target.checked)}
-          className="size-4 accent-primary"
-        />
+        <Switch checked={allStages} onChange={setAllStages} />
         {t("board.allStages")}
       </label>
       <div
