@@ -560,6 +560,34 @@ export function useProducts() {
   });
 }
 
+export interface PriceRow {
+  productId: string;
+  minQty: number;
+  price: number;
+  validFrom: string;
+}
+
+/** Every general sell price (no customer segment), oldest first, for the price timeline. */
+export function useSellPriceHistory() {
+  return useWorkspaceQuery("sell-price-history", async (workspaceId) => {
+    const rows = must(
+      await supabase()
+        .from("price")
+        .select("product_id, unit_price, valid_from, min_qty")
+        .eq("workspace_id", workspaceId)
+        .eq("kind", "sell")
+        .is("segment", null)
+        .order("valid_from"),
+    );
+    return rows.map((r): PriceRow => ({
+      productId: r.product_id,
+      minQty: r.min_qty ?? 0,
+      price: Number(r.unit_price),
+      validFrom: r.valid_from,
+    }));
+  });
+}
+
 export interface Party {
   id: string;
   kind: "customer" | "supplier";
