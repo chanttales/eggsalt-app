@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DatePicker } from "@/components/date-picker";
 import { QtyStepper, Sheet } from "@/components/sheet";
 import { EmptyState, inputClass, primaryButton } from "@/components/ui";
 import { useEnqueue } from "@/lib/data";
@@ -146,18 +147,10 @@ export function ReceiveSheet({ onClose }: { onClose: () => void }) {
           name={(id) => states.find((s) => s.stateId === id)?.stateName ?? id}
         />
       )}
-      <label className="flex flex-col gap-1 text-label font-medium">
+      <div className="flex flex-col gap-1 text-label font-medium">
         {t("receive.date")}
-        <input
-          type="date"
-          value={boughtOn}
-          max={today}
-          onChange={(e) =>
-            setBoughtOn(e.target.value && e.target.value <= today ? e.target.value : today)
-          }
-          className={inputClass}
-        />
-      </label>
+        <DatePicker value={boughtOn} max={today} onChange={setBoughtOn} />
+      </div>
       <div className="flex flex-col gap-1">
         <span className="text-label font-medium">{t("receive.qtyPaid")}</span>
         <QtyStepper value={qty} onChange={setQty} chips={[100, 150, 200, 300]} />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DatePicker } from "@/components/date-picker";
 import { FieldInput } from "@/components/field-input";
 import { QtyStepper, Sheet } from "@/components/sheet";
 import { inputClass, primaryButton } from "@/components/ui";
@@ -147,21 +148,13 @@ export function NewCardSheet({ board, onClose }: { board: Board; onClose: () => 
             ))}
           </div>
           <QtyStepper value={qty} onChange={setQty} />
-          <label className="flex flex-col gap-1 text-label font-medium">
+          <div className="flex flex-col gap-1 text-label font-medium">
             {t("order.date")}
-            <input
-              type="date"
-              value={orderedOn}
-              max={today}
-              onChange={(e) =>
-                setOrderedOn(e.target.value && e.target.value <= today ? e.target.value : today)
-              }
-              className={inputClass}
-            />
+            <DatePicker value={orderedOn} max={today} onChange={setOrderedOn} />
             {orderedOn !== today && (
               <span className="font-normal text-muted-foreground">{t("order.pastHint")}</span>
             )}
-          </label>
+          </div>
           {unitPrice != null && qty > 0 && (
             <p className="text-right text-label text-muted-foreground">
               {count(qty)} × {rupiah(unitPrice)} ={" "}

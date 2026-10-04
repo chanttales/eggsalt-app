@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { History } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { DatePicker } from "@/components/date-picker";
 import { Money } from "@/components/stock-sheets";
 import {
   EmptyState,
@@ -133,15 +134,10 @@ export default function PricesPage() {
         <History className="size-5" aria-hidden />
         {t("price.historyOpen")}
       </Link>
-      <label className="flex flex-col gap-1 text-label font-medium">
+      <div className="flex flex-col gap-1 text-label font-medium">
         {t("price.from")}
-        <input
-          type="date"
-          value={from}
-          onChange={(e) => setFrom(e.target.value || dayKey())}
-          className={inputClass}
-        />
-      </label>
+        <DatePicker value={from} onChange={setFrom} />
+      </div>
       {(products.data ?? []).map((p) => (
         <Section key={p.id} title={p.name}>
           <div className="grid grid-cols-2 gap-3">

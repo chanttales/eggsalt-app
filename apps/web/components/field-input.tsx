@@ -1,3 +1,4 @@
+import { DatePicker } from "@/components/date-picker";
 import { inputClass } from "@/components/ui";
 import { t, tOr } from "@/lib/i18n";
 import type { FieldDef } from "@/lib/queries";
@@ -53,11 +54,9 @@ export function FieldInput({
     );
   } else if (def.type === "date") {
     control = (
-      <input
-        type="date"
-        value={typeof value === "string" ? value.slice(0, 10) : ""}
-        onChange={(e) => onChange(e.target.value || undefined)}
-        className={inputClass}
+      <DatePicker
+        value={typeof value === "string" ? value.slice(0, 10) : undefined}
+        onChange={onChange}
       />
     );
   } else if (def.type === "select") {
