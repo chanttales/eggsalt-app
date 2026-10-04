@@ -101,18 +101,9 @@ function CardScreen() {
   const productName = new Map((products.data ?? []).map((p) => [p.id, p.name]));
 
   return (
-    <Page
-      back
-      guide="kartu"
-      title={`${c.title} #${c.number}`}
-      subtitle={board.name}
-      actions={
-        <Link href={`/papan?b=${board.id}`} className={ghostButton}>
-          {t("card.toBoard")}
-        </Link>
-      }
-    >
+    <Page back guide="kartu" title={`${c.title} #${c.number}`}>
       <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+        <span className="font-medium text-foreground">{board.name}</span>
         <StagePill name={stage?.name ?? c.stageKey} color={stage?.color} />
         {c.partyName && <span>{c.partyName}</span>}
         {c.dueAt && (
