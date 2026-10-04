@@ -26,7 +26,7 @@ export default function PriceHistoryPage() {
   }
 
   return (
-    <Page back="/atur/harga" title={t("price.historyTitle")} subtitle={t("price.historyIntro")}>
+    <Page back="/atur/harga" guide="hargaRiwayat" title={t("price.historyTitle")}>
       <div role="tablist" aria-label={t("price.historyTitle")} className={segmented}>
         {KINDS.map((k) => (
           <button

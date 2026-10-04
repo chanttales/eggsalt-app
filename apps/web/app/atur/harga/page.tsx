@@ -129,7 +129,7 @@ export default function PricesPage() {
   }
 
   return (
-    <Page back="/profil" title={t("price.title")} subtitle={t("price.intro")}>
+    <Page back="/profil" guide="harga" title={t("price.title")}>
       <Link href="/atur/harga/riwayat" className={secondaryButton}>
         <History className="size-5" aria-hidden />
         {t("price.historyOpen")}
