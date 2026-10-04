@@ -87,6 +87,7 @@ const messages = {
     "result.copiedBody":
       "Kontak pengembang belum diatur. Tempel detail ini saat menghubungi pengembang.",
     "confirm.back": "Kembali",
+    "nav.back": "Kembali",
     "error.title": "Halaman ini gagal dibuka",
     "error.body":
       "Data Anda aman. Coba buka lagi. Kalau masih gagal, muat ulang data di HP ini; perubahan yang belum terkirim tetap disimpan.",
@@ -575,6 +576,7 @@ const messages = {
     "result.copiedBody":
       "No developer contact is set yet. Paste these details when you contact the developer.",
     "confirm.back": "Go back",
+    "nav.back": "Back",
     "error.title": "This page couldn't open",
     "error.body":
       "Your data is safe. Try again. If it still fails, reload the data on this phone; changes not yet sent are kept.",

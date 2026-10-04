@@ -154,3 +154,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(web): show each product's price periods as coloured blocks
 - [x] feat(web): show price periods on a coloured month calendar
 - [x] feat(web): move sell and buy price history to their own page
+- [x] feat(web): add a back button to detail and sub-menu pages

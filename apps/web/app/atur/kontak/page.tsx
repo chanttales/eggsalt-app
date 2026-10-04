@@ -218,7 +218,7 @@ function ContactsPageContent() {
 
   if (workspace?.role !== "owner") {
     return (
-      <Page title={t("contact.title")}>
+      <Page back="/profil" title={t("contact.title")}>
         <EmptyState>{t("contact.ownerOnly")}</EmptyState>
       </Page>
     );
@@ -226,6 +226,7 @@ function ContactsPageContent() {
 
   return (
     <Page
+      back="/profil"
       title={t("contact.title")}
       actions={
         <button
