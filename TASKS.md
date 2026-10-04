@@ -163,3 +163,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] feat(template): rename the order boards to Pesanan and Pre-order
 - [x] feat(ui): use a shadcn-style select for every dropdown
 - [x] feat(ui): use shadcn-style checkbox, switch and radio controls
+- [x] feat(ui): ask for confirmation in a shadcn-style alert dialog

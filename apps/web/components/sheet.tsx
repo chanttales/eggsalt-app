@@ -1,5 +1,6 @@
 "use client";
 
+import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { X } from "lucide-react";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { t } from "@/lib/i18n";
@@ -111,7 +112,7 @@ export interface ConfirmOptions {
 }
 
 /**
- * A sheet that asks before something hard to take back, in place of the browser's confirm box.
+ * A dialog (shadcn AlertDialog style) that asks before something hard to take back.
  * `ask` resolves true when the user confirms; render `dialog` somewhere in the component.
  */
 export function useConfirm(): {
@@ -130,24 +131,29 @@ export function useConfirm(): {
     open?.resolve(ok);
     setOpen(null);
   };
-  const dialog = open && (
-    <Sheet title={open.title} onClose={() => close(false)}>
-      <p>{open.message}</p>
-      <button
-        type="button"
-        onClick={() => close(true)}
-        className="min-h-touch w-full rounded-md bg-danger px-4 font-semibold text-white"
-      >
-        {open.confirmLabel}
-      </button>
-      <button
-        type="button"
-        onClick={() => close(false)}
-        className="min-h-touch w-full rounded-md border border-border px-4 font-semibold"
-      >
-        {t("confirm.back")}
-      </button>
-    </Sheet>
+  const dialog = (
+    <AlertDialog.Root open={!!open} onOpenChange={(o) => !o && close(false)}>
+      <AlertDialog.Portal>
+        <AlertDialog.Overlay className="fixed inset-0 z-[60] bg-black/40" />
+        <AlertDialog.Content className="fixed top-1/2 left-1/2 z-[60] flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-xl bg-surface p-5 shadow-lg">
+          <AlertDialog.Title className="text-title font-bold">{open?.title}</AlertDialog.Title>
+          <AlertDialog.Description className="text-body text-muted-foreground">
+            {open?.message}
+          </AlertDialog.Description>
+          <div className="mt-2 flex flex-col gap-2">
+            <AlertDialog.Action
+              onClick={() => close(true)}
+              className="min-h-touch w-full rounded-md bg-danger px-4 font-semibold text-white"
+            >
+              {open?.confirmLabel}
+            </AlertDialog.Action>
+            <AlertDialog.Cancel className="min-h-touch w-full rounded-md border border-border px-4 font-semibold">
+              {t("confirm.back")}
+            </AlertDialog.Cancel>
+          </div>
+        </AlertDialog.Content>
+      </AlertDialog.Portal>
+    </AlertDialog.Root>
   );
   return { ask, dialog };
 }
