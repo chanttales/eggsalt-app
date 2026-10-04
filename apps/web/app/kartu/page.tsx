@@ -29,7 +29,7 @@ import { boardMap, ruleData, stockReader } from "@/lib/board-model";
 import { useEnqueue, useFailedOps, usePendingOps } from "@/lib/data";
 import { refusedText } from "@/lib/engine";
 import { count, rupiah, shortDate, time } from "@/lib/format";
-import { t } from "@/lib/i18n";
+import { t, tOr } from "@/lib/i18n";
 import {
   cardQty,
   cardTotal,
@@ -437,6 +437,13 @@ function describe(e: CardEvent, stageName: (key: string) => string): string {
       return t("event.undone");
     case "field_changed":
       return t("event.fieldChanged");
+    case "action_run": {
+      // A stage's onEnter action carries `action`; a stock or money op on the card carries `op`.
+      const name = e.payload.action ?? e.payload.op;
+      return typeof name === "string"
+        ? tOr(`event.action.${name}`, t("event.action"))
+        : t("event.action");
+    }
     default:
       return e.type;
   }
