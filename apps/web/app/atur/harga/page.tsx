@@ -1,14 +1,22 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { History } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
-import { ProductPriceTimelines } from "@/components/price-timeline";
 import { Money } from "@/components/stock-sheets";
-import { EmptyState, inputClass, Page, primaryButton, Section } from "@/components/ui";
+import {
+  EmptyState,
+  inputClass,
+  Page,
+  primaryButton,
+  secondaryButton,
+  Section,
+} from "@/components/ui";
 import { dayKey } from "@/lib/format";
 import { saveFailed, useToast } from "@/components/toast";
 import { t } from "@/lib/i18n";
-import { useProducts, useSellPriceHistory, type Product } from "@/lib/queries";
+import { useProducts, type Product } from "@/lib/queries";
 import { useSession } from "@/lib/session";
 import { supabase } from "@/lib/supabase";
 
@@ -22,7 +30,6 @@ export default function PricesPage() {
   const { state } = useSession();
   const workspace = state.status === "signed_in" ? state.workspace : undefined;
   const products = useProducts();
-  const history = useSellPriceHistory();
   const queryClient = useQueryClient();
   const [from, setFrom] = useState(dayKey());
   const [edits, setEdits] = useState<Edits>({});
@@ -122,6 +129,10 @@ export default function PricesPage() {
 
   return (
     <Page title={t("price.title")} subtitle={t("price.intro")}>
+      <Link href="/atur/harga/riwayat" className={secondaryButton}>
+        <History className="size-5" aria-hidden />
+        {t("price.historyOpen")}
+      </Link>
       <label className="flex flex-col gap-1 text-label font-medium">
         {t("price.from")}
         <input
@@ -161,7 +172,6 @@ export default function PricesPage() {
             />
           </div>
           <p className="text-label text-muted-foreground">{t("price.tierHint")}</p>
-          <ProductPriceTimelines rows={(history.data ?? []).filter((r) => r.productId === p.id)} />
         </Section>
       ))}
       <button
