@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
   if (!isOwner) {
     return (
-      <Page title={t("dash.title")}>
+      <Page back="/profil" title={t("dash.title")}>
         <EmptyState>{t("money.ownerOnly")}</EmptyState>
       </Page>
     );
@@ -84,7 +84,7 @@ export default function DashboardPage() {
   const stock = (levels.data ?? []).filter((l) => l.sellable);
 
   return (
-    <Page guide="dasbor" title={t("dash.title")}>
+    <Page back="/profil" guide="dasbor" title={t("dash.title")}>
       <Choice
         label={t("report.period")}
         options={PERIODS}

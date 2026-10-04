@@ -71,14 +71,14 @@ function CardScreen() {
 
   if (card.isPending || boards.isPending) {
     return (
-      <Page guide="kartu" title={t("card.title")}>
+      <Page back="/papan" guide="kartu" title={t("card.title")}>
         <ListSkeleton />
       </Page>
     );
   }
   if (!card.data || !board) {
     return (
-      <Page guide="kartu" title={t("card.title")}>
+      <Page back="/papan" guide="kartu" title={t("card.title")}>
         <EmptyState>{t("card.notFound")}</EmptyState>
       </Page>
     );
@@ -102,6 +102,7 @@ function CardScreen() {
 
   return (
     <Page
+      back="/papan"
       guide="kartu"
       title={`${c.title} #${c.number}`}
       subtitle={board.name}
