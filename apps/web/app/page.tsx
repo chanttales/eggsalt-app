@@ -3,6 +3,7 @@
 import { ArrowRight, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { DatePicker } from "@/components/date-picker";
 import { ProgressRing } from "@/components/progress-ring";
 import { Banner, EmptyState, primaryButton, ListSkeleton } from "@/components/ui";
 import { batchQty, boardMap, dueDay, isTerminal } from "@/lib/board-model";
@@ -210,25 +211,24 @@ export default function HomePage() {
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-title font-medium">{t("home.pickDate")}</h2>
-            {/* Any other day, past or future: the native date picker behind a calendar button. Clipped,
-                because a phone's date input keeps a wide minimum width and would widen the page. */}
-            <label
-              className={`relative flex size-10 items-center justify-center overflow-hidden rounded-full ${
-                days.includes(day)
-                  ? "bg-surface-muted text-primary"
-                  : "bg-primary text-primary-foreground"
-              }`}
-            >
-              <CalendarDays aria-hidden size={20} />
-              <span className="sr-only">{t("home.otherDate")}</span>
-              <input
-                type="date"
-                value={day}
-                onChange={(e) => e.target.value && setDay(e.target.value)}
-                onClick={(e) => e.currentTarget.showPicker?.()}
-                className="absolute inset-0 size-full min-w-0 cursor-pointer opacity-0"
-              />
-            </label>
+            {/* Any other day, past or future, from a calendar behind this button. */}
+            <DatePicker
+              value={day}
+              onChange={setDay}
+              trigger={
+                <button
+                  type="button"
+                  aria-label={t("home.otherDate")}
+                  className={`flex size-10 items-center justify-center rounded-full ${
+                    days.includes(day)
+                      ? "bg-surface-muted text-primary"
+                      : "bg-primary text-primary-foreground"
+                  }`}
+                >
+                  <CalendarDays aria-hidden size={20} />
+                </button>
+              }
+            />
           </div>
           <div className="grid grid-cols-5 items-center gap-2">
             {days.map((d) => {
