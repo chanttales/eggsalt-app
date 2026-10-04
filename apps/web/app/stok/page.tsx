@@ -12,7 +12,7 @@ import { t, tOr } from "@/lib/i18n";
 import { useOpenLots, useStockLevels, type Lot, type StockLevel } from "@/lib/queries";
 import { useSession } from "@/lib/session";
 
-// S08 Stok: per state how much is on hand, how much is promised to orders and what's free; then
+// Stok: per state how much is on hand, how much is promised to orders and what's free; then
 // the lots still holding stock, with the day-5 return countdown for supplier eggs.
 function StockScreen() {
   const params = useSearchParams();
@@ -91,7 +91,7 @@ function ActionLink({
   );
 }
 
-// StockMeter: count, tray equivalent, and the reserved part shown as a striped share.
+// Count, tray equivalent, and the reserved part shown as a striped share.
 function StockMeter({ level }: { level: StockLevel }) {
   const packs =
     level.packSize && level.onHand >= level.packSize
@@ -119,7 +119,7 @@ function StockMeter({ level }: { level: StockLevel }) {
   );
 }
 
-// LotRow: when it came in, what's left, what each egg cost, and the return countdown badge.
+// When a lot came in, what's left, what each egg cost, and the return countdown badge.
 function LotRow({
   lot,
   state,

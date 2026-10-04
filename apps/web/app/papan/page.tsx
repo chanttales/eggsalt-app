@@ -22,7 +22,7 @@ import { useBoards, useDoneCards, useOpenCards, type Board, type Card } from "@/
 
 type View = "kanban" | "list";
 
-// Pesanan (was the board screen). Phones get pill tabs for the order lists, one scrolling row of
+// Pesanan. Phones get pill tabs for the order lists, one scrolling row of
 // stage chips, and the cards stacked by stage. Wide screens keep the kanban columns and a list view.
 function BoardScreen() {
   const params = useSearchParams();
@@ -31,7 +31,7 @@ function BoardScreen() {
   const cards = useOpenCards();
   const done = useDoneCards();
 
-  // Pesanan: the order boards (warung, catering). An old link to another board still opens it.
+  // The order boards (Pesanan, Pre-order). An old link to another board still opens it.
   const all = boards.data ?? [];
   const orderBoards = all.filter((b) => b.kind === "order");
   const board = all.find((b) => b.id === params.get("b")) ?? orderBoards[0] ?? all[0];
@@ -121,7 +121,7 @@ function BoardScreen() {
       )}
 
       {params.get("aksi") === "baru" && !params.get("b") && orderBoards.length > 1 ? (
-        // The + button: pick warung order or catering pre-order first.
+        // The + button: pick Pesanan or Pre-order first.
         <Sheet title={t("order.new")} onClose={() => router.replace("/papan")}>
           {orderBoards.map((b) => (
             <button

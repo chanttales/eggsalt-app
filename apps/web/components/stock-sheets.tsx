@@ -85,7 +85,7 @@ function addDays(day: string, n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-// F5 Receive eggs from a supplier: stock in, money out, return date set by the supplier's terms.
+// Receive eggs from a supplier: stock in, money out, return date set by the supplier's terms.
 export function ReceiveSheet({ onClose }: { onClose: () => void }) {
   const enqueue = useEnqueue();
   const suppliers = useParties("supplier");
@@ -207,7 +207,7 @@ export function ReceiveSheet({ onClose }: { onClose: () => void }) {
   );
 }
 
-// F6 Return unused raw eggs to the supplier: stock out of that lot, refund or credit in.
+// Return unused raw eggs to the supplier: stock out of that lot, refund or credit in.
 export function ReturnSheet({ lotId, onClose }: { lotId: string | null; onClose: () => void }) {
   const enqueue = useEnqueue();
   const lots = useOpenLots();

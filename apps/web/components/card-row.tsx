@@ -6,7 +6,7 @@ import { count, rupiah, shortDate } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { cardQty, cardTotal, type Board, type Card } from "@/lib/queries";
 
-// A card in a list (design system: BoardCard). Opens the card detail.
+// A card in a list. Opens the card detail.
 export function CardRow({ card, board }: { card: Card; board: Board | undefined }) {
   const stage = stageOf(board, card.stageKey);
   const qty = cardQty(card);

@@ -48,7 +48,7 @@ import {
 } from "@/lib/queries";
 import { useSession } from "@/lib/session";
 
-// S05 Card detail: where the card is, what can happen next, its money and its history.
+// Card detail: where the card is, what can happen next, its money and its history.
 function CardScreen() {
   const params = useSearchParams();
   const router = useRouter();

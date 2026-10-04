@@ -8,8 +8,8 @@ import { t } from "@/lib/i18n";
 import type { PriceRow } from "@/lib/queries";
 
 // Price periods on a month calendar: each date is tinted in the colour of the price that applies,
-// the first day of a price is a filled circle, and a colour key sits below. Each price runs from its date until the day
-// before the next one; the first also covers older orders (they use the earliest price).
+// the first day of a price is a filled circle, and a colour key sits below. Each price runs from
+// its date until the day before the next one; the first also covers older orders.
 const COLORS = [
   "var(--primary)",
   "var(--accent)",

@@ -12,7 +12,7 @@ import type { BoardDraft } from "@/lib/board-editor";
 import { t } from "@/lib/i18n";
 import type { FieldDef } from "@/lib/queries";
 
-// S21 on a phone: the stages as a list. Each row opens to rename, recolor, reorder, mark as
+// Board editor on a phone: the stages as a list. Each row opens to rename, recolor, reorder, mark as
 // first or last, pick required fields, and set the arrows out of it with a simple rule.
 export function StageList({
   draft,

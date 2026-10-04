@@ -64,7 +64,7 @@ function NumberField({
   );
 }
 
-// First run (design flow F1): business name, template, then optional starting numbers. Every
+// First run: business name, template, then optional starting numbers. Every
 // starting number can be skipped and changed later.
 export default function StartPage() {
   const router = useRouter();

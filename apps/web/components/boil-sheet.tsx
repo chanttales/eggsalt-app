@@ -20,7 +20,7 @@ import {
 
 const QTY_FIELD = "jumlah_rebus";
 
-// F4 Boil: start the batches waiting to be boiled, then sort a boiled batch into good and broken
+// Boil: start the batches waiting to be boiled, then sort a boiled batch into good and broken
 // eggs with its LPG cost. Both are moves on the production board, so linked orders, stock and HPP
 // follow the board's own rules.
 export function BoilSheet({ onClose }: { onClose: () => void }) {
