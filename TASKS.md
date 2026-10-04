@@ -168,3 +168,4 @@ One line = one commit. The next task is the first unticked line. Tick the line i
 - [x] fix(web): tidy the order detail header and left-align the stages switch
 - [x] refactor(web): remove stale comments and the unused page placeholder
 - [x] docs(repo): rewrite README with stack, architecture, structure and flows
+- [x] fix(web): name automatic steps in the order history
