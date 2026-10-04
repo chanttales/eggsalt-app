@@ -31,7 +31,8 @@
     "next": "16.3.6",
     "react": "19.3.0",
     "react-day-picker": "10.0.2",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "vaul": "1.1.2"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.2",

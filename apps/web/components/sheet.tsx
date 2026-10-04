@@ -2,10 +2,12 @@
 
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { X } from "lucide-react";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
+import { Drawer } from "vaul";
 import { t } from "@/lib/i18n";
 
-// Bottom sheet on phone, side panel on desktop (design system 3.1). Escape or the backdrop closes it.
+// Drawer in the style of shadcn/ui (vaul): slides up from the bottom and closes with a swipe
+// down, the close button, the backdrop or Escape. Callers mount it while open.
 export function Sheet({
   title,
   onClose,
@@ -15,34 +17,25 @@ export function Sheet({
   onClose: () => void;
   children: ReactNode;
 }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   return (
-    <div className="fixed inset-0 z-50 flex items-end lg:items-stretch lg:justify-end">
-      <button
-        aria-label={t("sheet.close")}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/40"
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="relative flex max-h-[90dvh] w-full flex-col rounded-t-xl bg-background pb-[env(safe-area-inset-bottom)] lg:max-h-none lg:w-[28rem] lg:rounded-none"
-      >
-        <div className="flex items-center justify-between border-b border-border p-4">
-          <h2 className="text-title font-bold">{title}</h2>
-          <button aria-label={t("sheet.close")} onClick={onClose} className="min-h-touch px-2">
-            <X aria-hidden size={24} />
-          </button>
-        </div>
-        <div className="flex flex-col gap-4 overflow-y-auto p-4">{children}</div>
-      </div>
-    </div>
+    <Drawer.Root open onOpenChange={(open) => !open && onClose()}>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 z-50 bg-black/40" />
+        <Drawer.Content
+          aria-describedby={undefined}
+          className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-h-[90dvh] w-full max-w-lg flex-col rounded-t-xl bg-background pb-[env(safe-area-inset-bottom)] outline-none"
+        >
+          <div aria-hidden className="mx-auto mt-2 h-1.5 w-12 shrink-0 rounded-full bg-border" />
+          <div className="flex items-center justify-between border-b border-border px-4 pt-1 pb-3">
+            <Drawer.Title className="text-title font-bold">{title}</Drawer.Title>
+            <Drawer.Close aria-label={t("sheet.close")} className="min-h-touch px-2">
+              <X aria-hidden size={24} />
+            </Drawer.Close>
+          </div>
+          <div className="flex flex-col gap-4 overflow-y-auto p-4">{children}</div>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }
 
